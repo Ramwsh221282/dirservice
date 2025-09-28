@@ -13,7 +13,7 @@ public sealed class Department : ISoftDeletable
     public DepartmentPath Path { get; private set; }
     public DepartmentDepth Depth { get; private set; }
     public DepartmentId? Parent { get; private set; }
-    public bool Deleted { get; set; }
+    public bool Deleted => LifeCycle.IsDeleted;
 
     private Department(
         DepartmentId id,
@@ -22,8 +22,7 @@ public sealed class Department : ISoftDeletable
         DepartmentName name,
         DepartmentPath path,
         DepartmentDepth depth,
-        DepartmentId? parent = null,
-        bool isDeleted = false)
+        DepartmentId? parent = null)
     {
         Id = id;
         Identifier = identifier;
@@ -31,8 +30,7 @@ public sealed class Department : ISoftDeletable
         Name = name;
         Path = path;
         Depth = depth;
-        Parent = parent;
-        Deleted = isDeleted;
+        Parent = parent;        
     }
 
     public Department AttachOtherDepartment(Department other)
@@ -70,7 +68,6 @@ public sealed class Department : ISoftDeletable
                     name,
                     path,
                     depth,
-                    parent,
-                    false);
+                    parent);
     }
 }
