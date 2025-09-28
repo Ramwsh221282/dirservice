@@ -8,7 +8,7 @@ public readonly record struct DepartmentId
 
     public DepartmentId()
     {
-        throw new ConstructorShallNotBeCalledException(nameof(DepartmentId));
+        Value = Guid.NewGuid();
     }
 
     private DepartmentId(Guid value)

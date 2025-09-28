@@ -34,6 +34,18 @@ public sealed class Department : ISoftDeletable
         Deleted = isDeleted;
     }
 
+    public Department AttachOtherDepartment(Department other)
+    {
+        DepartmentIdentifier childIdentifier = Identifier.AttachChildIdentifier(other.Identifier);
+        DepartmentPath childPath = Path.CreateNodePart(other.Path);
+        DepartmentDepth depth = childPath.Depth();
+        other.Path = childPath;
+        other.Depth = depth;
+        other.Identifier = childIdentifier;
+        other.Parent = Id;
+        return other;        
+    }
+
     private static Department Create(
         DepartmentId id,
         DepartmentIdentifier identifier,

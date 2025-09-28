@@ -13,7 +13,15 @@ public sealed record DepartmentIdentifier
         Value = value;
     }
 
-    public static DepartmentIdentifier Create(string value)
+    public DepartmentIdentifier AttachChildIdentifier(DepartmentIdentifier identifier)
+    {
+        string[] parts = Value.Split('.');
+        string[] withChild = [.. parts, identifier.Value];
+        string resultValue = string.Join('.', withChild);
+        return new DepartmentIdentifier(resultValue);
+    }
+
+    public static DepartmentIdentifier CreateNode(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentException("Идентификатор департамента не должен быть пустым", nameof(value));

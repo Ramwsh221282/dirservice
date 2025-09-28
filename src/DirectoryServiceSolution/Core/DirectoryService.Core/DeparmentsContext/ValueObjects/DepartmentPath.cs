@@ -28,6 +28,12 @@ public sealed record DepartmentPath
             identifierIndex += 1;
     }
 
+    public DepartmentDepth Depth()
+    {
+        string[] parts = Value.Split('.');
+        return DepartmentDepth.Create((short)parts.Length);
+    }
+
     public DepartmentDepth Depth(DepartmentIdentifier name)
     {
         int level = DepthLevel(name);
@@ -38,7 +44,7 @@ public sealed record DepartmentPath
     {
         DepartmentPath node = Create(other);
         return CreateNodePart(node);
-    }
+    }    
 
     private int IndexOfIdentifier(DepartmentIdentifier identifier)
     {
