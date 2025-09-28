@@ -6,6 +6,8 @@ namespace DirectoryService.Core.DeparmentsContext;
 
 public sealed class Department : ISoftDeletable
 {
+    private readonly List<DepartmentLocation> _locations = [];
+    private readonly List<DepartmentPosition> _positions = [];
     public DepartmentId Id { get; }
     public DepartmentIdentifier Identifier { get; private set; }
     public EntityLifeCycle LifeCycle { get; private set; }
@@ -13,6 +15,8 @@ public sealed class Department : ISoftDeletable
     public DepartmentPath Path { get; private set; }
     public DepartmentDepth Depth { get; private set; }
     public DepartmentId? Parent { get; private set; }
+    public IReadOnlyList<DepartmentLocation> Locations => _locations;
+    public IReadOnlyList<DepartmentPosition> Positions => _positions;
     public bool Deleted => LifeCycle.IsDeleted;
 
     private Department(
@@ -22,6 +26,8 @@ public sealed class Department : ISoftDeletable
         DepartmentName name,
         DepartmentPath path,
         DepartmentDepth depth,
+        IEnumerable<DepartmentLocation> locations,
+        IEnumerable<DepartmentPosition> positions,
         DepartmentId? parent = null)
     {
         Id = id;
@@ -30,7 +36,9 @@ public sealed class Department : ISoftDeletable
         Name = name;
         Path = path;
         Depth = depth;
-        Parent = parent;        
+        Parent = parent;
+        _locations = locations.ToList();
+        _positions = positions.ToList();
     }
 
     public Department AttachOtherDepartment(Department other)
@@ -68,6 +76,8 @@ public sealed class Department : ISoftDeletable
                     name,
                     path,
                     depth,
+                    [],
+                    [],
                     parent);
     }
 }
