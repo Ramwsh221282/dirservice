@@ -53,7 +53,7 @@ public sealed class Department : ISoftDeletable
         return other;        
     }
 
-    private static Department Create(
+    public static Department Create(
         DepartmentId id,
         DepartmentIdentifier identifier,
         EntityLifeCycle lifeCycle,

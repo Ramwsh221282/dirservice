@@ -9,6 +9,11 @@ public sealed record DepartmentPath
         Value = value;
     }
 
+    public DepartmentPath(DepartmentIdentifier identifier)
+    {
+        Value = identifier.Value;
+    }
+
     public DepartmentPath CreateNodePart(DepartmentPath other)
     {
         return Create(this, other);
