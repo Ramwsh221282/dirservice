@@ -4,5 +4,14 @@ public readonly record struct PositionId
 {
     public Guid Value { get; }
 
-    public 
+    public PositionId()
+    {
+        Value = Guid.NewGuid();
+    }
+
+    public PositionId(Guid value)
+    {
+        Value = value;
+    }
 }
+

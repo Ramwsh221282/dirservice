@@ -1,4 +1,5 @@
 using DirectoryService.Core.Common.Interfaces;
+using DirectoryService.Core.Common.ValueObjects;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 
 namespace DirectoryService.Core.DeparmentsContext;
@@ -7,7 +8,7 @@ public sealed class Department : ISoftDeletable
 {
     public DepartmentId Id { get; }
     public DepartmentIdentifier Identifier { get; private set; }
-    public DepartmentLifeCycle LifeCycle { get; private set; }
+    public EntityLifeCycle LifeCycle { get; private set; }
     public DepartmentName Name { get; private set; }
     public DepartmentPath Path { get; private set; }
     public DepartmentDepth Depth { get; private set; }
@@ -17,7 +18,7 @@ public sealed class Department : ISoftDeletable
     private Department(
         DepartmentId id,
         DepartmentIdentifier identifier,
-        DepartmentLifeCycle lifeCycle,
+        EntityLifeCycle lifeCycle,
         DepartmentName name,
         DepartmentPath path,
         DepartmentDepth depth,
@@ -49,7 +50,7 @@ public sealed class Department : ISoftDeletable
     private static Department Create(
         DepartmentId id,
         DepartmentIdentifier identifier,
-        DepartmentLifeCycle lifeCycle,
+        EntityLifeCycle lifeCycle,
         DepartmentName name,
         DepartmentPath path,
         DepartmentDepth depth,
