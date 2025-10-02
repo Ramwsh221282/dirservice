@@ -9,7 +9,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOptions<NpgSqlConnectionOptions>()
+builder
+    .Services.AddOptions<NpgSqlConnectionOptions>()
     .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
 
 builder.Services.AddScoped<ServiceDbContext>();
@@ -31,3 +32,8 @@ app.MapControllers();
 app.MapSwagger();
 
 app.Run();
+
+namespace DirectoryService.API
+{
+    public partial class Program;
+}
