@@ -1,5 +1,6 @@
 using DirectoryService.Core.Common.Interfaces;
 using DirectoryService.Core.Common.ValueObjects;
+using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 
 namespace DirectoryService.Core.DeparmentsContext;
@@ -9,15 +10,17 @@ public sealed class Department : ISoftDeletable
     private readonly List<DepartmentLocation> _locations = [];
     private readonly List<DepartmentPosition> _positions = [];
     public DepartmentId Id { get; }
-    public DepartmentIdentifier Identifier { get; private set; }
+    public DepartmentIdentifier Identifier { get; private set; } = null!;
     public EntityLifeCycle LifeCycle { get; private set; }
-    public DepartmentName Name { get; private set; }
-    public DepartmentPath Path { get; private set; }
+    public DepartmentName Name { get; private set; } = null!;
+    public DepartmentPath Path { get; private set; } = null!;
     public DepartmentDepth Depth { get; private set; }
-    public DepartmentId? Parent { get; private set; }
+    public DepartmentId? Parent { get; private set; } = null!;
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
     public bool Deleted => LifeCycle.IsDeleted;
+
+    private Department() { }
 
     private Department(
         DepartmentId id,

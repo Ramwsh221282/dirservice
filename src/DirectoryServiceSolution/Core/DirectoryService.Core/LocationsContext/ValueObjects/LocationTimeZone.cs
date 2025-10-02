@@ -24,5 +24,5 @@ public sealed record LocationTimeZone
         parts[0] = parts[0].FormatForName();
         parts[1] = parts[1].FormatForName();
         return new LocationTimeZone(string.Join('/', parts));
-    }    
+    }
 }
