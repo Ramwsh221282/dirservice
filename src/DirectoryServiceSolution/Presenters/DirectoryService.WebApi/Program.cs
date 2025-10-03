@@ -1,5 +1,8 @@
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
+using DirectoryService.UseCases.Locations.Contracts;
+using DirectoryService.UseCases.Locations.CreateLocation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,8 @@ builder.Services.AddSwaggerGen();
 builder
     .Services.AddOptions<NpgSqlConnectionOptions>()
     .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
+builder.Services.AddScoped<CreateLocationCommandHandler>();
+builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 
 builder.Services.AddScoped<ServiceDbContext>();
 

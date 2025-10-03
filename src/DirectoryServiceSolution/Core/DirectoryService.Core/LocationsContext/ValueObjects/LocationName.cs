@@ -20,7 +20,7 @@ public sealed record LocationName
         string formatted = value.FormatForName();
         if (formatted.GreaterThan(MaxLength))
             throw new ArgumentException($"Наименование превышает длину {MaxLength} символов.");
-        if (formatted.GreaterThan(MinLength))
+        if (formatted.LessThan(MinLength))
             throw new ArgumentException($"Наименование менее длины {MinLength} символов.");
         return new LocationName(formatted);
     }
