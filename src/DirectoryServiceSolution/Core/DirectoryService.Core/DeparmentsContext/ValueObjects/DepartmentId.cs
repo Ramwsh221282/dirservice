@@ -1,5 +1,3 @@
-using DirectoryService.Core.Common.Exceptions;
-
 namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
 
 public readonly record struct DepartmentId

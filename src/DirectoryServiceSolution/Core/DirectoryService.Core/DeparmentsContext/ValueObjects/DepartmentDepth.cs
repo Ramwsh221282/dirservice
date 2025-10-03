@@ -1,5 +1,3 @@
-using DirectoryService.Core.Common.Exceptions;
-
 namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
 
 public readonly record struct DepartmentDepth
@@ -8,7 +6,7 @@ public readonly record struct DepartmentDepth
 
     public DepartmentDepth()
     {
-        throw new ConstructorShallNotBeCalledException(nameof(DepartmentDepth));
+        Value = 1;
     }
 
     private DepartmentDepth(short value)
