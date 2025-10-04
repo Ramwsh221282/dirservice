@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DirectoryService.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ee8272208bb437654aa1319ca4dee2ff5f6738d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+904b6ae5160f8f3f3c242d06d1f76a2f0b3b2948")]
 [assembly: System.Reflection.AssemblyProductAttribute("DirectoryService.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DirectoryService.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
