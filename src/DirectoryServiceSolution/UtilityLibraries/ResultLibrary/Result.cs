@@ -55,6 +55,9 @@ public sealed class Result<TValue> : Result
     private Result(string message, ErrorType errorType)
         : base(new Error(message, errorType)) { }
 
+    private Result(Result other)
+        : base(other.IsSuccess, other.IsFailure, other.Error) { }
+
     public static Result<TValue> Success(TValue value) => new Result<TValue>(value);
 
     public static new Result<TValue> Fail(string message, ErrorType errorType) =>
