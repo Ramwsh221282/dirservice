@@ -24,8 +24,10 @@ public sealed record LocationAddressPart
             throw new ArgumentException($"Часть адреса локации была пустой.");
         string formatted = value.FormatForName();
         if (formatted.GreaterThan(MaxLength))
-            throw new ArgumentException($"Часть адреса локации превышает длину {MaxLength} символов.");
-        if (formatted.GreaterThan(MinLength))
+            throw new ArgumentException(
+                $"Часть адреса локации превышает длину {MaxLength} символов."
+            );
+        if (formatted.LessThan(MinLength))
             throw new ArgumentException($"Часть адреса локации менее длины {MinLength} символов.");
         return new LocationAddressPart(formatted);
     }

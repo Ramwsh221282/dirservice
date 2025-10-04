@@ -35,7 +35,7 @@ public static class StringExtensions
     public static string MakeFirstLetterCapital(this ReadOnlySpan<char> input)
     {
         char firstLetter = char.ToUpper(input[0]);
-        ReadOnlySpan<char> otherPart = input.Slice(1, input.Length);
+        ReadOnlySpan<char> otherPart = input.Slice(1, input.Length - 1);
         return $"{firstLetter}{otherPart.ToString()}";
     }
 

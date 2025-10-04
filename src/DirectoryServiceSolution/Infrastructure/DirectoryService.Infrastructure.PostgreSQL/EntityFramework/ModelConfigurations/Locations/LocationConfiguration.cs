@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -29,14 +30,18 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
             }
         );
 
-        builder.OwnsOne(
-            l => l.Address,
-            onb =>
-            {
-                onb.ToJson("address_parts");
-                onb.OwnsMany(l => l.Parts);
-            }
-        );
+        builder
+            .Property(l => l.Address)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                ad => JsonSerializer.Serialize(ad, JsonSerializerOptions.Default),
+                jsonb =>
+                    JsonSerializer.Deserialize<LocationAddress>(
+                        jsonb,
+                        JsonSerializerOptions.Default
+                    )!
+            )
+            .HasColumnName("address");
 
         builder
             .Property(l => l.Name)
