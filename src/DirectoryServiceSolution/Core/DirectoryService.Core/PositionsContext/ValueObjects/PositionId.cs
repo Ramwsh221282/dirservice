@@ -14,4 +14,3 @@ public readonly record struct PositionId
         Value = value;
     }
 }
-

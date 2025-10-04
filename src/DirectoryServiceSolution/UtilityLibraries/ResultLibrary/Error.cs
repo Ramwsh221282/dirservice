@@ -15,4 +15,6 @@ public sealed record Error(string Message, ErrorType Type)
         new Error(message, new ExceptionalErrorType());
 
     public static Error NoError() => new Error("", new NoErrorType());
+
+    public bool Any() => !string.IsNullOrWhiteSpace(Message);
 }
