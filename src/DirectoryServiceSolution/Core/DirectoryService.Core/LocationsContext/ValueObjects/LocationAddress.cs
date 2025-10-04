@@ -1,3 +1,6 @@
+using DirectoryService.Core.Common.Extensions;
+using ResultLibrary;
+
 namespace DirectoryService.Core.LocationsContext.ValueObjects;
 
 public sealed record LocationAddress
@@ -10,16 +13,13 @@ public sealed record LocationAddress
         // ef core
     }
 
-    private LocationAddress(List<LocationAddressPart> parts)
-    {
-        _parts = parts;
-    }
+    private LocationAddress(List<LocationAddressPart> parts) => _parts = parts;
 
-    public static LocationAddress Create(IEnumerable<LocationAddressPart> parts)
+    public static Result<LocationAddress> Create(IEnumerable<LocationAddressPart> parts)
     {
-        List<LocationAddressPart> asList = parts.ToList();
-        if (asList.Count == 0)
-            throw new ArgumentException("Адрес не может состоять без частей адреса.");
-        return new LocationAddress(asList);
+        List<LocationAddressPart> asList = [.. parts];
+        return asList.IsEmpty()
+            ? Error.ValidationError("Адрес не может состоять без частей адреса.")
+            : new LocationAddress(asList);
     }
 }

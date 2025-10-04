@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\UseCases\DirectoryService.UseCases\DirectoryService.UseCases.csproj" />
+    <ProjectReference Include="..\..\UtilityLibraries\ResultLibrary\ResultLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

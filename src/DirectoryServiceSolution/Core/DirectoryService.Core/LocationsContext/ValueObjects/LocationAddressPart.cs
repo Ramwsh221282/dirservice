@@ -1,4 +1,5 @@
 using DirectoryService.Core.Common.Extensions;
+using ResultLibrary;
 
 namespace DirectoryService.Core.LocationsContext.ValueObjects;
 
@@ -13,22 +14,22 @@ public sealed record LocationAddressPart
         // ef core
     }
 
-    private LocationAddressPart(string value)
-    {
-        Node = value;
-    }
+    private LocationAddressPart(string value) => Node = value;
 
-    public static LocationAddressPart Create(string value)
+    public static Result<LocationAddressPart> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException($"Часть адреса локации была пустой.");
+            return Error.ValidationError("Часть адреса локации была пустой.");
+
         string formatted = value.FormatForName();
         if (formatted.GreaterThan(MaxLength))
-            throw new ArgumentException(
+            return Error.ValidationError(
                 $"Часть адреса локации превышает длину {MaxLength} символов."
             );
+
         if (formatted.LessThan(MinLength))
-            throw new ArgumentException($"Часть адреса локации менее длины {MinLength} символов.");
+            return Error.ValidationError($"Часть адреса локации менее длины {MinLength} символов.");
+
         return new LocationAddressPart(formatted);
     }
 }

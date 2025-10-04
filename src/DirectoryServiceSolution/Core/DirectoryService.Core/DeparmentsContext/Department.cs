@@ -2,6 +2,7 @@ using DirectoryService.Core.Common.Interfaces;
 using DirectoryService.Core.Common.ValueObjects;
 using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
+using ResultLibrary;
 
 namespace DirectoryService.Core.DeparmentsContext;
 
@@ -31,7 +32,8 @@ public sealed class Department : ISoftDeletable
         DepartmentDepth depth,
         IEnumerable<DepartmentLocation> locations,
         IEnumerable<DepartmentPosition> positions,
-        DepartmentId? parent = null)
+        DepartmentId? parent = null
+    )
     {
         Id = id;
         Identifier = identifier;
@@ -53,10 +55,10 @@ public sealed class Department : ISoftDeletable
         other.Depth = depth;
         other.Identifier = childIdentifier;
         other.Parent = Id;
-        return other;        
+        return other;
     }
 
-    public static Department Create(
+    public static Result<Department> Create(
         DepartmentId id,
         DepartmentIdentifier identifier,
         EntityLifeCycle lifeCycle,
@@ -64,23 +66,19 @@ public sealed class Department : ISoftDeletable
         DepartmentPath path,
         DepartmentDepth depth,
         DepartmentId? parent = null,
-        bool isDeleted = false)
+        bool isDeleted = false
+    )
     {
         if (isDeleted && lifeCycle.DeletedAt.HasValue)
-            throw new ArgumentException("Подразделение не может быть удалено, без указания даты удаления");
+            return Error.ConflictError(
+                "Подразделение не может быть удалено, без указания даты удаления"
+            );
         if (!path.ContainsIdentifier(identifier))
-            throw new ArgumentException("Путь подразделения не содержит узел по идентификатору");
+            return Error.ConflictError("Путь подразделения не содержит узел по идентификатору");
         if (!depth.DepthValidBy(path, identifier))
-            throw new ArgumentException("Глубина подразделения не соответствует уровню в пути подразделения");
-        return new Department(
-                    id,
-                    identifier,
-                    lifeCycle,
-                    name,
-                    path,
-                    depth,
-                    [],
-                    [],
-                    parent);
+            return Error.ConflictError(
+                "Глубина подразделения не соответствует уровню в пути подразделения"
+            );
+        return new Department(id, identifier, lifeCycle, name, path, depth, [], [], parent);
     }
 }

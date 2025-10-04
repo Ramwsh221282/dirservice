@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DirectoryService.Core\DirectoryService.Core.csproj" />
     <ProjectReference Include="..\..\Contracts\DirectoryService.Contracts\DirectoryService.Contracts.csproj" />
+    <ProjectReference Include="..\..\UtilityLibraries\ResultLibrary\ResultLibrary.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
