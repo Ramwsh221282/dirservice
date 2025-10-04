@@ -13,8 +13,8 @@ public sealed record EnvelopeHttpResult : IResult
 
     public async Task ExecuteAsync(HttpContext httpContext)
     {
-        await httpContext.Response.WriteAsJsonAsync(_template);
         httpContext.Response.StatusCode = _template.OperationStatus;
+        await httpContext.Response.WriteAsJsonAsync(_template);
     }
 }
 
@@ -29,7 +29,7 @@ public sealed record EnvelopeHttpResult<T> : IResult
 
     public async Task ExecuteAsync(HttpContext httpContext)
     {
-        await httpContext.Response.WriteAsJsonAsync(_template);
         httpContext.Response.StatusCode = _template.OperationStatus;
+        await httpContext.Response.WriteAsJsonAsync(_template);
     }
 }

@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {}
+    "net9.0": {
+      "ResultLibrary/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ResultLibrary.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ResultLibrary.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "ResultLibrary/1.0.0": {
+      "type": "project",
+      "path": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj",
+      "msbuildProject": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net9.0": []
+    "net9.0": [
+      "ResultLibrary >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\ramwsh\\.nuget\\packages\\": {}
@@ -13,11 +32,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj",
+      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj",
       "projectName": "DirectoryService.Core",
-      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj",
+      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj",
       "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\obj\\",
+      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -31,7 +50,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -65,7 +88,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

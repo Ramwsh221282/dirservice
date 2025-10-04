@@ -931,6 +931,9 @@
       "DirectoryService.Core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ResultLibrary": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/DirectoryService.Core.dll": {}
         },
@@ -943,13 +946,24 @@
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "DirectoryService.Contracts": "1.0.0",
-          "DirectoryService.Core": "1.0.0"
+          "DirectoryService.Core": "1.0.0",
+          "ResultLibrary": "1.0.0"
         },
         "compile": {
           "bin/placeholder/DirectoryService.UseCases.dll": {}
         },
         "runtime": {
           "bin/placeholder/DirectoryService.UseCases.dll": {}
+        }
+      },
+      "ResultLibrary/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ResultLibrary.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ResultLibrary.dll": {}
         }
       }
     }
@@ -2853,6 +2867,11 @@
       "type": "project",
       "path": "../../UseCases/DirectoryService.UseCases/DirectoryService.UseCases.csproj",
       "msbuildProject": "../../UseCases/DirectoryService.UseCases/DirectoryService.UseCases.csproj"
+    },
+    "ResultLibrary/1.0.0": {
+      "type": "project",
+      "path": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj",
+      "msbuildProject": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -2861,7 +2880,8 @@
       "Microsoft.EntityFrameworkCore >= 9.0.9",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.9",
       "Microsoft.EntityFrameworkCore.Tools >= 9.0.9",
-      "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4"
+      "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4",
+      "ResultLibrary >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -2870,11 +2890,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj",
+      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj",
       "projectName": "DirectoryService.Infrastructure.PostgreSQL",
-      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj",
+      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj",
       "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\obj\\",
+      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2889,8 +2909,11 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\UseCases\\DirectoryService.UseCases\\DirectoryService.UseCases.csproj": {
-              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\UseCases\\DirectoryService.UseCases\\DirectoryService.UseCases.csproj"
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UseCases\\DirectoryService.UseCases\\DirectoryService.UseCases.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UseCases\\DirectoryService.UseCases\\DirectoryService.UseCases.csproj"
+            },
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj"
             }
           }
         }
@@ -2948,7 +2971,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

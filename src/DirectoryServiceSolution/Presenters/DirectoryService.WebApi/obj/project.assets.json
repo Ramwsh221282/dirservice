@@ -1034,6 +1034,9 @@
       "DirectoryService.Core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ResultLibrary": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/DirectoryService.Core.dll": {}
         },
@@ -1047,7 +1050,8 @@
         "dependencies": {
           "DirectoryService.UseCases": "1.0.0",
           "Microsoft.EntityFrameworkCore": "9.0.9",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4"
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
+          "ResultLibrary": "1.0.0"
         },
         "compile": {
           "bin/placeholder/DirectoryService.Infrastructure.PostgreSQL.dll": {}
@@ -1061,7 +1065,8 @@
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "DirectoryService.Contracts": "1.0.0",
-          "DirectoryService.Core": "1.0.0"
+          "DirectoryService.Core": "1.0.0",
+          "ResultLibrary": "1.0.0"
         },
         "compile": {
           "bin/placeholder/DirectoryService.UseCases.dll": {}
@@ -1069,6 +1074,32 @@
         "runtime": {
           "bin/placeholder/DirectoryService.UseCases.dll": {}
         }
+      },
+      "ResultLibrary/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ResultLibrary.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ResultLibrary.dll": {}
+        }
+      },
+      "ResultLibrary.AspNetCore/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ResultLibrary": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ResultLibrary.AspNetCore.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ResultLibrary.AspNetCore.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       }
     }
   },
@@ -3307,6 +3338,16 @@
       "type": "project",
       "path": "../../UseCases/DirectoryService.UseCases/DirectoryService.UseCases.csproj",
       "msbuildProject": "../../UseCases/DirectoryService.UseCases/DirectoryService.UseCases.csproj"
+    },
+    "ResultLibrary/1.0.0": {
+      "type": "project",
+      "path": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj",
+      "msbuildProject": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj"
+    },
+    "ResultLibrary.AspNetCore/1.0.0": {
+      "type": "project",
+      "path": "../../UtilityLibraries/ResultLibrary.AspNetCore/ResultLibrary.AspNetCore.csproj",
+      "msbuildProject": "../../UtilityLibraries/ResultLibrary.AspNetCore/ResultLibrary.AspNetCore.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -3315,6 +3356,8 @@
       "DirectoryService.Infrastructure.PostgreSQL >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 9.0.9",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.9",
+      "ResultLibrary >= 1.0.0",
+      "ResultLibrary.AspNetCore >= 1.0.0",
       "Swashbuckle.AspNetCore >= 9.0.4",
       "Swashbuckle.AspNetCore.Swagger >= 9.0.4",
       "Swashbuckle.AspNetCore.SwaggerGen >= 9.0.4",
@@ -3327,11 +3370,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.WebApi\\DirectoryService.WebApi.csproj",
+      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.WebApi\\DirectoryService.WebApi.csproj",
       "projectName": "DirectoryService.WebApi",
-      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.WebApi\\DirectoryService.WebApi.csproj",
+      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.WebApi\\DirectoryService.WebApi.csproj",
       "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.WebApi\\obj\\",
+      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.WebApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -3346,11 +3389,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj": {
-              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj"
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj"
             },
-            "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj": {
-              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj"
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj"
+            },
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary.AspNetCore\\ResultLibrary.AspNetCore.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary.AspNetCore\\ResultLibrary.AspNetCore.csproj"
+            },
+            "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {
+              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj"
             }
           }
         }
@@ -3417,7 +3466,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0Av59yC0M1g=",
+  "dgSpecHash": "VdRN+EvE0W0=",
   "success": true,
-  "projectFilePath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj",
+  "projectFilePath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Infrastructure\\DirectoryService.Infrastructure.PostgreSQL\\DirectoryService.Infrastructure.PostgreSQL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ramwsh\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",

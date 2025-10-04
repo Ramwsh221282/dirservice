@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj": {}
+    "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj": {}
   },
   "projects": {
-    "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj": {
+    "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
+        "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
         "projectName": "DirectoryService.Contracts",
-        "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
+        "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
         "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\obj\\",
+        "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -59,7 +59,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

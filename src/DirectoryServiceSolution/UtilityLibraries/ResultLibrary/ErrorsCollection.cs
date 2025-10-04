@@ -50,15 +50,13 @@ public sealed class ErrorsCollection : Result, IEnumerable<Error>
     {
         ErrorType[] distinctErrorTypes = [.. _errors.Select(er => er.Type).Distinct()];
 
-        if (distinctErrorTypes.Length > 0)
-            throw new ApplicationException(
-                "Список ошибок не должен содержать различные типы ошибок."
-            );
-
         if (_errors.Count == 0)
             throw new ApplicationException("Список ошибок должен содержать ошибки.");
 
-        return _errors[0].Type;
+        if (distinctErrorTypes.Length > 0)
+            return _errors[0].Type;
+
+        throw new ApplicationException("Список ошибок не должен содержать различные типы ошибок.");
     }
 
     public IEnumerable<string> ErrorStrings()
