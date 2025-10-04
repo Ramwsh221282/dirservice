@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UtilityLibraries", "Utility
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResultLibrary", "UtilityLibraries\ResultLibrary\ResultLibrary.csproj", "{1EA369CD-007D-444E-83CE-C9693FE99FA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResultLibrary.AspNetCore", "UtilityLibraries\ResultLibrary.AspNetCore\ResultLibrary.AspNetCore.csproj", "{C79EF114-29E0-4714-93BE-A47BCE793E54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,18 @@ Global
 		{1EA369CD-007D-444E-83CE-C9693FE99FA7}.Release|x64.Build.0 = Release|Any CPU
 		{1EA369CD-007D-444E-83CE-C9693FE99FA7}.Release|x86.ActiveCfg = Release|Any CPU
 		{1EA369CD-007D-444E-83CE-C9693FE99FA7}.Release|x86.Build.0 = Release|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Debug|x64.Build.0 = Debug|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Debug|x86.Build.0 = Debug|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x64.ActiveCfg = Release|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x64.Build.0 = Release|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x86.ActiveCfg = Release|Any CPU
+		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,5 +164,6 @@ Global
 		{24A35291-4915-4FA7-9301-E6FDFEE9881D} = {F9018DC1-FA2E-7905-A09A-6553D14836D8}
 		{9EA9AB60-FAA8-41D5-BF4E-7AED22682AF8} = {E4546324-3847-858E-0144-6DBA837604EB}
 		{1EA369CD-007D-444E-83CE-C9693FE99FA7} = {1A6AE1B8-27DE-8B63-4072-4ECAA2734F07}
+		{C79EF114-29E0-4714-93BE-A47BCE793E54} = {1A6AE1B8-27DE-8B63-4072-4ECAA2734F07}
 	EndGlobalSection
 EndGlobal

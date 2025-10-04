@@ -1,6 +1,8 @@
 using DirectoryService.Contracts;
 using DirectoryService.UseCases.Locations.CreateLocation;
 using Microsoft.AspNetCore.Mvc;
+using ResultLibrary;
+using ResultLibrary.AspNetCore;
 
 namespace DirectoryService.WebApi.Controllers.Locations;
 
@@ -15,7 +17,7 @@ public sealed class LocationsController : ControllerBase
         CancellationToken ct
     )
     {
-        Guid result = await handler.Handle(command, ct);
-        return Results.Ok(result);
+        Result<Guid> result = await handler.Handle(command, ct);
+        return result.FromResult(nameof(CreateLocation));
     }
 }

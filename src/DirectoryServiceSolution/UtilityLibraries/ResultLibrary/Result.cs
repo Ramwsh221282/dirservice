@@ -2,9 +2,9 @@ namespace ResultLibrary;
 
 public class Result
 {
-    public bool IsSuccess { get; }
-    public bool IsFailure { get; }
-    public Error Error { get; }
+    public virtual bool IsSuccess { get; }
+    public virtual bool IsFailure { get; }
+    public virtual Error Error { get; }
 
     protected Result(Error error)
     {

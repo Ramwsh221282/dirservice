@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace ResultLibrary;
 
-public sealed record ErrorsCollection : IEnumerable<Error>
+public sealed class ErrorsCollection : Result, IEnumerable<Error>
 {
     private readonly List<Error> _errors = [];
 
@@ -22,6 +22,12 @@ public sealed record ErrorsCollection : IEnumerable<Error>
             _errors.Add(result.Error);
     }
 
+    public override bool IsFailure => Contains();
+
+    public override bool IsSuccess => !IsFailure;
+
+    public override Error Error => AsSingleError();
+
     public void Add(IEnumerable<Result> results) =>
         _errors.AddRange(results.Where(r => r.IsFailure).Select(r => r.Error));
 
@@ -40,7 +46,7 @@ public sealed record ErrorsCollection : IEnumerable<Error>
         return new Error(message, type);
     }
 
-    private ErrorType GeneralErrorType()
+    public ErrorType GeneralErrorType()
     {
         ErrorType[] distinctErrorTypes = [.. _errors.Select(er => er.Type).Distinct()];
 
@@ -53,6 +59,11 @@ public sealed record ErrorsCollection : IEnumerable<Error>
             throw new ApplicationException("Список ошибок должен содержать ошибки.");
 
         return _errors[0].Type;
+    }
+
+    public IEnumerable<string> ErrorStrings()
+    {
+        return _errors.Select(er => er.Message);
     }
 
     private string ErrorsListing()
