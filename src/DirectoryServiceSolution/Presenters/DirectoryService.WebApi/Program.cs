@@ -3,6 +3,7 @@ using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Lo
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Locations.Contracts;
 using DirectoryService.UseCases.Locations.CreateLocation;
+using DirectoryService.WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,14 +29,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseExceptionHandleMiddleware();
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.MapSwagger();
-
 app.Run();
 
 namespace DirectoryService.API
