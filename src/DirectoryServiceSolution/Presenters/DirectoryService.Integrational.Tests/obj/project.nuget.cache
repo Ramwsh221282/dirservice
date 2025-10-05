@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "QGK3/bEAALY=",
+  "dgSpecHash": "nmQMNzgg1iI=",
   "success": true,
   "projectFilePath": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Presenters\\DirectoryService.Integrational.Tests\\DirectoryService.Integrational.Tests.csproj",
   "expectedPackageFiles": [
@@ -56,6 +56,7 @@
     "C:\\Users\\ramwsh\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\9.0.4\\npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\serilog\\4.3.0\\serilog.4.3.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\serilog.aspnetcore\\9.0.0\\serilog.aspnetcore.9.0.0.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\serilog.exceptions\\8.4.0\\serilog.exceptions.8.4.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\serilog.extensions.hosting\\9.0.0\\serilog.extensions.hosting.9.0.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\serilog.extensions.logging\\9.0.0\\serilog.extensions.logging.9.0.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\serilog.formatting.compact\\3.0.0\\serilog.formatting.compact.3.0.0.nupkg.sha512",
@@ -72,6 +73,7 @@
     "C:\\Users\\ramwsh\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\9.0.4\\swashbuckle.aspnetcore.swaggerui.9.0.4.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\system.diagnostics.eventlog\\9.0.9\\system.diagnostics.eventlog.9.0.9.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\system.reflection.metadata\\1.6.0\\system.reflection.metadata.1.6.0.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\system.reflection.typeextensions\\4.7.0\\system.reflection.typeextensions.4.7.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\testcontainers\\4.7.0\\testcontainers.4.7.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\testcontainers.postgresql\\4.7.0\\testcontainers.postgresql.4.7.0.nupkg.sha512",
     "C:\\Users\\ramwsh\\.nuget\\packages\\xunit\\2.9.2\\xunit.2.9.2.nupkg.sha512",

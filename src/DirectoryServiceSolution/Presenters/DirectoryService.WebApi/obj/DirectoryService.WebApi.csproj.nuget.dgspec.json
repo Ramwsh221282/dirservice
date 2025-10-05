@@ -281,6 +281,10 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
+            "Serilog.Exceptions": {
+              "target": "Package",
+              "version": "[8.4.0, )"
+            },
             "Serilog.Sinks.Console": {
               "target": "Package",
               "version": "[6.0.0, )"

@@ -1,6 +1,6 @@
-using DirectoryService.API;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
+using DirectoryService.WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;

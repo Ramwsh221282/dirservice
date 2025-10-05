@@ -44,7 +44,7 @@ app.MapControllers();
 app.MapSwagger();
 app.Run();
 
-namespace DirectoryService.API
+namespace DirectoryService.WebApi
 {
     public partial class Program;
 }
