@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {}
+    "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {}
   },
   "projects": {
-    "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {
+    "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj",
+        "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj",
         "projectName": "ResultLibrary",
-        "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj",
+        "projectPath": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\ResultLibrary.csproj",
         "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\obj\\",
+        "outputPath": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\UtilityLibraries\\ResultLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"

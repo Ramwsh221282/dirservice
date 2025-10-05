@@ -1,8 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "wQe0AVNmork=",
+  "dgSpecHash": "ILT/ttyuUWc=",
   "success": true,
-  "projectFilePath": "c:\\Users\\ramwsh\\Desktop\\DirServiceBranchT6\\dirservice\\src\\DirectoryServiceSolution\\UseCases\\DirectoryService.UseCases\\DirectoryService.UseCases.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\UseCases\\DirectoryService.UseCases\\DirectoryService.UseCases.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\9.0.9\\microsoft.extensions.dependencyinjection.9.0.9.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.9\\microsoft.extensions.dependencyinjection.abstractions.9.0.9.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.extensions.logging\\9.0.9\\microsoft.extensions.logging.9.0.9.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\9.0.9\\microsoft.extensions.logging.abstractions.9.0.9.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.extensions.options\\9.0.9\\microsoft.extensions.options.9.0.9.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\microsoft.extensions.primitives\\9.0.9\\microsoft.extensions.primitives.9.0.9.nupkg.sha512",
+    "C:\\Users\\ramwsh\\.nuget\\packages\\serilog\\4.3.0\\serilog.4.3.0.nupkg.sha512"
+  ],
   "logs": []
 }
