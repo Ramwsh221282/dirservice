@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
+      "projectUniqueName": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
       "projectName": "DirectoryService.Contracts",
-      "projectPath": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
+      "projectPath": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\DirectoryService.Contracts.csproj",
       "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\obj\\",
+      "outputPath": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Contracts\\DirectoryService.Contracts\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"

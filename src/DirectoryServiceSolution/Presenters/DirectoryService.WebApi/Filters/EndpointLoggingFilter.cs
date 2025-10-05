@@ -4,30 +4,30 @@ namespace DirectoryService.WebApi.Filters;
 
 public sealed class EndpointLoggingFilter : IActionFilter
 {
-    private readonly ILogger<EndpointLoggingFilter> _logger;
+    private readonly ILogger _logger;
 
-    public EndpointLoggingFilter(ILogger<EndpointLoggingFilter> logger)
+    public EndpointLoggingFilter(ILogger logger)
     {
         _logger = logger;
     }
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
-        DateTime now = DateTime.UtcNow;
         _logger.LogInformation(
-            $"Эндпоинт {GetEndpointName(context)} выполнение начато. Дата: {now:dd.MM.yyyy HH.mm.ss}"
+            "Эндпоинт {Endpoint} выполнение начато.",
+            GetEndpointName(context)
         );
     }
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        DateTime now = DateTime.UtcNow;
         _logger.LogInformation(
-            $"Эндпоинт {GetEndpointName(context)} выполнение остановлено. Дата: {now:dd.MM.yyyy HH.mm.ss}"
+            "Эндпоинт {Endpoint} выполнение остановлено.",
+            GetEndpointName(context)
         );
     }
 
-    public string? GetEndpointName(FilterContext context)
+    private string? GetEndpointName(FilterContext context)
     {
         Endpoint? endpoint = context.HttpContext.GetEndpoint();
         string? endpointName = endpoint?.DisplayName;

@@ -415,11 +415,24 @@
       "DirectoryService.Core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ResultLibrary": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/DirectoryService.Core.dll": {}
         },
         "runtime": {
           "bin/placeholder/DirectoryService.Core.dll": {}
+        }
+      },
+      "ResultLibrary/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ResultLibrary.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ResultLibrary.dll": {}
         }
       }
     }
@@ -947,6 +960,11 @@
       "type": "project",
       "path": "../DirectoryService.Core/DirectoryService.Core.csproj",
       "msbuildProject": "../DirectoryService.Core/DirectoryService.Core.csproj"
+    },
+    "ResultLibrary/1.0.0": {
+      "type": "project",
+      "path": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj",
+      "msbuildProject": "../../UtilityLibraries/ResultLibrary/ResultLibrary.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -964,11 +982,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Tests\\DirectoryService.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Tests\\DirectoryService.Tests.csproj",
       "projectName": "DirectoryService.Tests",
-      "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Tests\\DirectoryService.Tests.csproj",
+      "projectPath": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Tests\\DirectoryService.Tests.csproj",
       "packagesPath": "C:\\Users\\ramwsh\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Tests\\obj\\",
+      "outputPath": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ramwsh\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -983,8 +1001,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj": {
-              "projectPath": "c:\\Users\\ramwsh\\Desktop\\DirectoryService\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj"
+            "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj": {
+              "projectPath": "C:\\Users\\ramwsh\\Desktop\\Directory_Service\\dirservice\\src\\DirectoryServiceSolution\\Core\\DirectoryService.Core\\DirectoryService.Core.csproj"
             }
           }
         }
@@ -1038,7 +1056,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

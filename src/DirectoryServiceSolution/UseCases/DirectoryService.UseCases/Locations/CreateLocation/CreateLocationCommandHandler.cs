@@ -2,7 +2,6 @@ using DirectoryService.Contracts;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Locations.Contracts;
-using Microsoft.Extensions.Logging;
 using ResultLibrary;
 using Serilog;
 
@@ -11,15 +10,15 @@ namespace DirectoryService.UseCases.Locations.CreateLocation;
 public sealed class CreateLocationCommandHandler
 {
     private readonly ILocationsRepository _repository;
-    private readonly ILogger<CreateLocationCommandHandler> _logger;
+    private readonly ILogger _logger;
 
     public CreateLocationCommandHandler(
         ILocationsRepository repository,
-        ILogger<CreateLocationCommandHandler> logger
+        ILogger logger
     )
     {
         _repository = repository;
-        _logger = logger;
+        _logger = logger.ForContext<CreateLocationCommandHandler>();
     }
 
     public async Task<Result<Guid>> Handle(
@@ -46,12 +45,18 @@ public sealed class CreateLocationCommandHandler
 
         if (errors.Contains())
         {
-            _logger.LogError("");
+            _logger.Error("Error: {Err}", errors.ErrorStrings());
             return errors.AsSingleError();
         }
 
         Location location = new Location(address, name, timeZone);
         Result<Guid> result = await _repository.AddLocation(location, ct);
-        return result.IsFailure ? result.Error : result.Value;
+        if (result.IsFailure)
+        {
+            _logger.Error("Error: {Err}", errors.ErrorStrings());
+            return result.Error;
+        }
+        
+        return result.Value;
     }
 }

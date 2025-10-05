@@ -7,10 +7,10 @@ namespace DirectoryService.WebApi.Middlewares;
 public sealed class ExceptionHandleMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionHandleMiddleware> _logger;
+    private readonly ILogger _logger;
 
     public ExceptionHandleMiddleware(
-        ILogger<ExceptionHandleMiddleware> logger,
+        ILogger logger,
         RequestDelegate next
     )
     {
