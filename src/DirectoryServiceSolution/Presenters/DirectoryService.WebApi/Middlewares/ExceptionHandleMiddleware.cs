@@ -7,10 +7,10 @@ namespace DirectoryService.WebApi.Middlewares;
 public sealed class ExceptionHandleMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger _logger;
+    private readonly Serilog.ILogger _logger;
 
     public ExceptionHandleMiddleware(
-        ILogger logger,
+        Serilog.ILogger logger,
         RequestDelegate next
     )
     {
@@ -43,6 +43,6 @@ public sealed class ExceptionHandleMiddleware
 
     private void LogException(Exception ex)
     {
-        _logger.LogError("Exception: {Ex}", ex);
+        _logger.Error("Exception: {Ex}", ex);
     }
 }

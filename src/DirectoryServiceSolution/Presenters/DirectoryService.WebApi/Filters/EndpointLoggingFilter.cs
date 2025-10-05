@@ -4,16 +4,16 @@ namespace DirectoryService.WebApi.Filters;
 
 public sealed class EndpointLoggingFilter : IActionFilter
 {
-    private readonly ILogger _logger;
+    private readonly Serilog.ILogger _logger;
 
-    public EndpointLoggingFilter(ILogger logger)
+    public EndpointLoggingFilter(Serilog.ILogger logger)
     {
         _logger = logger;
     }
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
-        _logger.LogInformation(
+        _logger.Information(
             "Эндпоинт {Endpoint} выполнение начато.",
             GetEndpointName(context)
         );
@@ -21,7 +21,7 @@ public sealed class EndpointLoggingFilter : IActionFilter
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        _logger.LogInformation(
+        _logger.Information(
             "Эндпоинт {Endpoint} выполнение остановлено.",
             GetEndpointName(context)
         );

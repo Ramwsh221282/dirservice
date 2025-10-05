@@ -10,3 +10,15 @@ c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSoluti
 c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\refint\ResultLibrary.dll
 c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.pdb
 c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ref\ResultLibrary.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\bin\Debug\net9.0\ResultLibrary.deps.json
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\bin\Debug\net9.0\ResultLibrary.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\bin\Debug\net9.0\ResultLibrary.pdb
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.AssemblyInfoInputs.cache
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.AssemblyInfo.cs
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.csproj.CoreCompileInputs.cache
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.sourcelink.json
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\refint\ResultLibrary.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ResultLibrary.pdb
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\UtilityLibraries\ResultLibrary\obj\Debug\net9.0\ref\ResultLibrary.dll

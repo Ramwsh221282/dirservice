@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DirectoryService.UseCases")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20fce34073a2a989f3326e99b81fc8eba6a512de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cad56dd215318e7074c450c77eabcff5de7fdf75")]
 [assembly: System.Reflection.AssemblyProductAttribute("DirectoryService.UseCases")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DirectoryService.UseCases")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

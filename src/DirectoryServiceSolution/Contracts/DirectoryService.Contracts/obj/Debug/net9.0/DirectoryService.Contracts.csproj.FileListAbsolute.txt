@@ -10,3 +10,15 @@ c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSoluti
 c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\refint\DirectoryService.Contracts.dll
 c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.pdb
 c:\Users\ramwsh\Desktop\DirServiceBranchT6\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\ref\DirectoryService.Contracts.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\bin\Debug\net9.0\DirectoryService.Contracts.deps.json
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\bin\Debug\net9.0\DirectoryService.Contracts.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\bin\Debug\net9.0\DirectoryService.Contracts.pdb
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.AssemblyInfoInputs.cache
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.AssemblyInfo.cs
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.csproj.CoreCompileInputs.cache
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.sourcelink.json
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\refint\DirectoryService.Contracts.dll
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\DirectoryService.Contracts.pdb
+C:\Users\ramwsh\Desktop\Directory_Service\dirservice\src\DirectoryServiceSolution\Contracts\DirectoryService.Contracts\obj\Debug\net9.0\ref\DirectoryService.Contracts.dll

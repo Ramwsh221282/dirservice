@@ -12,10 +12,7 @@ public sealed class CreateLocationCommandHandler
     private readonly ILocationsRepository _repository;
     private readonly ILogger _logger;
 
-    public CreateLocationCommandHandler(
-        ILocationsRepository repository,
-        ILogger logger
-    )
+    public CreateLocationCommandHandler(ILocationsRepository repository, ILogger logger)
     {
         _repository = repository;
         _logger = logger.ForContext<CreateLocationCommandHandler>();
@@ -56,7 +53,9 @@ public sealed class CreateLocationCommandHandler
             _logger.Error("Error: {Err}", errors.ErrorStrings());
             return result.Error;
         }
-        
+
+        _logger.Information("Создана локация: {Id} - {Name}", result.Value, command.Name);
+
         return result.Value;
     }
 }
