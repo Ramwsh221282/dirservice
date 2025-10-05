@@ -6,6 +6,18 @@
 # dotenv files
 .env
 
+.idea/
+.idea
+*.idea
+
+*.txt
+
+*.json
+
+*.nuget
+
+/obj
+
 # User-specific files
 *.rsuser
 *.suo

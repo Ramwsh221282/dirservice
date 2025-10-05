@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DirectoryService.Integrational.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20fce34073a2a989f3326e99b81fc8eba6a512de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e35f9278731892ee224b53a82028ea7a58dfd56c")]
 [assembly: System.Reflection.AssemblyProductAttribute("DirectoryService.Integrational.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DirectoryService.Integrational.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
