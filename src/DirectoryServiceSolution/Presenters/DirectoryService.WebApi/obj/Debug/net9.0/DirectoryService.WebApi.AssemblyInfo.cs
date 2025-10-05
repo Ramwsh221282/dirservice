@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DirectoryService.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f6e7b1bf2b1119c3f6043a1d5e7c9c23921b722")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+646eac7c82caaa1992fd3aad9add66f2f8f89d8e")]
 [assembly: System.Reflection.AssemblyProductAttribute("DirectoryService.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DirectoryService.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

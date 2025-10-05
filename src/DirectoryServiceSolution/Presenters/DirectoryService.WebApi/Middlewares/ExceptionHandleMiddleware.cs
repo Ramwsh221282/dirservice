@@ -1,14 +1,21 @@
 using System.Net;
+using ResultLibrary;
+using ResultLibrary.AspNetCore;
 
 namespace DirectoryService.WebApi.Middlewares;
 
 public sealed class ExceptionHandleMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandleMiddleware> _logger;
 
-    public ExceptionHandleMiddleware(RequestDelegate next)
+    public ExceptionHandleMiddleware(
+        ILogger<ExceptionHandleMiddleware> logger,
+        RequestDelegate next
+    )
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -20,22 +27,22 @@ public sealed class ExceptionHandleMiddleware
         catch (Exception ex)
         {
             LogException(ex);
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            await HandleExceptionalAction(context);
         }
+    }
+
+    private async Task HandleExceptionalAction(HttpContext context)
+    {
+        Error error = Error.ExceptionalError("Ошибка на стороне приложения.");
+        Result result = Result.Fail(error);
+        EnvelopeTemplate template = EnvelopeTemplate.FromResult(result, context.Request.Path);
+
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        await context.Response.WriteAsJsonAsync(template);
     }
 
     private void LogException(Exception ex)
     {
-        string message = ex.Message;
-        string? trace = ex.StackTrace;
-        string? source = ex.Source;
-        string template = """
-            Exception.
-            Message: {0}
-            Source: {1}
-            Trance: {2}
-            """;
-        string messageToLog = string.Format(template, message, source, trace);
-        Console.WriteLine(messageToLog);
+        _logger.LogError("Exception: {Ex}", ex);
     }
 }
