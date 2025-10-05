@@ -2,6 +2,7 @@ using DirectoryService.Contracts;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Locations.Contracts;
+using ResultLibrary;
 
 namespace DirectoryService.UseCases.Locations.CreateLocation;
 
@@ -14,16 +15,33 @@ public sealed class CreateLocationCommandHandler
         _repository = repository;
     }
 
-    public async Task<Guid> Handle(CreateLocationCommand command, CancellationToken ct = default)
+    public async Task<Result<Guid>> Handle(
+        CreateLocationCommand command,
+        CancellationToken ct = default
+    )
     {
-        IEnumerable<LocationAddressPart> addressParts = command.AddressParts.Select(
+        ErrorsCollection errors = [];
+        IEnumerable<Result<LocationAddressPart>> addressParts = command.AddressParts.Select(
             LocationAddressPart.Create
         );
-        LocationAddress address = LocationAddress.Create(addressParts);
-        LocationName name = LocationName.Create(command.Name);
-        LocationTimeZone timeZone = LocationTimeZone.Create(command.TimeZone);
+        errors.Add(addressParts);
+
+        Result<LocationAddress> address = LocationAddress.Create(
+            addressParts.Where(r => r.IsSuccess).Select(r => r.Value)
+        );
+        errors.Add(address);
+
+        Result<LocationName> name = LocationName.Create(command.Name);
+        errors.Add(name);
+
+        Result<LocationTimeZone> timeZone = LocationTimeZone.Create(command.TimeZone);
+        errors.Add(timeZone);
+
+        if (errors.Contains())
+            return errors.AsSingleError();
+
         Location location = new Location(address, name, timeZone);
-        await _repository.AddLocation(location, ct);
-        return location.Id.Value;
+        Result<Guid> result = await _repository.AddLocation(location, ct);
+        return result.IsFailure ? result.Error : result.Value;
     }
 }

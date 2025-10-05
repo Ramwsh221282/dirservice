@@ -1,4 +1,5 @@
 using DirectoryService.Core.Common.Extensions;
+using ResultLibrary;
 
 namespace DirectoryService.Core.PositionsContext.ValueObjects;
 
@@ -8,21 +9,20 @@ public sealed record PositionDescription
     public const int MaxLength = 1000;
     public string Value { get; }
 
-    private PositionDescription(string value)
-    {
-        Value = value;
-    }
+    private PositionDescription(string value) => Value = value;
 
-    public static PositionDescription Create(string value)
+    public static Result<PositionDescription> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException($"Описание должности не должно быть пустым.");
+            return Error.ValidationError($"Описание должности не должно быть пустым.");
+
         string formatted = value.MakeFirstLetterCapital();
         if (formatted.GreaterThan(MaxLength))
-            throw new ArgumentException($"Описание превышает длину {MaxLength} символов.");
+            return Error.ValidationError($"Описание превышает длину {MaxLength} символов.");
+
         if (formatted.LessThan(MinLength))
-            throw new ArgumentException($"Описание менее {MinLength} символов.");
+            return Error.ValidationError($"Описание менее {MinLength} символов.");
+
         return new PositionDescription(value);
     }
 }
-

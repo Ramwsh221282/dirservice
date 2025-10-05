@@ -1,3 +1,5 @@
+using ResultLibrary;
+
 namespace DirectoryService.Core.Common.ValueObjects;
 
 public readonly record struct EntityLifeCycle
@@ -22,25 +24,25 @@ public readonly record struct EntityLifeCycle
         UpdatedAt = updatedAt;
     }
 
-    public static EntityLifeCycle Create(DateTime? deletedAt, DateTime createdAt, DateTime updatedAt)
+    public static Result<EntityLifeCycle> Create(
+        DateTime? deletedAt,
+        DateTime createdAt,
+        DateTime updatedAt
+    )
     {
         DateTime[] dates = [createdAt, updatedAt];
-        if (dates.Any(d => d == default))
-            throw new ApplicationException("Даты жизненного цикла некорректны.");
-        return new EntityLifeCycle(deletedAt, createdAt, updatedAt);        
+        return dates.Any(d => d == default)
+            ? Error.ValidationError("Даты жизненного цикла некорректны.")
+            : new EntityLifeCycle(deletedAt, createdAt, updatedAt);
     }
 
-    public EntityLifeCycle Update()
-    {
-        if (IsDeleted)
-            throw new ApplicationException("Запись была удалена. Нельзя обновить.");
-        return new EntityLifeCycle(DeletedAt, CreatedAt, DateTime.UtcNow);
-    }
+    public Result<EntityLifeCycle> Update() =>
+        IsDeleted
+            ? Error.ConflictError("Запись была удалена. Нельзя обновить.")
+            : new EntityLifeCycle(DeletedAt, CreatedAt, DateTime.UtcNow);
 
-    public EntityLifeCycle Delete()
-    {
-        if (IsDeleted)
-            throw new ApplicationException("Запись уже было удалена. Нельзя удалить.");
-        return new EntityLifeCycle(DateTime.UtcNow, CreatedAt, UpdatedAt);
-    }
+    public Result<EntityLifeCycle> Delete() =>
+        IsDeleted
+            ? Error.ConflictError("Запись уже было удалена. Нельзя удалить.")
+            : new EntityLifeCycle(DateTime.UtcNow, CreatedAt, UpdatedAt);
 }
