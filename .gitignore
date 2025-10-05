@@ -11,10 +11,14 @@
 *.idea
 
 *.txt
+*.txt*
 
 *.json
 
+*.json*
+
 *.nuget
+*.nuget*
 
 /obj
 
