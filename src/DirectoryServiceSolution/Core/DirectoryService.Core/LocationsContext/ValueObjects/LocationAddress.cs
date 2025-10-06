@@ -24,6 +24,18 @@ public sealed record LocationAddress
             : new LocationAddress(asList);
     }
 
+    public static Result<LocationAddress> Create(IEnumerable<string> parts)
+    {
+        IEnumerable<Result<LocationAddressPart>> valid = parts.Select(LocationAddressPart.Create);
+        if (valid.Any(r => r.IsFailure))
+        {
+            Result<LocationAddressPart> failed = valid.First();
+            return failed.Error;
+        }
+
+        return Create(valid.Select(p => p.Value));
+    }
+
     public static LocationAddress FromJson(string json)
     {
         using JsonDocument document = JsonDocument.Parse(json);

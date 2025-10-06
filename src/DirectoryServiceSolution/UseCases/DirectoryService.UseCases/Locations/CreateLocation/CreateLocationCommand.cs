@@ -1,8 +1,9 @@
 using DirectoryService.Contracts;
+using DirectoryService.UseCases.Common.Cqrs;
 
 namespace DirectoryService.UseCases.Locations.CreateLocation;
 
-public sealed record CreateLocationCommand
+public sealed record CreateLocationCommand : ICommand<Guid>
 {
     public string Name { get; }
     public IEnumerable<string> AddressParts { get; }
