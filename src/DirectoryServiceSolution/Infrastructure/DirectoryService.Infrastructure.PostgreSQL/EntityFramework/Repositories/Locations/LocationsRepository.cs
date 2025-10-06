@@ -1,5 +1,6 @@
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.UseCases.Locations.Contracts;
+using Microsoft.EntityFrameworkCore;
 using ResultLibrary;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
@@ -17,6 +18,15 @@ public sealed class LocationsRepository : ILocationsRepository
     {
         try
         {
+            if (
+                await _dbContext
+                    .Locations.AsNoTracking()
+                    .AnyAsync(l => l.Name == location.Name, cancellationToken: ct)
+            )
+                return Error.ConflictError(
+                    $"Локация с названием: {location.Name.Value} уже существует."
+                );
+
             await _dbContext.AddAsync(location, ct);
             await _dbContext.SaveChangesAsync(ct);
             return location.Id.Value;
