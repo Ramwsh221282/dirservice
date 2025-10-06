@@ -1,19 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DirectoryService.Core\DirectoryService.Core.csproj" />
     <ProjectReference Include="..\..\Contracts\DirectoryService.Contracts\DirectoryService.Contracts.csproj" />
     <ProjectReference Include="..\..\UtilityLibraries\ResultLibrary\ResultLibrary.csproj" />
   </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Serilog" Version="4.3.0" />
   </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
 </Project>
