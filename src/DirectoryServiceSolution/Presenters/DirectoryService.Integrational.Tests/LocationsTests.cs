@@ -1,7 +1,9 @@
 ﻿using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Locations.CreateLocation;
+using DirectoryService.WebApi.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
@@ -27,16 +29,16 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
             CreateLocationCommand command = new(name.Value, addressParts, timeZone.Value);
-            CreateLocationCommandHandler handler =
-                scope.ServiceProvider.GetRequiredService<CreateLocationCommandHandler>();
+            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
+                ICommandHandler<Guid, CreateLocationCommand>
+            >();
             Result<Guid> result = await handler.Handle(command);
             Assert.True(result.IsSuccess);
         }
 
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
-            await using ServiceDbContext context =
-                scope.ServiceProvider.GetRequiredService<ServiceDbContext>();
+            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
             Location? location = await context.Locations.FirstOrDefaultAsync(l =>
                 l.Name == LocationName.Create(name.Value)
             );
@@ -54,14 +56,13 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         IEnumerable<string> addressParts = ["Some", "Big", "City"];
         string timeZone = "Big/City";
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            CreateLocationCommand command = new(name, addressParts, timeZone);
-            CreateLocationCommandHandler handler =
-                scope.ServiceProvider.GetRequiredService<CreateLocationCommandHandler>();
-            Result<Guid> result = await handler.Handle(command);
-            Assert.True(result.IsFailure);
-        }
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
+        CreateLocationCommand command = new(name, addressParts, timeZone);
+        ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
+            ICommandHandler<Guid, CreateLocationCommand>
+        >();
+        Result<Guid> result = await handler.Handle(command);
+        Assert.True(result.IsFailure);
     }
 
     [Fact]
@@ -74,16 +75,16 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
             CreateLocationCommand command = new(name, addressParts, timeZone);
-            CreateLocationCommandHandler handler =
-                scope.ServiceProvider.GetRequiredService<CreateLocationCommandHandler>();
+            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
+                ICommandHandler<Guid, CreateLocationCommand>
+            >();
             Result<Guid> result = await handler.Handle(command);
             Assert.True(result.IsFailure);
         }
 
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
-            await using ServiceDbContext context =
-                scope.ServiceProvider.GetRequiredService<ServiceDbContext>();
+            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
             Location? location = await context.Locations.FirstOrDefaultAsync(l =>
                 l.Name == LocationName.Create(name)
             );
@@ -101,16 +102,16 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
             CreateLocationCommand command = new(name, addressParts, timeZone);
-            CreateLocationCommandHandler handler =
-                scope.ServiceProvider.GetRequiredService<CreateLocationCommandHandler>();
+            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
+                ICommandHandler<Guid, CreateLocationCommand>
+            >();
             Result<Guid> result = await handler.Handle(command);
             Assert.True(result.IsFailure);
         }
 
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
-            await using ServiceDbContext context =
-                scope.ServiceProvider.GetRequiredService<ServiceDbContext>();
+            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
             Location? location = await context.Locations.FirstOrDefaultAsync(l =>
                 l.Name == LocationName.Create(name)
             );

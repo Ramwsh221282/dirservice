@@ -25,6 +25,12 @@ public static class DependencyInjectionExtensions
         builder.Services.AddScoped<ServiceDbContext>();
     }
 
+    public static T GetService<T>(this AsyncServiceScope scope) where T : notnull
+    {
+        T service = scope.ServiceProvider.GetRequiredService<T>();
+        return service;
+    }
+    
     private static void InjectUseCaseHandlers(this IServiceCollection services, Assembly assembly)
     {
         IEnumerable<Type> implementations = assembly

@@ -11,5 +11,6 @@ public sealed class CreateLocationCommandValidator : AbstractValidator<CreateLoc
         RuleFor(x => x.Name).MustBeValid(LocationName.Create);
         RuleFor(x => x.TimeZone).MustBeValid(LocationTimeZone.Create);
         RuleFor(x => x.AddressParts).AllMustBeValid(LocationAddressPart.Create);
+        RuleFor(x => x.AddressParts).MustBeValid(LocationAddress.Create);
     }
 }
