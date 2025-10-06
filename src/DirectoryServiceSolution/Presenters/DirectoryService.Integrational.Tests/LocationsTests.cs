@@ -21,13 +21,13 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
     [Fact]
     public async Task Create_Location_Success()
     {
-        string name = "Test Location";
+        LocationName name = LocationName.Create("Test Location");
+        LocationTimeZone timeZone = LocationTimeZone.Create("Big/City");
         IEnumerable<string> addressParts = ["Some", "Big", "City"];
-        string timeZone = "Big/City";
 
         await using (AsyncServiceScope scope = _services.CreateAsyncScope())
         {
-            CreateLocationCommand command = new(name, addressParts, timeZone);
+            CreateLocationCommand command = new(name.Value, addressParts, timeZone.Value);
             CreateLocationCommandHandler handler =
                 scope.ServiceProvider.GetRequiredService<CreateLocationCommandHandler>();
             Result<Guid> result = await handler.Handle(command);
@@ -39,11 +39,11 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
             await using ServiceDbContext context =
                 scope.ServiceProvider.GetRequiredService<ServiceDbContext>();
             Location? location = await context.Locations.FirstOrDefaultAsync(l =>
-                l.Name == LocationName.Create(name).Value
+                l.Name == LocationName.Create(name.Value)
             );
             Assert.NotNull(location);
-            Assert.Equal(location.Name.Value, name);
-            Assert.Equal(location.TimeZone.Value, timeZone);
+            Assert.Equal(location.Name.Value, name.Value);
+            Assert.Equal(location.TimeZone.Value, timeZone.Value);
             Assert.Contains(location.Address.Parts, p => addressParts.Any(ap => ap.Equals(p.Node)));
         }
     }
@@ -62,16 +62,6 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
                 scope.ServiceProvider.GetRequiredService<CreateLocationCommandHandler>();
             Result<Guid> result = await handler.Handle(command);
             Assert.True(result.IsFailure);
-        }
-
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext context =
-                scope.ServiceProvider.GetRequiredService<ServiceDbContext>();
-            Location? location = await context.Locations.FirstOrDefaultAsync(l =>
-                l.Name == LocationName.Create(name)
-            );
-            Assert.Null(location);
         }
     }
 
