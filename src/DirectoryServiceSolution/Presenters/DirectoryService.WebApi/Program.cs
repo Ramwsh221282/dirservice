@@ -3,11 +3,16 @@ using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Lo
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Locations.Contracts;
 using DirectoryService.UseCases.Locations.CreateLocation;
+using DirectoryService.WebApi.Configurations;
+using DirectoryService.WebApi.Middlewares;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Host.UseSerilog();
 
+builder.AddSeqLogging();
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -15,6 +20,7 @@ builder.Services.AddSwaggerGen();
 builder
     .Services.AddOptions<NpgSqlConnectionOptions>()
     .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
+
 builder.Services.AddScoped<CreateLocationCommandHandler>();
 builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
 
@@ -28,17 +34,14 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseExceptionHandleMiddleware();
+app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.MapSwagger();
-
 app.Run();
 
-namespace DirectoryService.API
+namespace DirectoryService.WebApi
 {
     public partial class Program;
 }

@@ -44,10 +44,15 @@ public class Result
 
 public sealed class Result<TValue> : Result
 {
-    public TValue Value { get; } = default!;
+    private readonly TValue _value = default!;
+
+    public TValue Value =>
+        IsSuccess
+            ? _value
+            : throw new ApplicationException("Нельзя получить доступ к неуспешному результату.");
 
     private Result(TValue value)
-        : base(true, false, new Error("", new NoErrorType())) { }
+        : base(true, false, new Error("", new NoErrorType())) => _value = value;
 
     private Result(Error error)
         : base(error) { }
