@@ -1,4 +1,3 @@
-using DirectoryService.Contracts;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Locations.Contracts;

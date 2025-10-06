@@ -1,5 +1,4 @@
-﻿using DirectoryService.Contracts;
-using DirectoryService.Core.LocationsContext;
+﻿using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using DirectoryService.UseCases.Locations.CreateLocation;
