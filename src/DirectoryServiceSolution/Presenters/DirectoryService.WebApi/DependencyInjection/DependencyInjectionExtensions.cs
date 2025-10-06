@@ -1,29 +1,28 @@
 ﻿using System.Reflection;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
+using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Cqrs;
+using DirectoryService.UseCases.Locations.Contracts;
 using FluentValidation;
 
 namespace DirectoryService.WebApi.DependencyInjection;
 
 public static class DependencyInjectionExtensions
 {
-    public static void InjectUseCaseLayer(this IServiceCollection services)
+    public static void InjectUseCaseLayer(this WebApplicationBuilder builder)
     {
         Assembly assembly = typeof(ICommand<>).Assembly;
-        services.InjectUseCaseHandlers(assembly);
-        services.InjectUseCaseValidators(assembly);
+        builder.Services.InjectUseCaseHandlers(assembly);
+        builder.Services.AddValidatorsFromAssembly(typeof(ICommand).Assembly);
     }
 
-    private static void InjectUseCaseValidators(this IServiceCollection services, Assembly assembly)
+    public static void InjectPostgreSqlLayer(this WebApplicationBuilder builder)
     {
-        IEnumerable<Type> implementations = assembly
-            .GetTypes()
-            .Where(t => t is { IsAbstract: false, IsInterface: false })
-            .Where(t =>
-                t.BaseType != null
-                && t.BaseType.GetGenericTypeDefinition() == typeof(AbstractValidator<>)
-            );
-
-        foreach (Type implementation in implementations) { }
+        builder.Services.AddOptions<NpgSqlConnectionOptions>()
+            .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
+        builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
+        builder.Services.AddScoped<ServiceDbContext>();
     }
 
     private static void InjectUseCaseHandlers(this IServiceCollection services, Assembly assembly)
@@ -38,11 +37,6 @@ public static class DependencyInjectionExtensions
             Type handlerInterface = implementation.GetInterfaces().Single(ImplementsHandler);
             services.AddScoped(handlerInterface, implementation);
         }
-    }
-
-    private static bool InheritsAbstractValidator(this Type type)
-    {
-        return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbstractValidator<>);
     }
 
     private static bool ImplementsHandler(this Type type) =>
