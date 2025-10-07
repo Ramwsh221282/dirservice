@@ -35,11 +35,7 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasColumnType("jsonb")
             .HasConversion(
                 ad => JsonSerializer.Serialize(ad, JsonSerializerOptions.Default),
-                jsonb =>
-                    JsonSerializer.Deserialize<LocationAddress>(
-                        jsonb,
-                        JsonSerializerOptions.Default
-                    )!
+                jsonb => LocationAddress.FromJson(jsonb)
             )
             .HasColumnName("address");
 

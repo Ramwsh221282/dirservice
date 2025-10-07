@@ -14,11 +14,12 @@ public sealed class LocationsController : ControllerBase
 {
     [HttpPost("")]
     public async Task<IResult> CreateLocation(
-        [FromBody] CreateLocationCommand command,
+        [FromBody] CreateLocationRequest request,
         [FromServices] CreateLocationCommandHandler handler,
         CancellationToken ct
     )
     {
+        CreateLocationCommand command = new(request);
         Result<Guid> result = await handler.Handle(command, ct);
         return result.FromResult(nameof(CreateLocation));
     }
