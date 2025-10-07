@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts;
+namespace DirectoryService.Contracts.Locations;
 
 public sealed record CreateLocationRequest(
     LocationNameDto Name,
