@@ -33,6 +33,12 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
             : department;
     }
 
+    public async Task<IEnumerable<Department>> GetByIdArray(IEnumerable<DepartmentId> ids, CancellationToken ct = default) =>
+        await _dbContext.Departments.Where(d => ids.Contains(d.Id)).ToListAsync(ct);
+
+    public async Task<IEnumerable<Department>> GetByIdArray(DepartmentsIdSet ids, CancellationToken ct = default) =>
+        await GetByIdArray(ids.DepartmentIds, ct);
+
     public async Task Add(Department department, CancellationToken ct = default) =>
         await _dbContext.Departments.AddAsync(department, ct);
 }

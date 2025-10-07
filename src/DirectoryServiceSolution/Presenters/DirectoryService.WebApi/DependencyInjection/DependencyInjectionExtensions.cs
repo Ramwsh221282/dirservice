@@ -2,11 +2,13 @@
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Positions;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
+using DirectoryService.UseCases.Positions.Contracts;
 using FluentValidation;
 
 namespace DirectoryService.WebApi.DependencyInjection;
@@ -28,6 +30,7 @@ public static class DependencyInjectionExtensions
         builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
         builder.Services.AddScoped<ServiceDbContext>();
         builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+        builder.Services.AddScoped<IPositionsRepository, PositionsRepository>();
     }
 
     public static T GetService<T>(this AsyncServiceScope scope) where T : notnull

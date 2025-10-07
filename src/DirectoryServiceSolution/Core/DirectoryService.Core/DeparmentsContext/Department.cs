@@ -4,6 +4,7 @@ using DirectoryService.Core.Common.ValueObjects;
 using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.Core.LocationsContext;
+using DirectoryService.Core.PositionsContext;
 using ResultLibrary;
 
 namespace DirectoryService.Core.DeparmentsContext;
@@ -99,6 +100,14 @@ public sealed class Department : ISoftDeletable
         return Result.Success();
     }
 
+    public Result AddPosition(Position position)
+    {
+        if (_positions.Any(p => p.DepartmentId == Id && p.PositionId == position.Id))
+            return Error.ConflictError($"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}.");
+        _positions.Add(new DepartmentPosition(this, position));
+        return Result.Success();
+    }
+    
     public Result AttachOtherDepartment(Department other)
     {
         if (Attachments.IsAttached(other))

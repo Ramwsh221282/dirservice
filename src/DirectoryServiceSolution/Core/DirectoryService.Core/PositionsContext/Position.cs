@@ -1,7 +1,9 @@
 using DirectoryService.Core.Common.Interfaces;
 using DirectoryService.Core.Common.ValueObjects;
+using DirectoryService.Core.DeparmentsContext;
 using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.PositionsContext.ValueObjects;
+using ResultLibrary;
 
 namespace DirectoryService.Core.PositionsContext;
 
@@ -20,7 +22,7 @@ public sealed class Position : ISoftDeletable
         // ef core
     }
 
-    public Position(
+    private Position(
         PositionName name,
         PositionDescription description,
         IEnumerable<DepartmentPosition> departments,
@@ -32,7 +34,7 @@ public sealed class Position : ISoftDeletable
         _departments = departments.ToList();
     }
 
-    public Position(
+    private Position(
         PositionName name,
         PositionDescription description,
         EntityLifeCycle? lifeCycle = null,
@@ -43,5 +45,27 @@ public sealed class Position : ISoftDeletable
         Name = name;
         Description = description;
         LifeCycle = lifeCycle ?? new EntityLifeCycle();
+    }
+
+    public static Result<Position> CreateNew(PositionName name,
+        PositionDescription description, PositionNameUniquesness uniquesness)
+    {
+        if (uniquesness.IsUnique(name) == false)
+            return uniquesness.NotUniqueNameError();
+        EntityLifeCycle lifeCycle = new EntityLifeCycle();
+        PositionId id = new PositionId();
+        return new Position(name, description, lifeCycle, id);
+    }
+
+    public Result BindToDepartment(IEnumerable<Department> departments)
+    {
+        foreach (Department department in departments)
+        {
+            Result adding = department.AddPosition(this);
+            if (adding.IsFailure)
+                return adding.Error;
+        }
+        
+        return Result.Success();
     }
 }
