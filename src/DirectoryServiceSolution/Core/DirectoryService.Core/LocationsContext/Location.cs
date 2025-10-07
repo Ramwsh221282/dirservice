@@ -2,6 +2,7 @@ using DirectoryService.Core.Common.Interfaces;
 using DirectoryService.Core.Common.ValueObjects;
 using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.LocationsContext.ValueObjects;
+using ResultLibrary;
 
 namespace DirectoryService.Core.LocationsContext;
 
@@ -21,7 +22,7 @@ public sealed class Location : ISoftDeletable
         // ef core
     }
 
-    public Location(
+    private Location(
         LocationAddress address,
         LocationName name,
         LocationTimeZone timeZone,
@@ -34,7 +35,7 @@ public sealed class Location : ISoftDeletable
         _departments = [.. departments];
     }
 
-    public Location(
+    private Location(
         LocationAddress address,
         LocationName name,
         LocationTimeZone timeZone,
@@ -48,4 +49,27 @@ public sealed class Location : ISoftDeletable
         TimeZone = timeZone;
         LifeCycle = lifeCycle ?? new EntityLifeCycle();
     }
+
+    public static Result<Location> CreateNew(
+        LocationName name,
+        LocationAddress address,
+        LocationTimeZone timeZone,
+        LocationNameUniquesness uniquesness
+    )
+    {
+        if (!uniquesness.IsUnique(name))
+            return uniquesness.NonUniqueLocationError();
+        LocationId id = new LocationId();
+        EntityLifeCycle lifeCycle = new EntityLifeCycle();
+        return new Location(address, name, timeZone, id, lifeCycle);
+    }
+
+    public static Location Create(
+        LocationAddress address,
+        LocationName name,
+        LocationTimeZone timeZone,
+        IEnumerable<DepartmentLocation> departments,
+        LocationId? id = null,
+        EntityLifeCycle? lifeCycle = null
+    ) => new(address, name, timeZone, departments, id, lifeCycle);
 }

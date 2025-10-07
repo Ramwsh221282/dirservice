@@ -39,7 +39,14 @@ public sealed class CreateLocationCommandHandler : ICommandHandler<Guid, CreateL
         LocationAddress address = LocationAddress.Create(command.AddressParts);
         LocationName name = LocationName.Create(command.Name);
         LocationTimeZone timeZone = LocationTimeZone.Create(command.TimeZone);
-        Location location = new Location(address, name, timeZone);
+        LocationNameUniquesness uniquesness = await _repository.IsLocationNameUnique(name, ct);
+
+        Result<Location> location = Location.CreateNew(name, address, timeZone, uniquesness);
+        if (location.IsFailure)
+        {
+            _logger.Error("Error: {Err}", location.Error.Message);
+            return location.Error;
+        }
 
         Result<Guid> result = await _repository.AddLocation(location, ct);
         if (result.IsFailure)

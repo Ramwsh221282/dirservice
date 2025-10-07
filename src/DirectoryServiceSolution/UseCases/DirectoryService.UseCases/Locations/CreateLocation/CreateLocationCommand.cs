@@ -10,7 +10,11 @@ public sealed record CreateLocationCommand : ICommand<Guid>
     public string TimeZone { get; }
 
     public CreateLocationCommand(CreateLocationRequest request)
-        : this(request.Name, request.AddressParts, request.TimeZone) { }
+        : this(
+            request.Name.Name,
+            request.AddressNodes.Select(n => n.Node),
+            request.TimeZone.TimeZone
+        ) { }
 
     public CreateLocationCommand(string name, IEnumerable<string> addressParts, string timeZone)
     {

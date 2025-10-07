@@ -1,4 +1,5 @@
 using DirectoryService.Core.LocationsContext;
+using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Locations.Contracts;
 using Microsoft.EntityFrameworkCore;
 using ResultLibrary;
@@ -18,15 +19,6 @@ public sealed class LocationsRepository : ILocationsRepository
     {
         try
         {
-            if (
-                await _dbContext
-                    .Locations.AsNoTracking()
-                    .AnyAsync(l => l.Name == location.Name, cancellationToken: ct)
-            )
-                return Error.ConflictError(
-                    $"Локация с названием: {location.Name.Value} уже существует."
-                );
-
             await _dbContext.AddAsync(location, ct);
             await _dbContext.SaveChangesAsync(ct);
             return location.Id.Value;
@@ -35,5 +27,16 @@ public sealed class LocationsRepository : ILocationsRepository
         {
             return Error.ExceptionalError("Непредвиденная ошибка при сохранении локации.");
         }
+    }
+
+    public async Task<LocationNameUniquesness> IsLocationNameUnique(
+        LocationName name,
+        CancellationToken ct = default
+    )
+    {
+        bool hasAny = await _dbContext.Locations.AsNoTracking().AnyAsync(l => l.Name == name, ct);
+        return hasAny
+            ? new LocationNameUniquesness(false, name.Value)
+            : new LocationNameUniquesness(true, string.Empty);
     }
 }
