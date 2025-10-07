@@ -1,4 +1,4 @@
-using DirectoryService.Contracts;
+using DirectoryService.Contracts.Locations;
 using DirectoryService.UseCases.Locations.CreateLocation;
 using DirectoryService.WebApi.Filters;
 using Microsoft.AspNetCore.Mvc;

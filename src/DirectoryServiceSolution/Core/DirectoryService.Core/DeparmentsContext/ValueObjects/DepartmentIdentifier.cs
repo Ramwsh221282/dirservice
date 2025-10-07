@@ -10,32 +10,29 @@ public sealed record DepartmentIdentifier
     public string Value { get; }
 
     private DepartmentIdentifier(string value) => Value = value;
-
-    public DepartmentIdentifier AttachChildIdentifier(DepartmentIdentifier identifier)
-    {
-        string[] parts = Value.Split('.');
-        string[] withChild = [.. parts, identifier.Value];
-        string resultValue = string.Join('.', withChild);
-        return new DepartmentIdentifier(resultValue);
-    }
-
-    public static Result<DepartmentIdentifier> CreateNode(string value)
+    
+    public static Result<DepartmentIdentifier> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Error.ValidationError("Идентификатор департамента не должен быть пустым");
+
         string formatted = value.Trim();
+
         if (formatted.LessThan(MinLength))
             return Error.ValidationError(
                 $"Идентификатор департамента не должен быть менее {MinLength} символов"
             );
+
         if (formatted.GreaterThan(MaxLength))
             return Error.ValidationError(
                 $"Идентификатор департамента не должен быть более {MaxLength} символов"
             );
+
         if (!formatted.IsLatinOnly())
             return Error.ValidationError(
-                $"Идентификатор департамента должен быть толькой латиницей"
+                $"Идентификатор департамента должен быть толькой латиницей без пробелов"
             );
-        return new DepartmentIdentifier(value.ToUpper());
+
+        return new DepartmentIdentifier(formatted);
     }
 }

@@ -41,6 +41,6 @@ public static class StringExtensions
 
     public static bool IsLatinOnly(this string input)
     {
-        return input.All(l => (l >= 'a' && l <= 'z') || (l >= 'A' && l <= 'Z'));
+        return input.All(l => (l >= 'a' && l <= 'z') || (l >= 'A' && l <= 'Z') || l == '-');
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
 {
     [DbContext(typeof(ServiceDbContext))]
-    partial class ServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251007171237_Added deparment attachments history")]
+    partial class Addeddeparmentattachmentshistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,6 +31,11 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<string>("Attachments")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("attachments");
 
                     b.Property<int>("ChildrensCount")
                         .HasColumnType("integer")
@@ -194,55 +202,6 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                         .IsUnique();
 
                     b.ToTable("positions", (string)null);
-                });
-
-            modelBuilder.Entity("DirectoryService.Core.DeparmentsContext.Department", b =>
-                {
-                    b.OwnsOne("DirectoryService.Core.DeparmentsContext.ValueObjects.DepartmentAttachmentsHistory", "Attachments", b1 =>
-                        {
-                            b1.Property<Guid>("DepartmentId")
-                                .HasColumnType("uuid");
-
-                            b1.HasKey("DepartmentId");
-
-                            b1.ToTable("departments");
-
-                            b1.ToJson("attachments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DepartmentId");
-
-                            b1.OwnsMany("DirectoryService.Core.DeparmentsContext.ValueObjects.DepartmentChildAttachment", "Attachments", b2 =>
-                                {
-                                    b2.Property<Guid>("DepartmentAttachmentsHistoryDepartmentId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    b2.Property<DateTime>("AttachedAt")
-                                        .HasColumnType("timestamp with time zone")
-                                        .HasColumnName("attached_at");
-
-                                    b2.Property<Guid>("Id")
-                                        .ValueGeneratedOnUpdateSometimes()
-                                        .HasColumnType("uuid")
-                                        .HasColumnName("id");
-
-                                    b2.HasKey("DepartmentAttachmentsHistoryDepartmentId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("departments");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("DepartmentAttachmentsHistoryDepartmentId");
-                                });
-
-                            b1.Navigation("Attachments");
-                        });
-
-                    b.Navigation("Attachments")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DirectoryService.Core.DeparmentsContext.Entities.DepartmentLocation", b =>

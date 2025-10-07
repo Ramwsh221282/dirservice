@@ -2,7 +2,6 @@ using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Locations.Contracts;
 using Microsoft.EntityFrameworkCore;
-using ResultLibrary;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
 
@@ -15,19 +14,16 @@ public sealed class LocationsRepository : ILocationsRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Result<Guid>> AddLocation(Location location, CancellationToken ct = default)
-    {
-        try
-        {
-            await _dbContext.AddAsync(location, ct);
-            await _dbContext.SaveChangesAsync(ct);
-            return location.Id.Value;
-        }
-        catch
-        {
-            return Error.ExceptionalError("Непредвиденная ошибка при сохранении локации.");
-        }
-    }
+    public async Task AddLocation(Location location, CancellationToken ct = default) =>
+        await _dbContext.AddAsync(location, ct);
+
+    public async Task<IEnumerable<Location>> GetBySet(
+        LocationsIdSet set,
+        CancellationToken ct = default
+    ) =>
+        await _dbContext
+            .Locations.Where(loc => set.Ids.Contains(loc.Id))
+            .ToListAsync(cancellationToken: ct);
 
     public async Task<LocationNameUniquesness> IsLocationNameUnique(
         LocationName name,

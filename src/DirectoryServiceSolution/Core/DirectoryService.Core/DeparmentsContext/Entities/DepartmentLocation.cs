@@ -11,7 +11,7 @@ public sealed class DepartmentLocation
     public LocationId LocationId { get; }
     public Location Location { get; } = null!;
 
-    public DepartmentLocation()
+    private DepartmentLocation()
     {
         // ef core
     }

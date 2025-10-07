@@ -10,12 +10,17 @@ public sealed record DepartmentPath
 
     public DepartmentPath(DepartmentIdentifier identifier) => Value = identifier.Value;
 
-    public Result<DepartmentPath> CreateNodePart(DepartmentPath other) => Create(this, other);
-
     public bool ContainsIdentifier(DepartmentIdentifier identifier)
     {
         int identifierIndex = IndexOfIdentifier(identifier);
         return identifierIndex >= 0;
+    }
+
+    public Result<DepartmentDepth> CalculateDepth()
+    {
+        string[] parts = Value.Split('.');
+        short nextDepth = (short)(parts.Length - 1);
+        return DepartmentDepth.Create(nextDepth);
     }
 
     public Result<int> DepthLevel(DepartmentIdentifier identifier)
@@ -40,12 +45,6 @@ public sealed record DepartmentPath
         return DepartmentDepth.Create((short)level);
     }
 
-    public Result<DepartmentPath> CreateNodePart(string other)
-    {
-        DepartmentPath node = Create(other);
-        return CreateNodePart(node);
-    }
-
     public static Result<DepartmentPath> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -54,15 +53,19 @@ public sealed record DepartmentPath
         return new DepartmentPath(formatted);
     }
 
-    public static Result<DepartmentPath> Create(DepartmentPath parentPath, string value)
+    public Result<DepartmentPath> BindWithOther(Department department)
     {
-        DepartmentPath node = Create(value);
-        return Create(parentPath, node);
+        return BindWithOther(department.Identifier);
     }
 
-    public static Result<DepartmentPath> Create(DepartmentPath parentPath, DepartmentPath node)
+    public Result<DepartmentPath> BindWithOther(DepartmentIdentifier node)
     {
-        string[] nodes = [parentPath.Value, node.Value];
+        if (Value.Contains(node.Value))
+            return Error.ConflictError(
+                $"Путь подразделения {Value} уже содержит узел {node.Value}."
+            );
+
+        string[] nodes = [Value, node.Value];
         string completeName = string.Join('.', nodes);
         return new DepartmentPath(completeName);
     }

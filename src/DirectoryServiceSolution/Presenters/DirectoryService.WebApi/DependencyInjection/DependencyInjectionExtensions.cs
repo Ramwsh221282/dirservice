@@ -1,8 +1,11 @@
 ﻿using System.Reflection;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Cqrs;
+using DirectoryService.UseCases.Common.UnitOfWork;
+using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
 using FluentValidation;
 
@@ -22,7 +25,9 @@ public static class DependencyInjectionExtensions
         builder.Services.AddOptions<NpgSqlConnectionOptions>()
             .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
         builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
+        builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
         builder.Services.AddScoped<ServiceDbContext>();
+        builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
     }
 
     public static T GetService<T>(this AsyncServiceScope scope) where T : notnull

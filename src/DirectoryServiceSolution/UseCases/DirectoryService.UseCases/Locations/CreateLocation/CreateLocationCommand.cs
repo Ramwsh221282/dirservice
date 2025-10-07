@@ -1,4 +1,4 @@
-using DirectoryService.Contracts;
+using DirectoryService.Contracts.Locations;
 using DirectoryService.UseCases.Common.Cqrs;
 
 namespace DirectoryService.UseCases.Locations.CreateLocation;
