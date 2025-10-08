@@ -21,12 +21,14 @@ public sealed class CreatePositionCommandHandler : ICommandHandler<Guid, CreateP
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<CreatePositionCommand> _validator;
     private readonly ILogger _logger;
-    
+
     public CreatePositionCommandHandler(
-        IDepartmentsRepository departments, 
-        IPositionsRepository positions, IUnitOfWork unitOfWork, 
-        IValidator<CreatePositionCommand> validator, 
-        ILogger logger)
+        IDepartmentsRepository departments,
+        IPositionsRepository positions,
+        IUnitOfWork unitOfWork,
+        IValidator<CreatePositionCommand> validator,
+        ILogger logger
+    )
     {
         _departments = departments;
         _positions = positions;
@@ -34,30 +36,39 @@ public sealed class CreatePositionCommandHandler : ICommandHandler<Guid, CreateP
         _validator = validator;
         _logger = logger;
     }
-    
-    public async Task<Result<Guid>> Handle(CreatePositionCommand command, CancellationToken ct = default)
+
+    public async Task<Result<Guid>> Handle(
+        CreatePositionCommand command,
+        CancellationToken ct = default
+    )
     {
         ValidationResult validation = await _validator.ValidateAsync(command, ct);
-        if (validation.IsValid == false)
+        if (!validation.IsValid)
         {
             Result<Guid> failed = validation.AsFailureResult<Guid>();
-            _logger.Error("{Method}. {Error}.", nameof(CreatePositionCommand), failed.Error.Message);
+            _logger.Error(
+                "{Method}. {Error}.",
+                nameof(CreatePositionCommand),
+                failed.Error.Message
+            );
             return failed;
         }
-        
+
         PositionName name = PositionName.Create(command.Name);
         PositionDescription description = PositionDescription.Create(command.Description);
         PositionNameUniquesness uniquesness = await _positions.IsUnique(name, ct);
         Result<Position> position = Position.CreateNew(name, description, uniquesness);
         if (position.IsFailure)
             return position.Error;
-        
+
         await _positions.Add(position.Value, ct);
-        
+
         DepartmentsIdSet identifiers = DepartmentsIdSet.Create(command.DepartmentIdentifiers);
         IEnumerable<Department> departments = await _departments.GetByIdArray(identifiers, ct);
         if (!departments.Any())
-            return Error.ConflictError("Не найдены подразделения, для которых нужно прикрепить позицию.");
+            return Error.ConflictError(
+                "Не найдены подразделения, для которых нужно прикрепить позицию."
+            );
 
         Result binding = position.Value.BindToDepartment(departments);
         if (binding.IsFailure)

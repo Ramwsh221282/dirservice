@@ -12,10 +12,10 @@ public sealed record CreateDepartmentCommand : ICommand<Guid>
 
     public CreateDepartmentCommand(CreateDepartmentRequest request)
         : this(
-            request.Name.Value,
-            request.Identifier.Value,
-            request.Locations.Select(l => l.Value),
-            request.ParentId?.Value
+            request.Name,
+            request.Identifier,
+            request.LocationIds.Values.Select(l => l),
+            request.ParentId
         ) { }
 
     public CreateDepartmentCommand(

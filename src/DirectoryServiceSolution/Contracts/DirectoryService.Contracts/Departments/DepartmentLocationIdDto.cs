@@ -1,3 +1,3 @@
 namespace DirectoryService.Contracts.Departments;
 
-public sealed record DepartmentLocationIdDto(Guid Value);
+public sealed record DepartmentLocationIdsDto(IEnumerable<Guid> Values);

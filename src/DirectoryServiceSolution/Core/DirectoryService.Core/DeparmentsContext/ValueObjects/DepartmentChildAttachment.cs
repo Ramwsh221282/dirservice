@@ -9,28 +9,33 @@ public sealed record DepartmentAttachmentsHistory
 
     public IReadOnlyList<DepartmentChildAttachment> Attachments => _attachments;
 
-    public DepartmentAttachmentsHistory()
+    private DepartmentAttachmentsHistory()
     {
-      // ef core   
+        // ef core
     }
 
     public int Count() => _attachments.Count;
-    
+
     public DepartmentAttachmentsHistory(IEnumerable<DepartmentChildAttachment> attachments) =>
-        _attachments = [..attachments];
-    
-    public bool IsAttached(DepartmentId departmentId) => _attachments.Any(a => a.Id == departmentId);
-    
+        _attachments = [.. attachments];
+
+    public bool IsAttached(DepartmentId departmentId) =>
+        _attachments.Any(a => a.Id == departmentId);
+
     public bool IsAttached(Department department) => IsAttached(department.Id);
+
+    public static DepartmentAttachmentsHistory Empty() => new DepartmentAttachmentsHistory([]);
 
     public static Result<DepartmentAttachmentsHistory> FromJson(string json)
     {
         using JsonDocument document = JsonDocument.Parse(json);
         List<DepartmentChildAttachment> attachments = [];
-        
+
         foreach (JsonElement entry in document.RootElement.EnumerateArray())
         {
-            Result<DepartmentChildAttachment> attachment = DepartmentChildAttachment.FromJson(entry);
+            Result<DepartmentChildAttachment> attachment = DepartmentChildAttachment.FromJson(
+                entry
+            );
             if (attachment.IsFailure)
                 return attachment.Error;
             attachments.Add(attachment);

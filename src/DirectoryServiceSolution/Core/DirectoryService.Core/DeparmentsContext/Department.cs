@@ -23,7 +23,8 @@ public sealed class Department : ISoftDeletable
     public DepartmentChildrensCount ChildrensCount { get; private set; }
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
-    public DepartmentAttachmentsHistory Attachments { get; private set; }
+    public DepartmentAttachmentsHistory Attachments { get; private set; } =
+        DepartmentAttachmentsHistory.Empty();
     public bool Deleted => LifeCycle.IsDeleted;
 
     private Department() { }
@@ -76,7 +77,7 @@ public sealed class Department : ISoftDeletable
         ChildrensCount = childrensCount;
         _locations = [];
         _positions = [];
-        Attachments = new DepartmentAttachmentsHistory([]);
+        Attachments = DepartmentAttachmentsHistory.Empty();
     }
 
     public bool Includes(Department department) =>
@@ -103,16 +104,20 @@ public sealed class Department : ISoftDeletable
     public Result AddPosition(Position position)
     {
         if (_positions.Any(p => p.DepartmentId == Id && p.PositionId == position.Id))
-            return Error.ConflictError($"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}.");
+            return Error.ConflictError(
+                $"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}."
+            );
         _positions.Add(new DepartmentPosition(this, position));
         return Result.Success();
     }
-    
+
     public Result AttachOtherDepartment(Department other)
     {
         if (Attachments.IsAttached(other))
-            return Error.ConflictError($"Подразделение {other.Identifier.Value} уже прикреплено к {Identifier.Value}.");
-        
+            return Error.ConflictError(
+                $"Подразделение {other.Identifier.Value} уже прикреплено к {Identifier.Value}."
+            );
+
         Result<DepartmentPath> childPath = Path.BindWithOther(other);
         if (childPath.IsFailure)
             return childPath.Error;
@@ -125,15 +130,40 @@ public sealed class Department : ISoftDeletable
         if (childDepth.IsFailure)
             return childDepth.Error;
 
-        DepartmentChildAttachment attachment = new DepartmentChildAttachment(other.Id, DateTime.UtcNow);
-        Attachments = new DepartmentAttachmentsHistory([..Attachments.Attachments, attachment]);
-        
+        DepartmentChildAttachment attachment = new DepartmentChildAttachment(
+            other.Id,
+            DateTime.UtcNow
+        );
+        Attachments = new DepartmentAttachmentsHistory([.. Attachments.Attachments, attachment]);
+
         ChildrensCount = nextCount.Value;
         other.Parent = Id;
         other.Path = childPath.Value;
         other.Depth = childDepth.Value;
         LifeCycle.Update();
         return Result.Success();
+    }
+
+    public static Result<Department> CreateNew(
+        DepartmentName name,
+        DepartmentIdentifier identifier,
+        IEnumerable<Location> locations,
+        Department? parent
+    )
+    {
+        Department child = CreateNew(name, identifier);
+        if (parent != null)
+        {
+            Result attaching = parent.AttachOtherDepartment(child);
+            if (attaching.IsFailure)
+                return attaching.Error;
+        }
+
+        Result addingLocations = child.AddLocations(locations);
+        if (addingLocations.IsFailure)
+            return addingLocations.Error;
+
+        return child;
     }
 
     public static Department CreateNew(DepartmentName name, DepartmentIdentifier identifier)

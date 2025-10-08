@@ -10,18 +10,20 @@ public sealed record CreatePositionCommand : ICommand<Guid>
     public string Description { get; }
 
     public CreatePositionCommand(
-        string name, 
-        string description, 
-        IEnumerable<Guid> departmentIdentifiers)
+        string name,
+        string description,
+        IEnumerable<Guid> departmentIdentifiers
+    )
     {
         Name = name;
         Description = description;
         DepartmentIdentifiers = departmentIdentifiers;
     }
 
-    public CreatePositionCommand(CreatePositionRequest request) : this(
-        request.Name.Value, 
-        request.Description.Value, 
-        request.Identifiers.DepartmentIdentifiers.Select(i => i))
-    {  }
+    public CreatePositionCommand(CreatePositionRequest request)
+        : this(
+            request.Name,
+            request.Description,
+            request.Identifiers.DepartmentIdentifiers.Select(i => i)
+        ) { }
 }

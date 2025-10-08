@@ -1,3 +1,3 @@
 namespace DirectoryService.Contracts.Locations;
 
-public sealed record LocationAddressNodeDto(string Node);
+public sealed record LocationAddressNodeDto(IEnumerable<string> Nodes);

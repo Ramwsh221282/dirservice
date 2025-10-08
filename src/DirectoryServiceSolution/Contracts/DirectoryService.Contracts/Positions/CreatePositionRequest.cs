@@ -1,6 +1,7 @@
 ﻿namespace DirectoryService.Contracts.Positions;
 
 public sealed record CreatePositionRequest(
-    PositionNameDto Name,
-    PositionDescriptionDto Description,
-    PositionDepartmentIdentifiersDto Identifiers);
+    string Name,
+    string Description,
+    PositionDepartmentIdentifiersDto Identifiers
+);

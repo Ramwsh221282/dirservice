@@ -1,4 +1,5 @@
 using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Common.Cqrs;
@@ -38,29 +39,36 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<Guid, Creat
     )
     {
         ValidationResult validation = await _validator.ValidateAsync(command, ct);
-        if (validation.IsValid == false)
+        if (!validation.IsValid)
             return validation.AsFailureResult<Guid>();
 
         LocationsIdSet locationIds = LocationsIdSet.Create(command.LocationIds);
         IEnumerable<Location> locations = await _locationsRepository.GetBySet(locationIds, ct);
-        if (locations.Any() == false)
+        if (!locations.Any())
             return Error.ConflictError(
                 "Для создания подразделения необходимо указать его локацию/локации."
             );
 
-        IDepartmentCreationStrategy strategy = command.ParentId switch
-        {
-            null => new RootDepartmentCreationStrategy(),
-            _ => new ChildDepartmentCreationStrategy(_departmentsRepository),
-        };
+        DepartmentName name = DepartmentName.Create(command.Name);
+        DepartmentIdentifier identifier = DepartmentIdentifier.Create(command.Identifier);
 
-        Result<Department> created = await strategy.Create(command, locations, ct);
-        if (created.IsFailure)
-            return created.Error;
-        
-        await _departmentsRepository.Add(created.Value, ct);
+        Department? parent = null;
+        if (command.ParentId != null)
+        {
+            Result<Department> parentResult = await _departmentsRepository.GetById(
+                command.ParentId.Value,
+                ct
+            );
+            if (parentResult.IsFailure)
+                return parentResult.Error;
+
+            parent = parentResult.Value;
+        }
+
+        Result<Department> department = Department.CreateNew(name, identifier, locations, parent);
+        await _departmentsRepository.Add(department.Value, ct);
         Result saving = await _unitOfWork.SaveChanges(ct);
-        
-        return saving.IsFailure ? saving.Error : created.Value.Id.Value;
+
+        return saving.IsFailure ? saving.Error : department.Value.Id.Value;
     }
 }
