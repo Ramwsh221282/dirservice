@@ -85,6 +85,9 @@ public sealed class Department : ISoftDeletable
 
     public Result AddLocations(IEnumerable<Location> locations)
     {
+        if (Deleted)
+            return Error.ConflictError("Подразделения не существует.");
+
         Location[] duplicates = [.. locations.ExtractDuplicates(l => l.Id)];
         if (duplicates.Any())
         {
@@ -103,6 +106,9 @@ public sealed class Department : ISoftDeletable
 
     public Result AddPosition(Position position)
     {
+        if (Deleted)
+            return Error.ConflictError("Подразделения не существует.");
+
         if (_positions.Any(p => p.DepartmentId == Id && p.PositionId == position.Id))
             return Error.ConflictError(
                 $"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}."
@@ -113,6 +119,9 @@ public sealed class Department : ISoftDeletable
 
     public Result AttachOtherDepartment(Department other)
     {
+        if (Deleted)
+            return Error.ConflictError("Подразделения не существует.");
+
         if (Attachments.IsAttached(other))
             return Error.ConflictError(
                 $"Подразделение {other.Identifier.Value} уже прикреплено к {Identifier.Value}."

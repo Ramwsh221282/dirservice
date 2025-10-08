@@ -22,7 +22,7 @@ public sealed class LocationsRepository : ILocationsRepository
         CancellationToken ct = default
     ) =>
         await _dbContext
-            .Locations.Where(loc => set.Ids.Contains(loc.Id))
+            .Locations.Where(loc => set.Ids.Contains(loc.Id) && loc.LifeCycle.DeletedAt == null)
             .ToListAsync(cancellationToken: ct);
 
     public async Task<LocationNameUniquesness> IsLocationNameUnique(
@@ -30,7 +30,10 @@ public sealed class LocationsRepository : ILocationsRepository
         CancellationToken ct = default
     )
     {
-        bool hasAny = await _dbContext.Locations.AsNoTracking().AnyAsync(l => l.Name == name, ct);
+        bool hasAny = await _dbContext
+            .Locations.AsNoTracking()
+            .AnyAsync(l => l.Name == name && l.LifeCycle.DeletedAt == null, ct);
+
         return hasAny
             ? new LocationNameUniquesness(false, name.Value)
             : new LocationNameUniquesness(true, string.Empty);

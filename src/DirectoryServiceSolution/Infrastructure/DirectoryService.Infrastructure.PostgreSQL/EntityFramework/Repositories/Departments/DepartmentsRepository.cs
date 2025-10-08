@@ -23,21 +23,31 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
 
     public async Task<Result<Department>> GetById(DepartmentId id, CancellationToken ct = default)
     {
-        Department? department = await _dbContext.Departments
-            .Include(d => d.Locations)
+        Department? department = await _dbContext
+            .Departments.Include(d => d.Locations)
             .Include(d => d.Positions)
-            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken: ct);
-        
+            .FirstOrDefaultAsync(
+                d => d.Id == id && d.LifeCycle.DeletedAt == null,
+                cancellationToken: ct
+            );
+
         return department == null
             ? Error.NotFoundError($"Подразделения с ID - {id.Value} не существует.")
             : department;
     }
 
-    public async Task<IEnumerable<Department>> GetByIdArray(IEnumerable<DepartmentId> ids, CancellationToken ct = default) =>
-        await _dbContext.Departments.Where(d => ids.Contains(d.Id)).ToListAsync(ct);
+    public async Task<IEnumerable<Department>> GetByIdArray(
+        IEnumerable<DepartmentId> ids,
+        CancellationToken ct = default
+    ) =>
+        await _dbContext
+            .Departments.Where(d => ids.Contains(d.Id) && d.LifeCycle.DeletedAt == null)
+            .ToListAsync(ct);
 
-    public async Task<IEnumerable<Department>> GetByIdArray(DepartmentsIdSet ids, CancellationToken ct = default) =>
-        await GetByIdArray(ids.DepartmentIds, ct);
+    public async Task<IEnumerable<Department>> GetByIdArray(
+        DepartmentsIdSet ids,
+        CancellationToken ct = default
+    ) => await GetByIdArray(ids.DepartmentIds, ct);
 
     public async Task Add(Department department, CancellationToken ct = default) =>
         await _dbContext.Departments.AddAsync(department, ct);
