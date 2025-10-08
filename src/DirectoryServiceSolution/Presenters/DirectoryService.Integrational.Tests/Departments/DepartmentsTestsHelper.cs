@@ -1,0 +1,45 @@
+﻿using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
+using DirectoryService.UseCases.Common.Cqrs;
+using DirectoryService.UseCases.Departments.Contracts;
+using DirectoryService.UseCases.Departments.CreateDepartment;
+using DirectoryService.WebApi.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using ResultLibrary;
+
+namespace DirectoryService.Integrational.Tests.Departments;
+
+public sealed class DepartmentsTestsHelper
+{
+    private readonly IServiceProvider _services;
+
+    public DepartmentsTestsHelper(TestApplicationFactory factory)
+    {
+        _services = factory.Services;
+    }
+
+    public async Task<Result<Guid>> CreateNewDepartment(
+        string name,
+        string identifier,
+        IEnumerable<Guid> locationIds,
+        Guid? parentId = null
+    )
+    {
+        CreateDepartmentCommand createDepartment = new(name, identifier, locationIds, parentId);
+        await using var scope = _services.CreateAsyncScope();
+        var createDepartmentHandler = scope.GetService<
+            ICommandHandler<Guid, CreateDepartmentCommand>
+        >();
+        return await createDepartmentHandler.Handle(createDepartment);
+    }
+
+    public async Task<Result<Department>> GetDepartment(Guid id)
+    {
+        await using var scope = _services.CreateAsyncScope();
+        await using var dbContext = scope.GetService<ServiceDbContext>();
+        IDepartmentsRepository repository = new DepartmentsRepository(dbContext);
+        var department = await repository.GetById(id);
+        return department;
+    }
+}

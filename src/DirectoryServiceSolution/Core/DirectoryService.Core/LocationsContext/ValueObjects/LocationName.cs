@@ -16,13 +16,12 @@ public sealed record LocationName
         if (string.IsNullOrWhiteSpace(value))
             return Error.ValidationError($"Наименование локации было пустым.");
 
-        string formatted = value.FormatForName();
-        if (formatted.GreaterThan(MaxLength))
+        if (value.GreaterThan(MaxLength))
             return Error.ValidationError($"Наименование превышает длину {MaxLength} символов.");
 
-        if (formatted.LessThan(MinLength))
+        if (value.LessThan(MinLength))
             return Error.ValidationError($"Наименование менее длины {MinLength} символов.");
 
-        return new LocationName(formatted);
+        return new LocationName(value);
     }
 }
