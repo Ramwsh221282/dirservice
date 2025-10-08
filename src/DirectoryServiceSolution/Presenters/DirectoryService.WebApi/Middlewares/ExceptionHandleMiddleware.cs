@@ -9,10 +9,7 @@ public sealed class ExceptionHandleMiddleware
     private readonly RequestDelegate _next;
     private readonly Serilog.ILogger _logger;
 
-    public ExceptionHandleMiddleware(
-        Serilog.ILogger logger,
-        RequestDelegate next
-    )
+    public ExceptionHandleMiddleware(Serilog.ILogger logger, RequestDelegate next)
     {
         _next = next;
         _logger = logger;
