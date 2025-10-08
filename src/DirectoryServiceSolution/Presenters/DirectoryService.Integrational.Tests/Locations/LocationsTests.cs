@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
 
-namespace DirectoryService.Integrational.Tests;
+namespace DirectoryService.Integrational.Tests.Locations;
 
 public class LocationsTests : IClassFixture<TestApplicationFactory>
 {

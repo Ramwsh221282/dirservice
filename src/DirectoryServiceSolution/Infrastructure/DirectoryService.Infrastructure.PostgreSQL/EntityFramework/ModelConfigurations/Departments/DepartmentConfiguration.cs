@@ -21,7 +21,7 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
         builder
             .Property(d => d.Identifier)
             .HasColumnName("identifier")
-            .HasConversion(toDb => toDb.Value, fromDb => DepartmentIdentifier.CreateNode(fromDb))
+            .HasConversion(toDb => toDb.Value, fromDb => DepartmentIdentifier.Create(fromDb))
             .HasMaxLength(DepartmentIdentifier.MaxLength);
 
         builder.ComplexProperty(
@@ -59,5 +59,22 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
             .Property(d => d.Parent)
             .HasConversion(toDb => toDb!.Value.Value, fromDb => DepartmentId.Create(fromDb))
             .IsRequired(false);
+
+        builder
+            .Property(d => d.ChildrensCount)
+            .HasColumnName("childrens_count")
+            .HasConversion(toDb => toDb.Value, fromDb => DepartmentChildrensCount.Create(fromDb))
+            .IsRequired();
+
+        builder.OwnsOne(d => d.Attachments, atb =>
+        {
+            atb.ToJson("attachments");
+            atb.OwnsMany(at => at.Attachments, b =>
+            {
+                b.Property(at => at.Id).HasColumnName("id")
+                    .HasConversion(toDb => toDb.Value, fromDb => DepartmentId.Create(fromDb));
+                b.Property(at => at.AttachedAt).HasColumnName("attached_at");
+            });
+        });
     }
 }

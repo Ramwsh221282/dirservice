@@ -1,6 +1,6 @@
-using DirectoryService.Core.Common.ValueObjects;
 using DirectoryService.Core.DeparmentsContext;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
+using ResultLibrary;
 
 namespace DirectoryService.Tests.DepartmentsContext;
 
@@ -10,30 +10,59 @@ public class DepartmentChildTests
     private void Attach_Child_Success()
     {
         const string expectedPath = "first.second";
-        const int expectedDepthParentLevel = 1;
-        const int expectedDepthChildLevel = 2;
+        const int expectedDepthParentLevel = 0;
+        const int expectedDepthChildLevel = 1;
+        const int exptectedParentChildCount = 1;
 
-        DepartmentId firstId = new DepartmentId();
-        DepartmentIdentifier firstIdentifier = DepartmentIdentifier.CreateNode("first");
-        EntityLifeCycle firstlifeCycle = new EntityLifeCycle();
         DepartmentName firstName = DepartmentName.Create("First name");
-        DepartmentPath firstPath = new DepartmentPath(firstIdentifier);
-        DepartmentDepth firstDepth = DepartmentDepth.Create(firstPath, firstIdentifier);
-        Department first = Department.Create(firstId, firstIdentifier, firstlifeCycle, firstName, firstPath, firstDepth);
+        DepartmentIdentifier firstIdentifier = DepartmentIdentifier.Create("first");
+        Department first = Department.CreateNew(firstName, firstIdentifier);
 
-        DepartmentId secondId = new DepartmentId();
-        DepartmentIdentifier secondIdentifier = DepartmentIdentifier.CreateNode("second");
-        EntityLifeCycle secondLifeCycle = new EntityLifeCycle();
+        DepartmentIdentifier secondIdentifier = DepartmentIdentifier.Create("second");
         DepartmentName secondName = DepartmentName.Create("Second name");
-        DepartmentPath secondPath = new DepartmentPath(secondIdentifier);
-        DepartmentDepth secondDepth = DepartmentDepth.Create(secondPath, secondIdentifier);
-        Department second = Department.Create(secondId, secondIdentifier, secondLifeCycle, secondName, secondPath, secondDepth);
-
-        Department attached = first.AttachOtherDepartment(second);
-        Assert.NotNull(attached.Parent);
-        Assert.Equal(expectedPath, attached.Identifier.Value);
-        Assert.Equal(expectedPath, attached.Path.Value);
+        Department second = Department.CreateNew(secondName, secondIdentifier);
+        
+        Result attaching = first.AttachOtherDepartment(second);
+        Assert.True(attaching.IsSuccess);
+        Assert.True(second.Includes(first));
+        Assert.Equal(exptectedParentChildCount, first.ChildrensCount.Value);
         Assert.Equal(expectedDepthParentLevel, first.Depth.Value);
-        Assert.Equal(expectedDepthChildLevel, attached.Depth.Value);
-    }    
+        Assert.Equal(expectedDepthChildLevel, second.Depth.Value);
+        Assert.Equal(expectedPath, second.Path.Value);
+        Assert.Equal(1, first.Attachments.Count());
+    }
+
+    [Fact]
+    private void Attach_Child_Again_Failure()
+    {
+        const string expectedPath = "first.second";
+        const int expectedDepthParentLevel = 0;
+        const int expectedDepthChildLevel = 1;
+        const int expectedParentChildsCount = 1;
+
+        DepartmentName firstName = DepartmentName.Create("First name");
+        DepartmentIdentifier firstIdentifier = DepartmentIdentifier.Create("first");
+        Department first = Department.CreateNew(firstName, firstIdentifier);
+
+        DepartmentIdentifier secondIdentifier = DepartmentIdentifier.Create("second");
+        DepartmentName secondName = DepartmentName.Create("Second name");
+        Department second = Department.CreateNew(secondName, secondIdentifier);
+
+        Result attaching = first.AttachOtherDepartment(second);
+        Assert.True(attaching.IsSuccess);
+        Assert.True(second.Includes(first));
+        Assert.Equal(expectedParentChildsCount, first.ChildrensCount.Value);
+        Assert.Equal(expectedDepthParentLevel, first.Depth.Value);
+        Assert.Equal(expectedDepthChildLevel, second.Depth.Value);
+        Assert.Equal(expectedPath, second.Path.Value);
+        Assert.Equal(1, first.Attachments.Count());
+
+        Result attachingAgain = first.AttachOtherDepartment(second);
+        Assert.True(attachingAgain.IsFailure);
+        Assert.True(second.Includes(first));
+        Assert.Equal(expectedParentChildsCount, first.ChildrensCount.Value);
+        Assert.Equal(expectedDepthParentLevel, first.Depth.Value);
+        Assert.Equal(expectedDepthChildLevel, second.Depth.Value);
+        Assert.Equal(expectedPath, second.Path.Value);
+    }
 }

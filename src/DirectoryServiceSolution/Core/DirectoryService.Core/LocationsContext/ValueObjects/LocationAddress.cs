@@ -26,6 +26,16 @@ public sealed record LocationAddress
 
     public static Result<LocationAddress> Create(IEnumerable<string> parts)
     {
+        IEnumerable<string> duplicates = parts.ExtractDuplicates(p => p);
+        if (duplicates.Any())
+        {
+            string errorMessage = $"""
+                У адреса локации найдены дублирующиеся узлы: 
+                {string.Join(", ", duplicates)}
+                """;
+            return Error.ValidationError(errorMessage);
+        }
+
         IEnumerable<Result<LocationAddressPart>> valid = parts.Select(LocationAddressPart.Create);
         if (valid.Any(r => r.IsFailure))
         {

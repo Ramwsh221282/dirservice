@@ -14,16 +14,19 @@ public sealed record DepartmentName
     public static Result<DepartmentName> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Error.ValidationError("Название подразделения не может быть пустым");
-        string formatted = value.FormatForName();
-        if (formatted.LessThan(MinLength))
+            return Error.ValidationError("Название подразделения не может быть пустым"); 
+        
+        
+        if (value.LessThan(MinLength))
             return Error.ValidationError(
                 $"Название подразделения не может быть менее {MinLength} символов"
             );
-        if (formatted.GreaterThan(MaxLength))
+        
+        if (value.GreaterThan(MaxLength))
             return Error.ValidationError(
                 $"Название подразделения не может быть более {MaxLength} символов"
             );
-        return new DepartmentName(formatted);
+        
+        return new DepartmentName(value);
     }
 }
