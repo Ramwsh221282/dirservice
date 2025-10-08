@@ -67,7 +67,7 @@ public sealed class Position : ISoftDeletable
     public Result BindToDepartment(IEnumerable<Department> departments)
     {
         if (Deleted)
-            return Error.ConflictError("Должности не существует");
+            return Error.EntityDeletedError();
 
         foreach (Department department in departments)
         {
