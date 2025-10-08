@@ -11,12 +11,7 @@ public sealed record CreateDepartmentCommand : ICommand<Guid>
     public IReadOnlyList<Guid> LocationIds { get; }
 
     public CreateDepartmentCommand(CreateDepartmentRequest request)
-        : this(
-            request.Name,
-            request.Identifier,
-            request.LocationIds.Values.Select(l => l),
-            request.ParentId
-        ) { }
+        : this(request.Name, request.Identifier, request.LocationIds, request.ParentId) { }
 
     public CreateDepartmentCommand(
         string name,

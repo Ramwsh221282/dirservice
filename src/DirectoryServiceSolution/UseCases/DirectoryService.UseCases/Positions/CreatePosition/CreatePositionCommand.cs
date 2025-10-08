@@ -21,9 +21,5 @@ public sealed record CreatePositionCommand : ICommand<Guid>
     }
 
     public CreatePositionCommand(CreatePositionRequest request)
-        : this(
-            request.Name,
-            request.Description,
-            request.Identifiers.DepartmentIdentifiers.Select(i => i)
-        ) { }
+        : this(request.Name, request.Description, request.DepartmentIds) { }
 }

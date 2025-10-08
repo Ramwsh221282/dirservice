@@ -3,6 +3,6 @@ namespace DirectoryService.Contracts.Departments;
 public sealed record CreateDepartmentRequest(
     string Name,
     string Identifier,
-    DepartmentLocationIdsDto LocationIds,
+    IEnumerable<Guid> LocationIds,
     Guid? ParentId = null
 );

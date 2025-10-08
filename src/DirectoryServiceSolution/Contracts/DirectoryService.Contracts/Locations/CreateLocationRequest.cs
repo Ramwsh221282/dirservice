@@ -2,6 +2,6 @@ namespace DirectoryService.Contracts.Locations;
 
 public sealed record CreateLocationRequest(
     string Name,
-    LocationAddressNodeDto AddressNodes,
+    LocationAddressDto Address,
     string TimeZone
 );
