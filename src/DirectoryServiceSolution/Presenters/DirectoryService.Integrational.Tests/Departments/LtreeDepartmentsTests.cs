@@ -53,6 +53,28 @@ public sealed class LtreeDepartmentsTests : IClassFixture<RealDatabaseTestApplic
         Assert.NotEmpty(items);
     }
 
+    [Fact]
+    private async Task Query_Department_Ancestors_Only_Success()
+    {
+        const string lowestPath = "department-a.department-c.department-d";
+
+        const string sql = """
+            SELECT * FROM departments
+            WHERE path @> @lowestPath::ltree
+            AND path != @lowestPath::ltree
+            """;
+
+        await CreateDepartmentFamily();
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
+        await using ServiceDbContext db = scope.GetService<ServiceDbContext>();
+        DbConnection connection = db.Database.GetDbConnection();
+
+        DepartmentPoco[] items = (
+            await connection.QueryAsync<DepartmentPoco>(sql, new { lowestPath })
+        ).ToArray();
+        Assert.NotEmpty(items);
+    }
+
     private async Task CreateDepartmentFamily()
     {
         Guid locationId = await _locationsTests.CreateNewLocation(
