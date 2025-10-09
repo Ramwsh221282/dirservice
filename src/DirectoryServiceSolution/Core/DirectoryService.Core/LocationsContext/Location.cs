@@ -59,6 +59,7 @@ public sealed class Location : ISoftDeletable
     {
         if (!uniquesness.IsUnique(name))
             return uniquesness.NonUniqueLocationError();
+
         LocationId id = new LocationId();
         EntityLifeCycle lifeCycle = new EntityLifeCycle();
         return new Location(address, name, timeZone, id, lifeCycle);

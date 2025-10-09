@@ -5,6 +5,7 @@ using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Lo
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Positions;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Cqrs;
+using DirectoryService.UseCases.Common.Transaction;
 using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
@@ -31,6 +32,7 @@ public static class DependencyInjectionExtensions
         builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
         builder.Services.AddScoped<ServiceDbContext>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<ITransactionSource, TransactionSource>();
         builder.Services.AddScoped<IPositionsRepository, PositionsRepository>();
     }
 

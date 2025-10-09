@@ -1,108 +1,59 @@
 ﻿using DirectoryService.Core.LocationsContext;
-using DirectoryService.Core.LocationsContext.ValueObjects;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
-using DirectoryService.UseCases.Common.Cqrs;
-using DirectoryService.UseCases.Locations.CreateLocation;
-using DirectoryService.WebApi.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
 
 namespace DirectoryService.Integrational.Tests.Locations;
 
 public class LocationsTests : IClassFixture<TestApplicationFactory>
 {
-    private readonly IServiceProvider _services;
+    private readonly LocationsTestsHelper _helper;
 
     public LocationsTests(TestApplicationFactory factory)
     {
-        _services = factory.Services;
+        _helper = new LocationsTestsHelper(factory);
     }
 
     [Fact]
     public async Task Create_Location_Name_Duplicate_Failure()
     {
-        LocationName name = LocationName.Create("Test Location");
-        LocationTimeZone timeZone = LocationTimeZone.Create("Big/City");
-        IEnumerable<string> addressParts = ["Some", "Big", "City"];
+        string name = "Test Location";
+        string timeZone = "Big/City";
+        IEnumerable<string> additionals = ["Some", "Big", "City"];
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            CreateLocationCommand command = new(name.Value, addressParts, timeZone.Value);
-            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
-                ICommandHandler<Guid, CreateLocationCommand>
-            >();
-            Result<Guid> result = await handler.Handle(command);
-            Assert.True(result.IsSuccess);
-        }
+        Result<Guid> firstLocation = await _helper.CreateNewLocation(name, timeZone, additionals);
+        Assert.True(firstLocation.IsSuccess);
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
-            Location? location = await context.Locations.FirstOrDefaultAsync(l =>
-                l.Name == LocationName.Create(name.Value)
-            );
-            Assert.NotNull(location);
-            Assert.Equal(location.Name.Value, name.Value);
-            Assert.Equal(location.TimeZone.Value, timeZone.Value);
-            Assert.Contains(location.Address.Parts, p => addressParts.Any(ap => ap.Equals(p.Node)));
-        }
-
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            CreateLocationCommand command = new(name.Value, addressParts, timeZone.Value);
-            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
-                ICommandHandler<Guid, CreateLocationCommand>
-            >();
-            Result<Guid> result = await handler.Handle(command);
-            Assert.True(result.IsFailure);
-        }
+        Result<Guid> firstLocationAgain = await _helper.CreateNewLocation(name, timeZone, additionals);
+        Assert.True(firstLocationAgain.IsFailure);
     }
 
     [Fact]
     public async Task Create_Location_Success()
     {
-        LocationName name = LocationName.Create("Test Location");
-        LocationTimeZone timeZone = LocationTimeZone.Create("Big/City");
-        IEnumerable<string> addressParts = ["Some", "Big", "City"];
+        string name = "Test Location";
+        string timeZone = "Big/City";
+        IEnumerable<string> additionals = ["Some", "Big", "City"];
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            CreateLocationCommand command = new(name.Value, addressParts, timeZone.Value);
-            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
-                ICommandHandler<Guid, CreateLocationCommand>
-            >();
-            Result<Guid> result = await handler.Handle(command);
-            Assert.True(result.IsSuccess);
-        }
+        Result<Guid> firstLocation = await _helper.CreateNewLocation(name, timeZone, additionals);
+        Assert.True(firstLocation.IsSuccess);
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
-            Location? location = await context.Locations.FirstOrDefaultAsync(l =>
-                l.Name == LocationName.Create(name.Value)
-            );
-            Assert.NotNull(location);
-            Assert.Equal(location.Name.Value, name.Value);
-            Assert.Equal(location.TimeZone.Value, timeZone.Value);
-            Assert.Contains(location.Address.Parts, p => addressParts.Any(ap => ap.Equals(p.Node)));
-        }
+        Result<Location> created = await _helper.GetLocation(firstLocation);
+        Assert.True(created.IsSuccess);
+
+        Location location = created.Value;
+        Assert.Equal(location.Name.Value, name);
+        Assert.Equal(location.TimeZone.Value, timeZone);
+        Assert.Contains(location.Address.Parts, p => additionals.Any(ap => ap.Equals(p.Node)));
     }
 
     [Fact]
     public async Task Create_Location_Name_Failure()
     {
         string name = "   ";
-        IEnumerable<string> addressParts = ["Some", "Big", "City"];
         string timeZone = "Big/City";
+        IEnumerable<string> addressParts = ["Some", "Big", "City"];
 
-        await using AsyncServiceScope scope = _services.CreateAsyncScope();
-        CreateLocationCommand command = new(name, addressParts, timeZone);
-        ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
-            ICommandHandler<Guid, CreateLocationCommand>
-        >();
-        Result<Guid> result = await handler.Handle(command);
-        Assert.True(result.IsFailure);
+        Result<Guid> firstLocation = await _helper.CreateNewLocation(name, timeZone, addressParts);
+        Assert.True(firstLocation.IsFailure);
     }
 
     [Fact]
@@ -112,24 +63,8 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         IEnumerable<string> addressParts = ["Some", "Big", "City"];
         string timeZone = "Some Random String";
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            CreateLocationCommand command = new(name, addressParts, timeZone);
-            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
-                ICommandHandler<Guid, CreateLocationCommand>
-            >();
-            Result<Guid> result = await handler.Handle(command);
-            Assert.True(result.IsFailure);
-        }
-
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
-            Location? location = await context.Locations.FirstOrDefaultAsync(l =>
-                l.Name == LocationName.Create(name)
-            );
-            Assert.Null(location);
-        }
+        Result<Guid> firstLocation = await _helper.CreateNewLocation(name, timeZone, addressParts);
+        Assert.True(firstLocation.IsFailure);
     }
 
     [Fact]
@@ -139,23 +74,7 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         IEnumerable<string> addressParts = [];
         string timeZone = "Big/City";
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            CreateLocationCommand command = new(name, addressParts, timeZone);
-            ICommandHandler<Guid, CreateLocationCommand> handler = scope.GetService<
-                ICommandHandler<Guid, CreateLocationCommand>
-            >();
-            Result<Guid> result = await handler.Handle(command);
-            Assert.True(result.IsFailure);
-        }
-
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext context = scope.GetService<ServiceDbContext>();
-            Location? location = await context.Locations.FirstOrDefaultAsync(l =>
-                l.Name == LocationName.Create(name)
-            );
-            Assert.Null(location);
-        }
+        Result<Guid> firstLocation = await _helper.CreateNewLocation(name, timeZone, addressParts);
+        Assert.True(firstLocation.IsFailure);
     }
 }

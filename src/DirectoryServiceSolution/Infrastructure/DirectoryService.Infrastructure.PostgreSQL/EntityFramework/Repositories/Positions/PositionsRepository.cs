@@ -13,17 +13,23 @@ public sealed class PositionsRepository : IPositionsRepository
     {
         _dbContext = dbContext;
     }
-    
+
     public async Task Add(Position position, CancellationToken ct = default)
     {
         await _dbContext.Positions.AddAsync(position, ct);
     }
 
-    public async Task<PositionNameUniquesness> IsUnique(PositionName name, CancellationToken ct = default)
+    public async Task<PositionNameUniquesness> IsUnique(
+        PositionName name,
+        CancellationToken ct = default
+    )
     {
-        bool hasAny = await _dbContext.Positions.AsNoTracking().AnyAsync(p => p.Name == name, cancellationToken: ct);
-        return hasAny ? 
-            new PositionNameUniquesness(false, name.Value) 
+        bool hasAny = await _dbContext
+            .Positions.AsNoTracking()
+            .AnyAsync(p => p.Name == name && p.LifeCycle.DeletedAt == null, cancellationToken: ct);
+
+        return hasAny
+            ? new PositionNameUniquesness(false, name.Value)
             : new PositionNameUniquesness(true, "");
     }
 }

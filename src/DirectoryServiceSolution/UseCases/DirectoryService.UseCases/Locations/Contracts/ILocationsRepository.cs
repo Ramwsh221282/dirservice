@@ -7,10 +7,14 @@ namespace DirectoryService.UseCases.Locations.Contracts;
 public interface ILocationsRepository
 {
     Task AddLocation(Location location, CancellationToken ct = default);
+
     Task<LocationNameUniquesness> IsLocationNameUnique(
-        LocationName location,
+        LocationName name,
         CancellationToken ct = default
     );
 
-    Task<IEnumerable<Location>> GetBySet(LocationsIdSet Set, CancellationToken ct = default);
+    Task<IEnumerable<Location>> GetBySet(LocationsIdSet set, CancellationToken ct = default);
+
+    Task<Result<Location>> GetById(Guid id, CancellationToken ct = default);
+    Task<Result<Location>> GetById(LocationId id, CancellationToken ct = default);
 }

@@ -1,271 +1,158 @@
-﻿using DirectoryService.Core.DeparmentsContext;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
-using DirectoryService.UseCases.Common.Cqrs;
-using DirectoryService.UseCases.Departments.Contracts;
-using DirectoryService.UseCases.Departments.CreateDepartment;
-using DirectoryService.UseCases.Locations.CreateLocation;
-using DirectoryService.WebApi.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using ResultLibrary;
+﻿using DirectoryService.Integrational.Tests.Locations;
 
 namespace DirectoryService.Integrational.Tests.Departments;
 
 public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory>
 {
-    private readonly IServiceProvider _services;
+    private readonly DepartmentsTestsHelper _departmentsHelper;
+    private readonly LocationsTestsHelper _locationsHelper;
 
     public CreateDepartmentTests(TestApplicationFactory factory)
     {
-        _services = factory.Services;
+        _departmentsHelper = new DepartmentsTestsHelper(factory);
+        _locationsHelper = new LocationsTestsHelper(factory);
     }
 
     [Fact]
     private async Task Create_Department_Root_Success()
     {
+        const int expectedAttachmentsCount = 0;
         const int expectedLocationsCount = 2;
         const string expectedDepartmentName = "Test Department";
         const string expectedDepartmentIdentifier = "test-identifier";
         const string expectedDepartmentPath = "test-identifier";
         const int expectedDepartmentDepthLevel = 0;
-        
-        List<Guid> createdLocationIds = [];
-        CreateLocationCommand createLocationFirst =
-            new CreateLocationCommand("Test Location First", ["Test", "Location", "First"], "Test/Location");
-        CreateLocationCommand createLocationSecond = 
-            new CreateLocationCommand("Test Location Second", ["Test", "Location", "Second"], "Test/Location");
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateLocationCommand> createLocationHandler =
-                scope.GetService<ICommandHandler<Guid, CreateLocationCommand>>();
-            Result<Guid> createdLocationId = await createLocationHandler.Handle(createLocationFirst);
-            
-            Assert.True(createdLocationId.IsSuccess);
-            createdLocationIds.Add(createdLocationId);
-        }
+        var firstLocationId = await _locationsHelper.CreateNewLocation(
+            "Test Location First",
+            "Test/Location",
+            ["Test", "Location", "First"]
+        );
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateLocationCommand> createLocationHandler =
-                scope.GetService<ICommandHandler<Guid, CreateLocationCommand>>();
-            Result<Guid> createdLocationId = await createLocationHandler.Handle(createLocationSecond);
-            
-            Assert.True(createdLocationId.IsSuccess);
-            createdLocationIds.Add(createdLocationId);
-        }
-        
-        Assert.Equal(2, expectedLocationsCount);
+        var secondLocationId = await _locationsHelper.CreateNewLocation(
+            "Test Location Second",
+            "Test/Location",
+            ["Test", "Location", "Second"]
+        );
 
-        CreateDepartmentCommand createDepartment =
-            new CreateDepartmentCommand(expectedDepartmentName, expectedDepartmentIdentifier, createdLocationIds);
+        Assert.True(firstLocationId.IsSuccess);
+        Assert.True(secondLocationId.IsSuccess);
+        IEnumerable<Guid> createdLocationIds = [firstLocationId, secondLocationId];
 
-        Guid departmentId = Guid.Empty;
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateDepartmentCommand> createDepartmentHandler =
-                scope.GetService<ICommandHandler<Guid, CreateDepartmentCommand>>();
-            
-            Result<Guid> createdDepartmentId = await createDepartmentHandler.Handle(createDepartment);
-            Assert.True(createdDepartmentId.IsSuccess);
-            departmentId = createdDepartmentId.Value;
-        }
-        
-        Assert.NotEqual(departmentId, Guid.Empty);
+        var createdDepartment = await _departmentsHelper.CreateNewDepartment(
+            expectedDepartmentName,
+            expectedDepartmentIdentifier,
+            createdLocationIds
+        );
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext dbContext = scope.GetService<ServiceDbContext>();
-            IDepartmentsRepository repository = new DepartmentsRepository(dbContext);
-            
-            Result<Department> created = await repository.GetById(departmentId);
-            Assert.True(created.IsSuccess);
-            
-            Department department = created.Value;
-            Assert.Equal(expectedDepartmentName, department.Name.Value);
-            Assert.Equal(expectedDepartmentIdentifier, department.Identifier.Value);
-            Assert.Equal(expectedDepartmentPath, department.Path.Value);
-            Assert.Equal(expectedDepartmentDepthLevel, department.Depth.Value);
-            Assert.Equal(0, department.Attachments.Count());;
-            Assert.True(department.Locations.All(l => createdLocationIds.Any(cr => cr == l.LocationId.Value)));
-        }
+        Assert.True(createdDepartment.IsSuccess);
+
+        var created = await _departmentsHelper.GetDepartment(createdDepartment);
+        Assert.True(created.IsSuccess);
+
+        var department = created.Value;
+        Assert.Equal(expectedDepartmentName, department.Name.Value);
+        Assert.Equal(expectedDepartmentIdentifier, department.Identifier.Value);
+        Assert.Equal(expectedDepartmentPath, department.Path.Value);
+        Assert.Equal(expectedDepartmentDepthLevel, department.Depth.Value);
+        Assert.Equal(expectedAttachmentsCount, department.Attachments.Count());
+        Assert.Equal(expectedLocationsCount, department.Locations.Count);
+
+        Assert.True(
+            department.Locations.All(l => createdLocationIds.Any(cr => cr == l.LocationId.Value))
+        );
     }
 
     [Fact]
     private async Task Create_Child_Department_Success()
     {
-        const int expectedLocationsCount = 2;
-        const string expectedDepartmentName = "Test Department";
-        const string expectedDepartmentIdentifier = "test-identifier";
-        
-        List<Guid> createdLocationIds = [];
-        CreateLocationCommand createLocationFirst =
-            new CreateLocationCommand("Test Location First", ["Test", "Location", "First"], "Test/Location");
-        CreateLocationCommand createLocationSecond = 
-            new CreateLocationCommand("Test Location Second", ["Test", "Location", "Second"], "Test/Location");
+        var firstLocationId = await _locationsHelper.CreateNewLocation(
+            "Test Location First",
+            "Test/Location",
+            ["Test", "Location", "First"]
+        );
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateLocationCommand> createLocationHandler =
-                scope.GetService<ICommandHandler<Guid, CreateLocationCommand>>();
-            Result<Guid> createdLocationId = await createLocationHandler.Handle(createLocationFirst);
-            Assert.True(createdLocationId.IsSuccess);
-            createdLocationIds.Add(createdLocationId);
-        }
+        var secondLocation = await _locationsHelper.CreateNewLocation(
+            "Test Location Second",
+            "Test/Location",
+            ["Test", "Location", "Second"]
+        );
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateLocationCommand> createLocationHandler =
-                scope.GetService<ICommandHandler<Guid, CreateLocationCommand>>();
-            Result<Guid> createdLocationId = await createLocationHandler.Handle(createLocationSecond);
-            Assert.True(createdLocationId.IsSuccess);
-            createdLocationIds.Add(createdLocationId);
-        }
-        
-        Assert.Equal(2, expectedLocationsCount);
 
-        CreateDepartmentCommand createDepartment =
-            new CreateDepartmentCommand(expectedDepartmentName, expectedDepartmentIdentifier, createdLocationIds);
+        Assert.True(firstLocationId.IsSuccess);
+        Assert.True(secondLocation.IsSuccess);
 
-        Guid departmentId = Guid.Empty;
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateDepartmentCommand> createDepartmentHandler =
-                scope.GetService<ICommandHandler<Guid, CreateDepartmentCommand>>();
-            Result<Guid> createdDepartmentId = await createDepartmentHandler.Handle(createDepartment);
-            Assert.True(createdDepartmentId.IsSuccess);
-            departmentId = createdDepartmentId.Value;
-        }
-        
-        Assert.NotEqual(departmentId, Guid.Empty);
+        IEnumerable<Guid> locationIds = [firstLocationId, secondLocation];
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext dbContext = scope.GetService<ServiceDbContext>();
-            IDepartmentsRepository repository = new DepartmentsRepository(dbContext);
-            Result<Department> created = await repository.GetById(departmentId);
-            Assert.True(created.IsSuccess);
-        }
+        var createdParentId = await _departmentsHelper.CreateNewDepartment(
+            "First Department",
+            "first",
+            locationIds
+        );
 
-        CreateDepartmentCommand childDepartment =
-            new CreateDepartmentCommand("Child Dep", "child-dep", createdLocationIds, departmentId);
-        
-        Guid childDepartmentId = Guid.Empty;
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateDepartmentCommand> createDepartmentHandler =
-                scope.GetService<ICommandHandler<Guid, CreateDepartmentCommand>>();
-            Result<Guid> createdDepartmentId = await createDepartmentHandler.Handle(childDepartment);
-            Assert.True(createdDepartmentId.IsSuccess);
-            childDepartmentId = createdDepartmentId.Value;
-        }
-        
-        Assert.NotEqual(childDepartmentId, Guid.Empty);
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext dbContext = scope.GetService<ServiceDbContext>();
-            IDepartmentsRepository repository = new DepartmentsRepository(dbContext);
-            Result<Department> created = await repository.GetById(childDepartmentId);
-            Assert.True(created.IsSuccess);
-        }
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext dbContext = scope.GetService<ServiceDbContext>();
-            IDepartmentsRepository repository = new DepartmentsRepository(dbContext);
-            
-            Result<Department> created = await repository.GetById(departmentId);
-            Assert.True(created.IsSuccess);
-            
-            Department department = created.Value;
-            Assert.Equal(1, department.Attachments.Count());
-            Assert.Equal(1, department.ChildrensCount.Value);
-        }
+        Assert.True(createdParentId.IsSuccess);
+
+        var childDepartmentId = await _departmentsHelper.CreateNewDepartment(
+            "Second department",
+            "second",
+            locationIds,
+            createdParentId
+        );
+
+        Assert.True(childDepartmentId.IsSuccess);
+
+        var created = await _departmentsHelper.GetDepartment(createdParentId);
+        Assert.True(created.IsSuccess);
+        var department = created.Value;
+        Assert.Equal(1, department.Attachments.Count());
+        Assert.Equal(1, department.ChildrensCount.Value);
     }
-    
+
     [Fact]
     private async Task Create_Child_Department_Twice_Failure()
     {
         const int expectedLocationsCount = 2;
         const string expectedDepartmentName = "Test Department";
         const string expectedDepartmentIdentifier = "test-identifier";
-        
-        List<Guid> createdLocationIds = [];
-        CreateLocationCommand createLocationFirst =
-            new CreateLocationCommand("Test Location First", ["Test", "Location", "First"], "Test/Location");
-        CreateLocationCommand createLocationSecond = 
-            new CreateLocationCommand("Test Location Second", ["Test", "Location", "Second"], "Test/Location");
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateLocationCommand> createLocationHandler =
-                scope.GetService<ICommandHandler<Guid, CreateLocationCommand>>();
-            Result<Guid> createdLocationId = await createLocationHandler.Handle(createLocationFirst);
-            Assert.True(createdLocationId.IsSuccess);
-            createdLocationIds.Add(createdLocationId);
-        }
+        var firstLocationId = await _locationsHelper.CreateNewLocation(
+            "Test Location First",
+            "Test/Location",
+            ["Test", "Location", "First"]
+        );
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateLocationCommand> createLocationHandler =
-                scope.GetService<ICommandHandler<Guid, CreateLocationCommand>>();
-            Result<Guid> createdLocationId = await createLocationHandler.Handle(createLocationSecond);
-            Assert.True(createdLocationId.IsSuccess);
-            createdLocationIds.Add(createdLocationId);
-        }
-        
-        Assert.Equal(2, expectedLocationsCount);
+        var secondLocation = await _locationsHelper.CreateNewLocation(
+            "Test Location Second",
+            "Test/Location",
+            ["Test", "Location", "Second"]
+        );
 
-        CreateDepartmentCommand createDepartment =
-            new CreateDepartmentCommand(expectedDepartmentName, expectedDepartmentIdentifier, createdLocationIds);
+        Assert.True(firstLocationId.IsSuccess);
+        Assert.True(secondLocation.IsSuccess);
 
-        Guid departmentId = Guid.Empty;
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateDepartmentCommand> createDepartmentHandler =
-                scope.GetService<ICommandHandler<Guid, CreateDepartmentCommand>>();
-            Result<Guid> createdDepartmentId = await createDepartmentHandler.Handle(createDepartment);
-            Assert.True(createdDepartmentId.IsSuccess);
-            departmentId = createdDepartmentId.Value;
-        }
-        
-        Assert.NotEqual(departmentId, Guid.Empty);
+        IEnumerable<Guid> locationIds = [firstLocationId, secondLocation];
 
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            await using ServiceDbContext dbContext = scope.GetService<ServiceDbContext>();
-            IDepartmentsRepository repository = new DepartmentsRepository(dbContext);
-            Result<Department> created = await repository.GetById(departmentId);
-            Assert.True(created.IsSuccess);
-        }
+        var createDepartment = await _departmentsHelper.CreateNewDepartment(
+            expectedDepartmentName,
+            expectedDepartmentIdentifier,
+            locationIds
+        );
+        Assert.True(createDepartment.IsSuccess);
 
-        CreateDepartmentCommand childDepartment =
-            new CreateDepartmentCommand("Child Dep", "child-dep", createdLocationIds, departmentId);
-        
-        Guid childDepartmentId = Guid.Empty;
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateDepartmentCommand> createDepartmentHandler =
-                scope.GetService<ICommandHandler<Guid, CreateDepartmentCommand>>();
-            Result<Guid> createdDepartmentId = await createDepartmentHandler.Handle(childDepartment);
-            Assert.True(createdDepartmentId.IsSuccess);
-            childDepartmentId = createdDepartmentId.Value;
-        }
-        
-        Assert.NotEqual(childDepartmentId, Guid.Empty);
-        
-        await using (AsyncServiceScope scope = _services.CreateAsyncScope())
-        {
-            ICommandHandler<Guid, CreateDepartmentCommand> createDepartmentHandler =
-                scope.GetService<ICommandHandler<Guid, CreateDepartmentCommand>>();
-            Result<Guid> createdDepartmentId = await createDepartmentHandler.Handle(childDepartment);
-            Assert.True(createdDepartmentId.IsFailure);
-        }
+        var createChild = await _departmentsHelper.CreateNewDepartment(
+            "Child Dep",
+            "child-dep",
+            locationIds,
+            createDepartment
+        );
+        Assert.True(createChild.IsSuccess);
+
+        var createChildAgain = await _departmentsHelper.CreateNewDepartment(
+            "Child Dep",
+            "child-dep",
+            locationIds,
+            createDepartment
+        );
+        Assert.True(createChildAgain.IsFailure);
     }
 }

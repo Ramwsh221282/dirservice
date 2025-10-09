@@ -14,6 +14,9 @@ public sealed record Error(string Message, ErrorType Type)
     public static Error ExceptionalError(string message) =>
         new Error(message, new ExceptionalErrorType());
 
+    public static Error EntityDeletedError() =>
+        new Error("Объект не существует.", new NotFoundErrorType());
+
     public static Error NoError() => new Error("", new NoErrorType());
 
     public bool Any() => !string.IsNullOrWhiteSpace(Message);

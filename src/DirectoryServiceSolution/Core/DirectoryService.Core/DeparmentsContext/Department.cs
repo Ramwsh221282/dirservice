@@ -80,11 +80,23 @@ public sealed class Department : ISoftDeletable
         Attachments = DepartmentAttachmentsHistory.Empty();
     }
 
+    public Result UpdateLocations(IEnumerable<Location> locations)
+    {
+        if (Deleted)
+            return Error.EntityDeletedError();
+
+        _locations.Clear();
+        return AddLocations(locations);
+    }
+
     public bool Includes(Department department) =>
         Parent != null && Parent == department.Id && Path.ContainsIdentifier(department.Identifier);
 
     public Result AddLocations(IEnumerable<Location> locations)
     {
+        if (Deleted)
+            return Error.EntityDeletedError();
+
         Location[] duplicates = [.. locations.ExtractDuplicates(l => l.Id)];
         if (duplicates.Any())
         {
@@ -103,16 +115,23 @@ public sealed class Department : ISoftDeletable
 
     public Result AddPosition(Position position)
     {
+        if (Deleted)
+            return Error.EntityDeletedError();
+
         if (_positions.Any(p => p.DepartmentId == Id && p.PositionId == position.Id))
             return Error.ConflictError(
                 $"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}."
             );
+
         _positions.Add(new DepartmentPosition(this, position));
         return Result.Success();
     }
 
     public Result AttachOtherDepartment(Department other)
     {
+        if (Deleted)
+            return Error.EntityDeletedError();
+
         if (Attachments.IsAttached(other))
             return Error.ConflictError(
                 $"Подразделение {other.Identifier.Value} уже прикреплено к {Identifier.Value}."

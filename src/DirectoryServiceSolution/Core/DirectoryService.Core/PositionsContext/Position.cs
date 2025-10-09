@@ -23,15 +23,18 @@ public sealed class Position : ISoftDeletable
     }
 
     private Position(
+        PositionId id,
         PositionName name,
         PositionDescription description,
-        IEnumerable<DepartmentPosition> departments,
-        EntityLifeCycle? lifeCycle = null,
-        PositionId? id = null
+        EntityLifeCycle lifeCycle,
+        IEnumerable<DepartmentPosition> departments
     )
-        : this(name, description, lifeCycle, id)
     {
-        _departments = departments.ToList();
+        Id = id;
+        Name = name;
+        Description = description;
+        LifeCycle = lifeCycle;
+        _departments = [.. departments];
     }
 
     private Position(
@@ -47,11 +50,15 @@ public sealed class Position : ISoftDeletable
         LifeCycle = lifeCycle ?? new EntityLifeCycle();
     }
 
-    public static Result<Position> CreateNew(PositionName name,
-        PositionDescription description, PositionNameUniquesness uniquesness)
+    public static Result<Position> CreateNew(
+        PositionName name,
+        PositionDescription description,
+        PositionNameUniquesness uniquesness
+    )
     {
-        if (uniquesness.IsUnique(name) == false)
+        if (!uniquesness.IsUnique(name))
             return uniquesness.NotUniqueNameError();
+
         EntityLifeCycle lifeCycle = new EntityLifeCycle();
         PositionId id = new PositionId();
         return new Position(name, description, lifeCycle, id);
@@ -59,13 +66,16 @@ public sealed class Position : ISoftDeletable
 
     public Result BindToDepartment(IEnumerable<Department> departments)
     {
+        if (Deleted)
+            return Error.EntityDeletedError();
+
         foreach (Department department in departments)
         {
             Result adding = department.AddPosition(this);
             if (adding.IsFailure)
                 return adding.Error;
         }
-        
+
         return Result.Success();
     }
 }
