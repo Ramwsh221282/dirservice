@@ -4,6 +4,7 @@ namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
 
 public sealed record DepartmentPath
 {
+    private const char Separator = '.';
     public string Value { get; }
 
     private DepartmentPath(string value) => Value = value;
@@ -18,7 +19,7 @@ public sealed record DepartmentPath
 
     public Result<DepartmentDepth> CalculateDepth()
     {
-        string[] parts = Value.Split('.');
+        string[] parts = Value.Split(Separator);
         short nextDepth = (short)(parts.Length - 1);
         return DepartmentDepth.Create(nextDepth);
     }
@@ -30,7 +31,7 @@ public sealed record DepartmentPath
             ? Error.NotFoundError(
                 $"Не удается получить уровень глубины для подразделения с идентификатором {identifier.Value}"
             )
-            : identifierIndex += 1;
+            : identifierIndex + 1;
     }
 
     public Result<DepartmentDepth> Depth()
@@ -66,7 +67,7 @@ public sealed record DepartmentPath
             );
 
         string[] nodes = [Value, node.Value];
-        string completeName = string.Join('.', nodes);
+        string completeName = string.Join(Separator, nodes);
         return new DepartmentPath(completeName);
     }
 
@@ -84,6 +85,6 @@ public sealed record DepartmentPath
 
     private string[] SplitNames()
     {
-        return Value.Split('.');
+        return Value.Split(Separator);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Positions.CreatePosition;
+using DirectoryService.WebApi;
 using DirectoryService.WebApi.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
 
@@ -11,6 +13,11 @@ public sealed class PositionsTestsHelper
     private readonly IServiceProvider _services;
 
     public PositionsTestsHelper(TestApplicationFactory factory)
+    {
+        _services = factory.Services;
+    }
+
+    public PositionsTestsHelper(WebApplicationFactory<Program> factory)
     {
         _services = factory.Services;
     }

@@ -19,12 +19,14 @@ public sealed class Department : ISoftDeletable
     public DepartmentName Name { get; private set; } = null!;
     public DepartmentPath Path { get; private set; } = null!;
     public DepartmentDepth Depth { get; private set; }
-    public DepartmentId? Parent { get; private set; } = null!;
+    public DepartmentId? Parent { get; private set; }
     public DepartmentChildrensCount ChildrensCount { get; private set; }
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
-    public DepartmentAttachmentsHistory Attachments { get; private set; } =
-        DepartmentAttachmentsHistory.Empty();
+
+    public DepartmentChildAttachmentsHistory Attachments { get; private set; } =
+        DepartmentChildAttachmentsHistory.Empty();
+
     public bool Deleted => LifeCycle.IsDeleted;
 
     private Department() { }
@@ -37,7 +39,7 @@ public sealed class Department : ISoftDeletable
         DepartmentPath path,
         DepartmentDepth depth,
         DepartmentChildrensCount childrensCount,
-        DepartmentAttachmentsHistory attachments,
+        DepartmentChildAttachmentsHistory attachments,
         IEnumerable<DepartmentLocation> locations,
         IEnumerable<DepartmentPosition> positions,
         DepartmentId? parent = null
@@ -77,7 +79,7 @@ public sealed class Department : ISoftDeletable
         ChildrensCount = childrensCount;
         _locations = [];
         _positions = [];
-        Attachments = DepartmentAttachmentsHistory.Empty();
+        Attachments = DepartmentChildAttachmentsHistory.Empty();
     }
 
     public Result UpdateLocations(IEnumerable<Location> locations)
@@ -153,7 +155,8 @@ public sealed class Department : ISoftDeletable
             other.Id,
             DateTime.UtcNow
         );
-        Attachments = new DepartmentAttachmentsHistory([.. Attachments.Attachments, attachment]);
+
+        Attachments = Attachments.Attach(attachment);
 
         ChildrensCount = nextCount.Value;
         other.Parent = Id;

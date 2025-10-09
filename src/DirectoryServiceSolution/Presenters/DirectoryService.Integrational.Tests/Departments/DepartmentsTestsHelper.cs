@@ -4,7 +4,9 @@ using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.De
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Departments.CreateDepartment;
+using DirectoryService.WebApi;
 using DirectoryService.WebApi.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
 
@@ -15,6 +17,11 @@ public sealed class DepartmentsTestsHelper
     private readonly IServiceProvider _services;
 
     public DepartmentsTestsHelper(TestApplicationFactory factory)
+    {
+        _services = factory.Services;
+    }
+
+    public DepartmentsTestsHelper(WebApplicationFactory<Program> factory)
     {
         _services = factory.Services;
     }

@@ -3,48 +3,6 @@ using ResultLibrary;
 
 namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
 
-public sealed record DepartmentAttachmentsHistory
-{
-    private readonly List<DepartmentChildAttachment> _attachments = [];
-
-    public IReadOnlyList<DepartmentChildAttachment> Attachments => _attachments;
-
-    private DepartmentAttachmentsHistory()
-    {
-        // ef core
-    }
-
-    public int Count() => _attachments.Count;
-
-    public DepartmentAttachmentsHistory(IEnumerable<DepartmentChildAttachment> attachments) =>
-        _attachments = [.. attachments];
-
-    public bool IsAttached(DepartmentId departmentId) =>
-        _attachments.Any(a => a.Id == departmentId);
-
-    public bool IsAttached(Department department) => IsAttached(department.Id);
-
-    public static DepartmentAttachmentsHistory Empty() => new DepartmentAttachmentsHistory([]);
-
-    public static Result<DepartmentAttachmentsHistory> FromJson(string json)
-    {
-        using JsonDocument document = JsonDocument.Parse(json);
-        List<DepartmentChildAttachment> attachments = [];
-
-        foreach (JsonElement entry in document.RootElement.EnumerateArray())
-        {
-            Result<DepartmentChildAttachment> attachment = DepartmentChildAttachment.FromJson(
-                entry
-            );
-            if (attachment.IsFailure)
-                return attachment.Error;
-            attachments.Add(attachment);
-        }
-
-        return new DepartmentAttachmentsHistory(attachments);
-    }
-}
-
 public sealed record DepartmentChildAttachment(DepartmentId Id, DateTime AttachedAt)
 {
     public DepartmentId Id { get; } = Id;
@@ -62,10 +20,18 @@ public sealed record DepartmentChildAttachment(DepartmentId Id, DateTime Attache
         return new DepartmentChildAttachment(departmentId, attachedAt);
     }
 
-    public static Result<DepartmentChildAttachment> FromJson(JsonElement json)
+    public static DepartmentChildAttachment FromJson(JsonElement json)
     {
-        Guid id = json.GetProperty(nameof(Id)).GetGuid();
-        DateTime attachedAt = json.GetProperty(nameof(AttachedAt)).GetDateTime();
-        return Create(id, attachedAt);
+        try
+        {
+            Guid id = json.GetProperty(nameof(Id)).GetProperty("Value").GetGuid();
+            DateTime attachedAt = json.GetProperty(nameof(AttachedAt)).GetDateTime();
+            return Create(id, attachedAt);
+        }
+        catch (JsonException)
+        {
+            string message = $"Некорректный маппинг из JSON в {nameof(DepartmentChildAttachment)}.";
+            throw new ApplicationException(message);
+        }
     }
 }

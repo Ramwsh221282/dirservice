@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DirectoryService.Core.DeparmentsContext;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +49,10 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
             .Property(d => d.Path)
             .IsRequired()
             .HasColumnName("path")
+            .HasColumnType("ltree")
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentPath.Create(fromDb));
+
+        builder.HasIndex(x => x.Path).HasMethod("gist").HasDatabaseName("idx_department_path");
 
         builder
             .Property(d => d.Depth)
@@ -66,15 +70,13 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentChildrensCount.Create(fromDb))
             .IsRequired();
 
-        builder.OwnsOne(d => d.Attachments, atb =>
-        {
-            atb.ToJson("attachments");
-            atb.OwnsMany(at => at.Attachments, b =>
-            {
-                b.Property(at => at.Id).HasColumnName("id")
-                    .HasConversion(toDb => toDb.Value, fromDb => DepartmentId.Create(fromDb));
-                b.Property(at => at.AttachedAt).HasColumnName("attached_at");
-            });
-        });
+        builder
+            .Property(d => d.Attachments)
+            .HasColumnName("attachments")
+            .HasColumnType("jsonb")
+            .HasConversion(
+                toDb => JsonSerializer.Serialize(toDb, JsonSerializerOptions.Default),
+                fromDb => DepartmentChildAttachmentsHistory.FromJson(fromDb)
+            );
     }
 }
