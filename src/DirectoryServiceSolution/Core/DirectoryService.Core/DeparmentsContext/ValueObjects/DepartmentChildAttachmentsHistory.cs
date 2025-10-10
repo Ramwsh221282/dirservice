@@ -23,6 +23,13 @@ public sealed record DepartmentChildAttachmentsHistory
         return new DepartmentChildAttachmentsHistory([.. _attachments, attachment]);
     }
 
+    public DepartmentChildAttachmentsHistory Detach(Department department)
+    {
+        return new DepartmentChildAttachmentsHistory(
+            [.. _attachments.Where(a => a.Id != department.Id)]
+        );
+    }
+
     public int Count() => _attachments.Count;
 
     public bool IsAttached(DepartmentId departmentId) =>

@@ -17,7 +17,14 @@ public readonly record struct DepartmentChildrensCount
             )
             : new DepartmentChildrensCount(value);
 
-    public Result<DepartmentChildrensCount> Add(DepartmentPath parent, Department other) => Add(parent, other.Identifier);
+    public Result<DepartmentChildrensCount> Reduce()
+    {
+        int nextValue = Value - 1;
+        return Create(nextValue);
+    }
+
+    public Result<DepartmentChildrensCount> Add(DepartmentPath parent, Department other) =>
+        Add(parent, other.Identifier);
 
     public Result<DepartmentChildrensCount> Add(
         DepartmentPath parent,
