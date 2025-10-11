@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
 {
     [DbContext(typeof(ServiceDbContext))]
-    [Migration("20251007175822_Fixed json serialization in departments entity configuration")]
-    partial class Fixedjsonserializationindepartmentsentityconfiguration
+    [Migration("20251011022150_Fixed department Depth name to depth, department Parent Id to parent_id")]
+    partial class FixeddepartmentDepthnametodepthdepartmentParentIdtoparent_id
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,7 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                 .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("DirectoryService.Core.DeparmentsContext.Department", b =>
@@ -42,7 +43,8 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                         .HasColumnName("childrens_count");
 
                     b.Property<short>("Depth")
-                        .HasColumnType("smallint");
+                        .HasColumnType("smallint")
+                        .HasColumnName("depth");
 
                     b.Property<string>("Identifier")
                         .IsRequired()
@@ -57,11 +59,12 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                         .HasColumnName("name");
 
                     b.Property<Guid?>("Parent")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("ltree")
                         .HasColumnName("path");
 
                     b.ComplexProperty<Dictionary<string, object>>("LifeCycle", "DirectoryService.Core.DeparmentsContext.Department.LifeCycle#EntityLifeCycle", b1 =>
@@ -81,6 +84,11 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_departments");
+
+                    b.HasIndex("Path")
+                        .HasDatabaseName("idx_department_path");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
 
                     b.ToTable("departments", (string)null);
                 });

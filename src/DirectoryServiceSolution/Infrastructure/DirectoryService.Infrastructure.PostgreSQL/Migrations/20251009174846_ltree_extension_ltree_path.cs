@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ltree_extension_ltree_path : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:ltree", ",,");
+
             migrationBuilder.CreateTable(
                 name: "departments",
                 columns: table => new
@@ -18,12 +21,14 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     identifier = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    path = table.Column<string>(type: "text", nullable: false),
+                    path = table.Column<string>(type: "ltree", nullable: false),
                     Depth = table.Column<short>(type: "smallint", nullable: false),
                     Parent = table.Column<Guid>(type: "uuid", nullable: true),
+                    childrens_count = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    attachments = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,12 +40,12 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    address = table.Column<string>(type: "jsonb", nullable: false),
                     name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     time_zone = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    address_parts = table.Column<string>(type: "jsonb", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,6 +125,12 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                 name: "IX_department_positions_position_id",
                 table: "department_positions",
                 column: "position_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_department_path",
+                table: "departments",
+                column: "path")
+                .Annotation("Npgsql:IndexMethod", "gist");
 
             migrationBuilder.CreateIndex(
                 name: "IX_positions_name",

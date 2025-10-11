@@ -21,6 +21,7 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                 .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("DirectoryService.Core.DeparmentsContext.Department", b =>
@@ -29,12 +30,18 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Attachments")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("attachments");
+
                     b.Property<int>("ChildrensCount")
                         .HasColumnType("integer")
                         .HasColumnName("childrens_count");
 
                     b.Property<short>("Depth")
-                        .HasColumnType("smallint");
+                        .HasColumnType("smallint")
+                        .HasColumnName("depth");
 
                     b.Property<string>("Identifier")
                         .IsRequired()
@@ -49,11 +56,12 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                         .HasColumnName("name");
 
                     b.Property<Guid?>("Parent")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("ltree")
                         .HasColumnName("path");
 
                     b.ComplexProperty<Dictionary<string, object>>("LifeCycle", "DirectoryService.Core.DeparmentsContext.Department.LifeCycle#EntityLifeCycle", b1 =>
@@ -73,6 +81,11 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_departments");
+
+                    b.HasIndex("Path")
+                        .HasDatabaseName("idx_department_path");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
 
                     b.ToTable("departments", (string)null);
                 });
@@ -194,55 +207,6 @@ namespace DirectoryService.Infrastructure.PostgreSQL.Migrations
                         .IsUnique();
 
                     b.ToTable("positions", (string)null);
-                });
-
-            modelBuilder.Entity("DirectoryService.Core.DeparmentsContext.Department", b =>
-                {
-                    b.OwnsOne("DirectoryService.Core.DeparmentsContext.ValueObjects.DepartmentAttachmentsHistory", "Attachments", b1 =>
-                        {
-                            b1.Property<Guid>("DepartmentId")
-                                .HasColumnType("uuid");
-
-                            b1.HasKey("DepartmentId");
-
-                            b1.ToTable("departments");
-
-                            b1.ToJson("attachments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("DepartmentId");
-
-                            b1.OwnsMany("DirectoryService.Core.DeparmentsContext.ValueObjects.DepartmentChildAttachment", "Attachments", b2 =>
-                                {
-                                    b2.Property<Guid>("DepartmentAttachmentsHistoryDepartmentId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    b2.Property<DateTime>("AttachedAt")
-                                        .HasColumnType("timestamp with time zone")
-                                        .HasColumnName("attached_at");
-
-                                    b2.Property<Guid>("Id")
-                                        .ValueGeneratedOnUpdateSometimes()
-                                        .HasColumnType("uuid")
-                                        .HasColumnName("id");
-
-                                    b2.HasKey("DepartmentAttachmentsHistoryDepartmentId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("departments");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("DepartmentAttachmentsHistoryDepartmentId");
-                                });
-
-                            b1.Navigation("Attachments");
-                        });
-
-                    b.Navigation("Attachments")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DirectoryService.Core.DeparmentsContext.Entities.DepartmentLocation", b =>

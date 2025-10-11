@@ -19,12 +19,14 @@ public sealed class Department : ISoftDeletable
     public DepartmentName Name { get; private set; } = null!;
     public DepartmentPath Path { get; private set; } = null!;
     public DepartmentDepth Depth { get; private set; }
-    public DepartmentId? Parent { get; private set; } = null!;
+    public DepartmentId? Parent { get; private set; }
     public DepartmentChildrensCount ChildrensCount { get; private set; }
     public IReadOnlyList<DepartmentLocation> Locations => _locations;
     public IReadOnlyList<DepartmentPosition> Positions => _positions;
-    public DepartmentAttachmentsHistory Attachments { get; private set; } =
-        DepartmentAttachmentsHistory.Empty();
+
+    public DepartmentChildAttachmentsHistory Attachments { get; private set; } =
+        DepartmentChildAttachmentsHistory.Empty();
+
     public bool Deleted => LifeCycle.IsDeleted;
 
     private Department() { }
@@ -37,7 +39,7 @@ public sealed class Department : ISoftDeletable
         DepartmentPath path,
         DepartmentDepth depth,
         DepartmentChildrensCount childrensCount,
-        DepartmentAttachmentsHistory attachments,
+        DepartmentChildAttachmentsHistory attachments,
         IEnumerable<DepartmentLocation> locations,
         IEnumerable<DepartmentPosition> positions,
         DepartmentId? parent = null
@@ -77,7 +79,21 @@ public sealed class Department : ISoftDeletable
         ChildrensCount = childrensCount;
         _locations = [];
         _positions = [];
-        Attachments = DepartmentAttachmentsHistory.Empty();
+        Attachments = DepartmentChildAttachmentsHistory.Empty();
+    }
+
+    public Result Detach(Department child)
+    {
+        DepartmentChildAttachmentsHistory detached = Attachments.Detach(child);
+
+        Result<DepartmentChildrensCount> reducing = ChildrensCount.Reduce();
+        if (reducing.IsFailure)
+            return reducing.Error;
+
+        LifeCycle = LifeCycle.Update();
+        Attachments = detached;
+        ChildrensCount = reducing;
+        return Result.Success();
     }
 
     public Result UpdateLocations(IEnumerable<Location> locations)
@@ -86,6 +102,8 @@ public sealed class Department : ISoftDeletable
             return Error.EntityDeletedError();
 
         _locations.Clear();
+
+        LifeCycle = LifeCycle.Update();
         return AddLocations(locations);
     }
 
@@ -124,6 +142,7 @@ public sealed class Department : ISoftDeletable
             );
 
         _positions.Add(new DepartmentPosition(this, position));
+        LifeCycle.Update();
         return Result.Success();
     }
 
@@ -153,7 +172,8 @@ public sealed class Department : ISoftDeletable
             other.Id,
             DateTime.UtcNow
         );
-        Attachments = new DepartmentAttachmentsHistory([.. Attachments.Attachments, attachment]);
+
+        Attachments = Attachments.Attach(attachment);
 
         ChildrensCount = nextCount.Value;
         other.Parent = Id;
@@ -183,6 +203,34 @@ public sealed class Department : ISoftDeletable
             return addingLocations.Error;
 
         return child;
+    }
+
+    public static Department Create(
+        DepartmentId id,
+        Guid? parentId,
+        DepartmentIdentifier identifier,
+        DepartmentName name,
+        DepartmentPath path,
+        DepartmentDepth depth,
+        DepartmentChildAttachmentsHistory attachments,
+        DepartmentChildrensCount childrensCount,
+        EntityLifeCycle lifeCycle
+    )
+    {
+        DepartmentId? parent = parentId == null ? null : DepartmentId.Create(parentId.Value).Value;
+        return new Department(
+            id,
+            identifier,
+            lifeCycle,
+            name,
+            path,
+            depth,
+            childrensCount,
+            attachments,
+            [],
+            [],
+            parent
+        );
     }
 
     public static Department CreateNew(DepartmentName name, DepartmentIdentifier identifier)

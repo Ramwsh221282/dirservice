@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DirectoryService.Core.DeparmentsContext;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -47,16 +48,21 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
         builder
             .Property(d => d.Path)
             .IsRequired()
+            .HasColumnType("ltree")
             .HasColumnName("path")
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentPath.Create(fromDb));
+
+        builder.HasIndex(x => x.Path).HasMethod("gist").HasDatabaseName("idx_department_path");
 
         builder
             .Property(d => d.Depth)
             .IsRequired()
+            .HasColumnName("depth")
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentDepth.Create(fromDb));
 
         builder
             .Property(d => d.Parent)
+            .HasColumnName("parent_id")
             .HasConversion(toDb => toDb!.Value.Value, fromDb => DepartmentId.Create(fromDb))
             .IsRequired(false);
 
@@ -66,15 +72,31 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentChildrensCount.Create(fromDb))
             .IsRequired();
 
-        builder.OwnsOne(d => d.Attachments, atb =>
-        {
-            atb.ToJson("attachments");
-            atb.OwnsMany(at => at.Attachments, b =>
-            {
-                b.Property(at => at.Id).HasColumnName("id")
-                    .HasConversion(toDb => toDb.Value, fromDb => DepartmentId.Create(fromDb));
-                b.Property(at => at.AttachedAt).HasColumnName("attached_at");
-            });
-        });
+        builder
+            .Property(d => d.Attachments)
+            .HasColumnName("attachments")
+            .HasColumnType("jsonb")
+            .HasConversion(
+                toDb => DepartmentChildAttachmentsAsJsonb(toDb),
+                fromDb => JsonbAsChildAttachmentHistory(fromDb)
+            );
+    }
+
+    private static string DepartmentChildAttachmentsAsJsonb(
+        DepartmentChildAttachmentsHistory history
+    )
+    {
+        string jsonb = JsonSerializer.Serialize(history, JsonSerializerOptions.Default);
+        return jsonb;
+    }
+
+    private static DepartmentChildAttachmentsHistory JsonbAsChildAttachmentHistory(string jsonb)
+    {
+        DepartmentChildAttachmentsHistory history =
+            JsonSerializer.Deserialize<DepartmentChildAttachmentsHistory>(
+                jsonb,
+                JsonSerializerOptions.Default
+            )!;
+        return history;
     }
 }
