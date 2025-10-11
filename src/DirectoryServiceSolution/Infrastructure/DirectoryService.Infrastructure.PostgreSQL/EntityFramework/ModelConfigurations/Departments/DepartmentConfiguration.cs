@@ -48,8 +48,8 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
         builder
             .Property(d => d.Path)
             .IsRequired()
-            .HasColumnName("path")
             .HasColumnType("ltree")
+            .HasColumnName("path")
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentPath.Create(fromDb));
 
         builder.HasIndex(x => x.Path).HasMethod("gist").HasDatabaseName("idx_department_path");
@@ -57,10 +57,12 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
         builder
             .Property(d => d.Depth)
             .IsRequired()
+            .HasColumnName("depth")
             .HasConversion(toDb => toDb.Value, fromDb => DepartmentDepth.Create(fromDb));
 
         builder
             .Property(d => d.Parent)
+            .HasColumnName("parent_id")
             .HasConversion(toDb => toDb!.Value.Value, fromDb => DepartmentId.Create(fromDb))
             .IsRequired(false);
 
