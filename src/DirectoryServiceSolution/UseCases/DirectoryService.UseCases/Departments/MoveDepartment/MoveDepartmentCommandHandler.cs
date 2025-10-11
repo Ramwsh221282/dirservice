@@ -41,7 +41,6 @@ public sealed class MoveDepartmentCommandHandler : ICommandHandler<Guid, MoveDep
     )
     {
         await using ITransactionScope transaction = await _transactions.ReceiveTransaction(ct);
-
         ValidationResult validation = await _validator.ValidateAsync(command, ct);
         if (!validation.IsValid)
         {
@@ -58,19 +57,21 @@ public sealed class MoveDepartmentCommandHandler : ICommandHandler<Guid, MoveDep
         if (movement.IsFailure)
             return _logger.ReturnLogged<Guid>(movement.Error);
 
-        // закрепляем для change tracker, потому что PerformMovement() доменная логика, изменяющая состояние объектов без SQL.
-        _departments.Attach(movement.Value.Movable, movement.Value.MovingTo);
+        // получить разрешение на передвижение подразделений.
+        DepartmentMovementApproval approval = await _departments.GetMovementApproval(
+            movement.Value.MovingTo,
+            movement.Value.Movable,
+            ct
+        );
 
         // копируем старый путь подразделения, которое двигаем, чтобы дальше по нему расчитался ltree для дочерних подразделений после передвижения.
         DepartmentPath path = DepartmentPath.Create(movement.Value.Movable.Path.Value);
-
-        // получаем текущего владельца подразделения, чтобы у него удалить из ChildAttachmentsHistory информацию о подразделении, которое движетя.
         Result<Department> oldAncestor = await _departments.GetParentDeparmentByChildPath(path, ct);
         if (oldAncestor.IsFailure)
             return _logger.ReturnLogged<Guid>(oldAncestor.Error);
 
         // процесс передвижения подразделения в качестве логики домена
-        Result moving = movement.Value.PerformMovement(oldAncestor);
+        Result moving = movement.Value.PerformMovement(oldAncestor, approval);
         if (moving.IsFailure)
             return _logger.ReturnLogged<Guid>(moving.Error);
 

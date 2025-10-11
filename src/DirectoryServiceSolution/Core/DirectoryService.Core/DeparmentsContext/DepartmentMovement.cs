@@ -23,8 +23,12 @@ public sealed class DepartmentMovement
         Movable = movable;
     }
 
-    public Result PerformMovement(Department oldAncestor)
+    public Result PerformMovement(Department oldAncestor, DepartmentMovementApproval approval)
     {
+        Result approve = approval.Approve(this);
+        if (approve.IsFailure)
+            return approve;
+
         Result detaching = oldAncestor.Detach(Movable);
         return detaching.IsFailure ? detaching.Error : MovingTo.AttachOtherDepartment(Movable);
     }

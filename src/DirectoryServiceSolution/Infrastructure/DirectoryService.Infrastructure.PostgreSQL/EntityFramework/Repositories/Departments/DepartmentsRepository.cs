@@ -2,7 +2,6 @@ using System.Data.Common;
 using Dapper;
 using DirectoryService.Core.DeparmentsContext;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments.Pocos;
 using DirectoryService.UseCases.Departments.Contracts;
 using Microsoft.EntityFrameworkCore;
 using ResultLibrary;
@@ -21,12 +20,6 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     public void Attach(Department department)
     {
         _dbContext.Departments.Attach(department);
-    }
-
-    public void Attach(params Department[] department)
-    {
-        foreach (Department item in department)
-            Attach(item);
     }
 
     public async Task<Result<Department>> GetById(Guid id, CancellationToken ct = default)
@@ -67,8 +60,53 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         await _dbContext.Departments.AddAsync(department, ct);
 
     /// <summary>
+    /// Получение "разрешения" на передвижение подразделения в другое подразделение путем сравнения путей.
+    /// </summary>
+    public async Task<DepartmentMovementApproval> GetMovementApproval(
+        Department parent,
+        Department child,
+        CancellationToken ct = default
+    )
+    {
+        const string sql = "SELECT @parentPath::ltree @> @childPath::ltree as is_ancestor_owning;";
+        string parentPath = parent.Path.Value;
+        string childPath = child.Path.Value;
+        CommandDefinition command = new(sql, new { parentPath, childPath }, cancellationToken: ct);
+
+        DbConnection connection = _dbContext.Database.GetDbConnection();
+        bool isDepartmentOwning = await connection.QueryFirstAsync<bool>(command);
+
+        return new DepartmentMovementApproval(parent, child, isDepartmentOwning);
+    }
+
+    public async Task<Result<DepartmentMovement>> GetDepartmentMovement(
+        DepartmentId parentId,
+        DepartmentId childId,
+        CancellationToken ct = default
+    )
+    {
+        await BlockDepartmentForMovement(parentId.Value);
+        await BlockDepartmentForMovement(childId.Value);
+
+        Department? ancestor = await _dbContext.Departments.FirstOrDefaultAsync(
+            d => d.Id == parentId,
+            cancellationToken: ct
+        );
+        if (ancestor == null)
+            return Error.NotFoundError($"Не найдено новое подразделение для передвижения.");
+
+        Department? descendant = await _dbContext.Departments.FirstOrDefaultAsync(
+            d => d.Id == childId,
+            ct
+        );
+        if (descendant == null)
+            return Error.NotFoundError($"Не найдено дочернее подразделение для передвижения.");
+
+        return new DepartmentMovement(ancestor, descendant);
+    }
+
+    /// <summary>
     /// Получение "Движения подразделения".
-    /// Если движение выполняется как передвинуть подразделение к его дочернему - ошибка
     /// Если не найдено хотя бы одно из подразделений - ошибка
     /// </summary>
     public async Task<Result<DepartmentMovement>> GetDepartmentMovement(
@@ -77,100 +115,20 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         CancellationToken ct = default
     )
     {
-        await BlockDepartmentForMovement(parentId);
-        await BlockDepartmentForMovement(childId);
-
-        const string sql = """
-            WITH ancestor_department_info AS
-                (SELECT 
-                     id,
-                     identifier,
-                     name,
-                     path,
-                     "Depth",
-                     "Parent",
-                     childrens_count,
-                     created_at,
-                     deleted_at,
-                     updated_at,
-                     attachments
-                 FROM departments 
-                 WHERE id = @parentId),
-            descendant_department_info AS
-                (SELECT
-                     id,
-                     identifier,
-                     name,
-                     path,
-                     "Depth",
-                     "Parent",
-                     childrens_count,
-                     created_at,
-                     deleted_at,
-                     updated_at,
-                     attachments 
-                 FROM departments 
-                 WHERE id = @childId)
-            SELECT
-                ancestor_department_info.path::ltree @> descendant_department_info.path::ltree as is_ancestor_owning,
-                ancestor_department_info.id as ancestor_id,
-                ancestor_department_info.identifier as ancestor_identifier,
-                ancestor_department_info.name as ancestor_name,
-                ancestor_department_info."Depth" as ancestor_depth,
-                ancestor_department_info.path as ancestor_path,
-                ancestor_department_info."Parent" as ancestor_parent_id,
-                ancestor_department_info.childrens_count as ancestor_childrens_count,
-                ancestor_department_info.created_at as ancestor_created_at,
-                ancestor_department_info.deleted_at as ancestor_deleted_at,
-                ancestor_department_info.updated_at as ancestor_updated_at,
-                ancestor_department_info.attachments as ancestor_attachments,
-                
-                descendant_department_info.id as descendant_id,
-                descendant_department_info.identifier as descendant_identifier,
-                descendant_department_info.name as descendant_name,
-                descendant_department_info."Depth" as descendant_depth,
-                descendant_department_info.path as descendant_path,
-                descendant_department_info."Parent" as descendant_parent_id,
-                descendant_department_info.childrens_count as descendant_childrens_count,
-                descendant_department_info.created_at as descendant_created_at,
-                descendant_department_info.deleted_at as descendant_deleted_at,
-                descendant_department_info.updated_at as descendant_updated_at,
-                descendant_department_info.attachments as descendant_attachments
-            FROM ancestor_department_info
-                CROSS JOIN descendant_department_info;
-            """;
-
-        CommandDefinition command = new CommandDefinition(
-            sql,
-            new { parentId, childId },
-            cancellationToken: ct
-        );
-        DbConnection connection = _dbContext.Database.GetDbConnection();
-
-        DepartmentMovementPoco[] movement = (
-            await connection.QueryAsync<DepartmentMovementPoco>(command)
-        ).ToArray();
-
-        if (movement.Length == 0)
-            return Error.NotFoundError(
-                $"Не удается найти информацию для смены подразделения {childId} к {parentId}"
-            );
-
-        if (!movement[0].is_ancestor_owning)
-            return Error.ConflictError(
-                $"Нельзя передвинуть подразделение {childId} в его дочернее {parentId}."
-            );
-
-        return movement[0].ToDomainObject();
+        DepartmentId typedParentId = DepartmentId.Create(parentId);
+        DepartmentId typedChildId = DepartmentId.Create(childId);
+        return await GetDepartmentMovement(typedParentId, typedChildId, ct);
     }
 
     public async Task<Result<Department>> GetParentDeparmentByChildPath(
         DepartmentPath path,
         CancellationToken cancellationToken = default
-    )
-    {
-        return await GetParentDeparmentByChildPath(path.Value, cancellationToken);
-    }
+    ) => await GetParentDeparmentByChildPath(path.Value, cancellationToken);
+
+    public async Task<Result<Department>> GetParentDeparmentByChildPath(
+        Department department,
+        CancellationToken ct = default
+    ) => await GetParentDeparmentByChildPath(department.Path.Value, ct);
 
     /// <summary>
     /// Получение родительского подразделения дочернего подразделения по пути дочернего подразделения
@@ -180,37 +138,31 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         CancellationToken ct = default
     )
     {
-        const string sql = """
-            SELECT 
-                id as Id, 
-                "Parent" as ParentId,
-                identifier as Identifier,
-                name as Name,
-                created_at as CreatedAt,
-                deleted_at as DeletedAt,
-                updated_at as UpdatedAt,
-                attachments as Attachments,
-                path as Path,
-                "Depth" as Depth,
-                childrens_count as ChildrensCount
-            FROM departments
-            WHERE path @> @childPath::ltree AND deleted_at IS NULL
-            ORDER BY depth DESC
-            LIMIT 1 OFFSET 1
-            """;
+        Department? department = await _dbContext
+            .Departments.FromSqlInterpolated(
+                $@"
+                SELECT
+                    id,
+                    identifier,
+                    name,
+                    path,
+                    depth,
+                    parent_id,
+                    childrens_count,
+                    created_at as ""LifeCycle_CreatedAt"",
+                    deleted_at as ""LifeCycle_DeletedAt"",
+                    updated_at as ""LifeCycle_UpdatedAt"",
+                    attachments
+                FROM departments
+                WHERE path @> {childPath}::ltree AND deleted_at IS NULL
+                ORDER BY depth DESC
+                LIMIT 1 OFFSET 1"
+            )
+            .FirstOrDefaultAsync(cancellationToken: ct);
 
-        CommandDefinition command = new CommandDefinition(
-            sql,
-            new { childPath },
-            cancellationToken: ct
-        );
-
-        DbConnection connection = _dbContext.Database.GetDbConnection();
-        DepartmentPoco? poco = await connection.QueryFirstOrDefaultAsync<DepartmentPoco>(command);
-
-        if (poco == null)
+        if (department == null)
             return Error.NotFoundError("Не найдено родительское подразделение.");
-        return poco.ToDepartment();
+        return department;
     }
 
     /// <summary>
@@ -258,15 +210,15 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
             WITH controlled_department AS (
                 SELECT id, 
                        path, 
-                       "Depth",
-                       "Parent",
+                       depth,
+                       parent_id,
                        attachments FROM departments WHERE id = @id           
             )
             SELECT
                 dependant_departments.id,
                 dependant_departments.path,
-                dependant_departments."Depth",
-                dependant_departments."Parent",
+                dependant_departments.depth,
+                dependant_departments.parent_id,
                 dependant_departments.attachments
             FROM departments 
                 AS dependant_departments

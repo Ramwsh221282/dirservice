@@ -20,10 +20,6 @@ public interface IDepartmentsRepository
         CancellationToken ct = default
     );
 
-    void Attach(Department department);
-
-    void Attach(params Department[] department);
-
     Task<IEnumerable<Department>> GetByIdArray(
         DepartmentsIdSet ids,
         CancellationToken ct = default
@@ -37,8 +33,25 @@ public interface IDepartmentsRepository
         CancellationToken ct = default
     );
 
+    Task<DepartmentMovementApproval> GetMovementApproval(
+        Department parent,
+        Department child,
+        CancellationToken ct = default
+    );
+
+    Task<Result<DepartmentMovement>> GetDepartmentMovement(
+        DepartmentId parentId,
+        DepartmentId childId,
+        CancellationToken ct = default
+    );
+
     Task<Result<Department>> GetParentDeparmentByChildPath(
         DepartmentPath path,
+        CancellationToken ct = default
+    );
+
+    Task<Result<Department>> GetParentDeparmentByChildPath(
+        Department department,
         CancellationToken ct = default
     );
 

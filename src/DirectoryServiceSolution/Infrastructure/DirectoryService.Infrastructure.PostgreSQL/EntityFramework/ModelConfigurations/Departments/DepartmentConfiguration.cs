@@ -77,8 +77,26 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
             .HasColumnName("attachments")
             .HasColumnType("jsonb")
             .HasConversion(
-                toDb => JsonSerializer.Serialize(toDb, JsonSerializerOptions.Default),
-                fromDb => DepartmentChildAttachmentsHistory.FromJson(fromDb)
+                toDb => DepartmentChildAttachmentsAsJsonb(toDb),
+                fromDb => JsonbAsChildAttachmentHistory(fromDb)
             );
+    }
+
+    private static string DepartmentChildAttachmentsAsJsonb(
+        DepartmentChildAttachmentsHistory history
+    )
+    {
+        string jsonb = JsonSerializer.Serialize(history, JsonSerializerOptions.Default);
+        return jsonb;
+    }
+
+    private static DepartmentChildAttachmentsHistory JsonbAsChildAttachmentHistory(string jsonb)
+    {
+        DepartmentChildAttachmentsHistory history =
+            JsonSerializer.Deserialize<DepartmentChildAttachmentsHistory>(
+                jsonb,
+                JsonSerializerOptions.Default
+            )!;
+        return history;
     }
 }
