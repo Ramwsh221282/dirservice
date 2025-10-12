@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
+using DirectoryService.UseCases.Common.Database;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
@@ -26,6 +27,8 @@ public sealed class NpgSqlConnectionFactory : IDbConnectionFactory, IAsyncDispos
         NpgsqlConnection connection = await _dataSource.OpenConnectionAsync(ct);
         return connection;
     }
+
+    public IQueryClause CreateClause() => new SqlInterpolationClause();
 
     public void Dispose() => _dataSource.Dispose();
 

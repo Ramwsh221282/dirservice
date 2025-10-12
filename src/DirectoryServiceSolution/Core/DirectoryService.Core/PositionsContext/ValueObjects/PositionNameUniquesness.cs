@@ -13,9 +13,8 @@ public sealed class PositionNameUniquesness
         _existingName = existingName;
     }
 
-    public bool IsUnique(PositionName name) => 
-        _isUnique && !_existingName.Equals(name.Value);
+    public bool IsUnique(PositionName name) => _isUnique || !_existingName.Equals(name.Value);
 
-    public Error NotUniqueNameError() => 
+    public Error NotUniqueNameError() =>
         Error.ConflictError($"Позиция с наименованием: {_existingName} уже существует в системе.");
 }

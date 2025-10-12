@@ -43,10 +43,7 @@ public sealed class PositionsSeeder : ISeeder
 
     private async Task SeedData()
     {
-        List<Department> allDepartments = await _context
-            .Departments.AsNoTracking()
-            .Where(d => !d.Deleted)
-            .ToListAsync();
+        List<Department> allDepartments = await _context.Departments.ToListAsync();
 
         if (!allDepartments.Any())
         {

@@ -1,4 +1,4 @@
-namespace DirectoryService.Contracts.Locations;
+namespace DirectoryService.Contracts.Locations.Common;
 
 public sealed record LocationAddressDto(
     string Country,

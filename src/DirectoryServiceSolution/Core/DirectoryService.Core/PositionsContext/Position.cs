@@ -64,6 +64,24 @@ public sealed class Position : ISoftDeletable
         return new Position(name, description, lifeCycle, id);
     }
 
+    public static Result<Position> CreateNew(
+        PositionName name,
+        PositionDescription description,
+        PositionNameUniquesness uniquesness,
+        IEnumerable<Department> departments
+    )
+    {
+        Result<Position> position = CreateNew(name, description, uniquesness);
+        if (position.IsFailure)
+            return position.Error;
+
+        IEnumerable<DepartmentPosition> departmentPositions = departments.Select(
+            d => new DepartmentPosition(d, position)
+        );
+        position.Value._departments.AddRange(departmentPositions);
+        return position;
+    }
+
     public Result BindToDepartment(IEnumerable<Department> departments)
     {
         if (Deleted)

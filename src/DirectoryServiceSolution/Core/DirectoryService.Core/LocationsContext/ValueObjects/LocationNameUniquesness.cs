@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Core.LocationsContext.ValueObjects;
 
-public sealed class LocationNameUniquesness
+public class LocationNameUniquesness
 {
     private readonly bool _isUnique;
     private readonly string _nameOfExisting;
@@ -15,7 +15,7 @@ public sealed class LocationNameUniquesness
 
     public bool IsUnique(LocationName name)
     {
-        return !name.Value.Equals(_nameOfExisting) && _isUnique;
+        return !name.Value.Equals(_nameOfExisting) || _isUnique;
     }
 
     public Error NonUniqueLocationError()

@@ -3,6 +3,7 @@ using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using ResultLibrary;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.Seeding;
@@ -24,11 +25,17 @@ public sealed class DepartmentsSeeder : ISeeder
     public async Task SeedAsync()
     {
         _logger.Information("Seeding departments...");
+        IDbContextTransaction txn = await _dbContext.Database.BeginTransactionAsync();
 
-        try { }
+        try
+        {
+            await SeedData();
+            await txn.CommitAsync();
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "An error occurred seeding departments.");
+            await txn.RollbackAsync();
         }
 
         _logger.Information("Departments seeded.");

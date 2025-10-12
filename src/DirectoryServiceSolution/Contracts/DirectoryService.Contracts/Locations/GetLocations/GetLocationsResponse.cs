@@ -1,9 +1,8 @@
-﻿namespace DirectoryService.Contracts.Locations;
+﻿namespace DirectoryService.Contracts.Locations.GetLocations;
 
-public sealed class GetLocationsResponse
-{
-    public required IEnumerable<LocationView> Locations { get; init; }
-    public required int TotalCount { get; init; }
-    public required int Page { get; init; }
-    public required int PageSize { get; init; }
-}
+public sealed record GetLocationsResponse(
+    IEnumerable<LocationView> Locations,
+    int TotalCount,
+    int Page,
+    int PageSize
+);

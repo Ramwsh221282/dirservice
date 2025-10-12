@@ -1,4 +1,5 @@
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Contracts.Departments.UpdateDepartment;
 using DirectoryService.UseCases.Common.Cqrs;
 
 namespace DirectoryService.UseCases.Departments.UpdateDepartmentLocations;
