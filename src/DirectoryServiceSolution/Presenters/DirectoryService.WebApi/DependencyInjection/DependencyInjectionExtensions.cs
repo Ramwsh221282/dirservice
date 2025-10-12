@@ -1,14 +1,18 @@
 ﻿using System.Reflection;
+using DirectoryService.Contracts.Locations;
+using DirectoryService.Infrastructure.PostgreSQL.Database;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Positions;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Cqrs;
+using DirectoryService.UseCases.Common.Database;
 using DirectoryService.UseCases.Common.Transaction;
 using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
+using DirectoryService.UseCases.Locations.GetLocations;
 using DirectoryService.UseCases.Positions.Contracts;
 using FluentValidation;
 
@@ -20,20 +24,23 @@ public static class DependencyInjectionExtensions
     {
         Assembly assembly = typeof(ICommand<>).Assembly;
         builder.Services.InjectUseCaseHandlers(assembly);
+        builder.Services.InjectQueryHandlers(assembly);
         builder.Services.AddValidatorsFromAssembly(typeof(ICommand).Assembly);
     }
 
-    public static void InjectPostgreSqlLayer(this WebApplicationBuilder builder)
+    public static void InjectInfrastructureLayers(this WebApplicationBuilder builder)
     {
         builder
             .Services.AddOptions<NpgSqlConnectionOptions>()
             .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
+        builder.Services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
         builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
         builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
         builder.Services.AddScoped<ServiceDbContext>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<ITransactionSource, TransactionSource>();
         builder.Services.AddScoped<IPositionsRepository, PositionsRepository>();
+        builder.Services.AddScoped<IReadDbContext, ServiceDbContext>();
     }
 
     public static T GetService<T>(this AsyncServiceScope scope)
@@ -57,10 +64,31 @@ public static class DependencyInjectionExtensions
         }
     }
 
+    private static void InjectQueryHandlers(this IServiceCollection services, Assembly assembly)
+    {
+        IEnumerable<Type> implementations = assembly
+            .GetTypes()
+            .Where(t => t is { IsAbstract: false, IsInterface: false })
+            .Where(t => t.GetInterfaces().Any(ImplementsQueryHandler));
+
+        foreach (Type implementation in implementations)
+        {
+            Type handlerInterface = implementation.GetInterfaces().Single(ImplementsQueryHandler);
+            services.AddScoped(handlerInterface, implementation);
+        }
+    }
+
     private static bool ImplementsHandler(this Type type) =>
         type.IsGenericType
         && (
             type.GetGenericTypeDefinition() == typeof(ICommandHandler<,>)
             || type.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
+        );
+
+    private static bool ImplementsQueryHandler(this Type type) =>
+        type.IsGenericType
+        && (
+            type.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
+            || type.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
         );
 }
