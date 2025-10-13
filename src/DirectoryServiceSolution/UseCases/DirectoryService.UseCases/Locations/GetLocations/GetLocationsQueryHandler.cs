@@ -190,14 +190,34 @@ public sealed class GetLocationsQueryHandler
 
         private LocationAddressDto ToAddressDto()
         {
-            LocationAddressDto? view = JsonSerializer.Deserialize<LocationAddressDto>(
-                AddressObject
-            );
+            using JsonDocument document = JsonDocument.Parse(AddressObject);
+            JsonElement arrayOfNodes = document.RootElement.GetProperty("Parts");
+            JsonElement[] array = arrayOfNodes.EnumerateArray().ToArray();
+            Queue<string> addressParts = GetNodesQueue(array);
 
-            return view
-                ?? throw new InvalidOperationException(
-                    $"Invalid object: {AddressObject} for mapping into: {nameof(LocationAddressDto)}"
-                );
+            string country = addressParts.Dequeue();
+            string city = addressParts.Dequeue();
+
+            return new LocationAddressDto()
+            {
+                Country = country,
+                City = city,
+                Additionals = [.. addressParts],
+            };
+        }
+
+        private Queue<string> GetNodesQueue(JsonElement[] array)
+        {
+            Queue<string> queue = [];
+            foreach (JsonElement node in array)
+            {
+                string? propertyValue = node.GetProperty("Node").GetString();
+                if (string.IsNullOrWhiteSpace(propertyValue))
+                    throw new ApplicationException("Address information has not valid parameters.");
+                queue.Enqueue(propertyValue);
+            }
+
+            return queue;
         }
     }
 }
