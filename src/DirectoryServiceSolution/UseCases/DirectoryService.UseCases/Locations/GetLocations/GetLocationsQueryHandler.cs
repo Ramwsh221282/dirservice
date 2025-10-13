@@ -171,12 +171,12 @@ public sealed class GetLocationsQueryHandler
                 CreatedAt = CreatedAt,
                 DeletedAt = DeletedAt,
                 UpdatedAt = UpdatedAt,
-                Address = ToAddressView(),
-                Departments = ToDepartmentsView(),
+                Address = ToAddressDto(),
+                Departments = ToDepartmentDto(),
                 DepartmentsCount = DepartmentsCount,
             };
 
-        private IEnumerable<LocationDepartmentDto> ToDepartmentsView()
+        private IEnumerable<LocationDepartmentDto> ToDepartmentDto()
         {
             IEnumerable<LocationDepartmentDto>? view = JsonSerializer.Deserialize<
                 IEnumerable<LocationDepartmentDto>
@@ -188,7 +188,7 @@ public sealed class GetLocationsQueryHandler
                 );
         }
 
-        private LocationAddressDto ToAddressView()
+        private LocationAddressDto ToAddressDto()
         {
             LocationAddressDto? view = JsonSerializer.Deserialize<LocationAddressDto>(
                 AddressObject
