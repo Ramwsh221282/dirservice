@@ -1,5 +1,4 @@
-﻿using DirectoryService.Contracts.Locations;
-using DirectoryService.Contracts.Locations.GetLocations;
+﻿using DirectoryService.Contracts.Locations.GetLocations;
 using DirectoryService.UseCases.Common.Cqrs;
 
 namespace DirectoryService.UseCases.Locations.GetLocations;

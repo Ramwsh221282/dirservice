@@ -162,7 +162,7 @@ public sealed class GetLocationsQueryHandler
 
         public int TotalCount { get; init; }
 
-        public LocationView ToLocationView() =>
+        public LocationDto ToLocationView() =>
             new()
             {
                 Id = Id,
@@ -171,32 +171,32 @@ public sealed class GetLocationsQueryHandler
                 CreatedAt = CreatedAt,
                 DeletedAt = DeletedAt,
                 UpdatedAt = UpdatedAt,
-                AddressObject = ToAddressView(),
-                DepartmentObjects = ToDepartmentsView(),
+                Address = ToAddressView(),
+                Departments = ToDepartmentsView(),
                 DepartmentsCount = DepartmentsCount,
             };
 
-        private IEnumerable<LocationDepartmentView> ToDepartmentsView()
+        private IEnumerable<LocationDepartmentDto> ToDepartmentsView()
         {
-            IEnumerable<LocationDepartmentView>? view = JsonSerializer.Deserialize<
-                IEnumerable<LocationDepartmentView>
+            IEnumerable<LocationDepartmentDto>? view = JsonSerializer.Deserialize<
+                IEnumerable<LocationDepartmentDto>
             >(DepartmentObjects, DepartmentSerializationOptions);
 
             return view
                 ?? throw new InvalidOperationException(
-                    $"Invalid object: {DepartmentObjects} for mapping into: {nameof(LocationDepartmentView)}"
+                    $"Invalid object: {DepartmentObjects} for mapping into: {nameof(LocationDepartmentDto)}"
                 );
         }
 
-        private LocationAddressView ToAddressView()
+        private LocationAddressDto ToAddressView()
         {
-            LocationAddressView? view = JsonSerializer.Deserialize<LocationAddressView>(
+            LocationAddressDto? view = JsonSerializer.Deserialize<LocationAddressDto>(
                 AddressObject
             );
 
             return view
                 ?? throw new InvalidOperationException(
-                    $"Invalid object: {AddressObject} for mapping into: {nameof(LocationAddressView)}"
+                    $"Invalid object: {AddressObject} for mapping into: {nameof(LocationAddressDto)}"
                 );
         }
     }

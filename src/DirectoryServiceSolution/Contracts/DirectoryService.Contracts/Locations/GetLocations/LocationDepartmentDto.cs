@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Locations.GetLocations;
 
-public sealed class LocationDepartmentView
+public sealed class LocationDepartmentDto
 {
     public required Guid Id { get; init; }
     public required string Name { get; init; }

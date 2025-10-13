@@ -40,7 +40,6 @@ public static class DependencyInjectionExtensions
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<ITransactionSource, TransactionSource>();
         builder.Services.AddScoped<IPositionsRepository, PositionsRepository>();
-        builder.Services.AddScoped<IReadDbContext, ServiceDbContext>();
     }
 
     public static T GetService<T>(this AsyncServiceScope scope)
