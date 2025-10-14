@@ -1,4 +1,3 @@
-using DirectoryService.Contracts.Locations;
 using DirectoryService.Contracts.Locations.CreateLocation;
 using DirectoryService.Contracts.Locations.GetLocations;
 using DirectoryService.UseCases.Common.Cqrs;
@@ -32,25 +31,24 @@ public sealed class LocationsController : ControllerBase
     public async Task<IResult> GetLocations(
         [FromQuery(Name = "page")] int? page,
         [FromQuery(Name = "pageSize")] int? pageSize,
-        [FromQuery(Name = "nameSort")] string? nameSort,
-        [FromQuery(Name = "dateCreatedSort")] string? dateCreatedSort,
         [FromQuery(Name = "nameSearch")] string? nameSearch,
         [FromQuery(Name = "isActive")] bool? isActive,
         [FromQuery(Name = "departmentIds")] IEnumerable<Guid>? departmentIds,
+        [FromQuery(Name = "sortOptions")] IEnumerable<string>? sortOptions,
+        [FromQuery(Name = "sortDirection")] string? sortDirection,
         [FromServices] IQueryHandler<GetLocationsQuery, GetLocationsResponse> handler,
         CancellationToken ct
     )
     {
         GetLocationsQuery query = new(
-            nameSort,
-            dateCreatedSort,
             nameSearch,
             isActive,
             departmentIds,
             page,
-            pageSize
+            pageSize,
+            sortOptions,
+            sortDirection
         );
-
         GetLocationsResponse response = await handler.Handle(query, ct);
         return Results.Ok(response);
     }
