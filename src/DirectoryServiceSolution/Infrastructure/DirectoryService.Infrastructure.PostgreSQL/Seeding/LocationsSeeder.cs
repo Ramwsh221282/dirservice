@@ -39,349 +39,173 @@ public sealed class LocationsSeeder : ISeeder
 
         var seedData = new[]
         {
-            // Россия
             new
             {
                 Name = "Главный офис",
-                AddressParts = new[] { "Россия", "Москва", "Тверская ул., 1" },
+                AddressParts = new[]
+                {
+                    "Краснодарский край",
+                    "г. Краснодар",
+                    "ул. Пушкина",
+                    "д. Колотушкина",
+                },
                 TimeZone = "Europe/Moscow",
             },
             new
             {
                 Name = "Филиал в Санкт-Петербурге",
-                AddressParts = new[] { "Россия", "Санкт-Петербург", "Невский пр., 10" },
+                AddressParts = new[]
+                {
+                    "Московская область",
+                    "город Москва",
+                    "улица Тверская",
+                    "дом 13",
+                },
                 TimeZone = "Europe/Moscow",
             },
             new
             {
                 Name = "Офис в Екатеринбурге",
-                AddressParts = new[] { "Россия", "Екатеринбург", "ул. Ленина, 50" },
+                AddressParts = new[]
+                {
+                    "Ленинградская область",
+                    "г. Санкт-Петербург",
+                    "проспект Невский",
+                    "д. 25",
+                },
                 TimeZone = "Asia/Yekaterinburg",
             },
             new
             {
                 Name = "Представительство в Новосибирске",
-                AddressParts = new[] { "Россия", "Новосибирск", "Красный проспект, 25" },
+                AddressParts = new[]
+                {
+                    "Свердловская область",
+                    "город Екатеринбург",
+                    "бульвар Ленина",
+                    "дом 5А",
+                },
                 TimeZone = "Asia/Novosibirsk",
             },
             new
             {
                 Name = "Центр в Казани",
-                AddressParts = new[] { "Россия", "Казань", "ул. Баумана, 12" },
+                AddressParts = new[]
+                {
+                    "Новосибирская область",
+                    "г. Новосибирск",
+                    "переулок Садовый",
+                    "корпус 3",
+                },
                 TimeZone = "Europe/Moscow",
             },
             new
             {
                 Name = "Филиал в Краснодаре",
-                AddressParts = new[] { "Россия", "Краснодар", "ул. Красная, 30" },
+                AddressParts = new[]
+                {
+                    "Томская область",
+                    "город Томск",
+                    "шоссе Московское",
+                    "строение 7",
+                },
                 TimeZone = "Europe/Moscow",
             },
             new
             {
                 Name = "Офис в Владивостоке",
-                AddressParts = new[] { "Россия", "Владивосток", "ул. Светланская, 45" },
+                AddressParts = new[]
+                {
+                    "Московская область",
+                    "посёлок Жаворонки",
+                    "СНТ «Рассвет»",
+                    "д. 12",
+                },
                 TimeZone = "Asia/Vladivostok",
             },
             new
             {
                 Name = "Представительство в Самаре",
-                AddressParts = new[] { "Россия", "Самара", "ул. Ленинградская, 8" },
+                AddressParts = new[]
+                {
+                    "Ленинградская область",
+                    "деревня Марьино",
+                    "днп «Зелёный угол»",
+                    "дом 5Б",
+                },
                 TimeZone = "Europe/Samara",
             },
             new
             {
                 Name = "Центр в Ростове-на-Дону",
-                AddressParts = new[] { "Россия", "Ростов-на-Дону", "Большая Садовая ул., 43" },
+                AddressParts = new[]
+                {
+                    "Ростовская область",
+                    "г. Ростов-на-Дону",
+                    "микрорайон 12",
+                    "д. 45",
+                },
                 TimeZone = "Europe/Moscow",
             },
             new
             {
                 Name = "Офис в Иркутске",
-                AddressParts = new[] { "Россия", "Иркутск", "ул. Карла Маркса, 15" },
+                AddressParts = new[]
+                {
+                    "Кемеровская область",
+                    "город Кемерово",
+                    "мкр. Центральный",
+                    "корп. 2",
+                },
                 TimeZone = "Asia/Irkutsk",
             },
-            // Ближнее зарубежье
             new
             {
                 Name = "Международный офис в Минске",
-                AddressParts = new[] { "Беларусь", "Минск", "пр. Независимости, 95" },
+                AddressParts = new[]
+                {
+                    "Самарская область",
+                    "г. Самара",
+                    "аллея Славы",
+                    "владение 8",
+                },
                 TimeZone = "Europe/Minsk",
             },
             new
             {
                 Name = "Филиал в Алматы",
-                AddressParts = new[] { "Казахстан", "Алматы", "пр. Абая, 77" },
+                AddressParts = new[]
+                {
+                    "Калининградская область",
+                    "город Калининград",
+                    "улица Багратиона",
+                    "литера А",
+                },
                 TimeZone = "Asia/Almaty",
             },
             new
             {
                 Name = "Представительство в Киеве",
-                AddressParts = new[] { "Украина", "Киев", "ул. Хрещатик, 1" },
+                AddressParts = new[]
+                {
+                    "Челябинская область",
+                    "г. Челябинск",
+                    "пр. Победы",
+                    "д. 15В",
+                },
                 TimeZone = "Europe/Kiev",
             },
-            // Дальнее зарубежье
             new
             {
                 Name = "Офис в Берлине",
-                AddressParts = new[] { "Германия", "Берлин", "Unter den Linden, 77" },
+                AddressParts = new[]
+                {
+                    "Воронежская область",
+                    "город Воронеж",
+                    "ул. Лизюкова",
+                    "к. 10Г",
+                },
                 TimeZone = "Europe/Berlin",
-            },
-            new
-            {
-                Name = "Центр в Дубае",
-                AddressParts = new[] { "ОАЭ", "Дубай", "Sheikh Zayed Road, 123" },
-                TimeZone = "Asia/Dubai",
-            },
-            new
-            {
-                Name = "Представительство в Нью-Йорке",
-                AddressParts = new[] { "США", "Нью-Йорк", "5th Avenue, 350" },
-                TimeZone = "America/New_York",
-            },
-            new
-            {
-                Name = "Офис в Токио",
-                AddressParts = new[] { "Япония", "Токио", "Shibuya, 2-1-1" },
-                TimeZone = "Asia/Tokyo",
-            },
-            new
-            {
-                Name = "Филиал в Лондоне",
-                AddressParts = new[] { "Великобритания", "Лондон", "Oxford Street, 100" },
-                TimeZone = "Europe/London",
-            },
-            new
-            {
-                Name = "Центр в Сингапуре",
-                AddressParts = new[] { "Сингапур", "Сингапур", "Orchard Road, 400" },
-                TimeZone = "Asia/Singapore",
-            },
-            new
-            {
-                Name = "Представительство в Париже",
-                AddressParts = new[] { "Франция", "Париж", "Avenue des Champs-Élysées, 50" },
-                TimeZone = "Europe/Paris",
-            },
-            // === Россия (дополнительно) ===
-            new
-            {
-                Name = "Офис в Воронеже",
-                AddressParts = new[] { "Россия", "Воронеж", "просп. Революции, 30" },
-                TimeZone = "Europe/Moscow",
-            },
-            new
-            {
-                Name = "Филиал в Красноярске",
-                AddressParts = new[] { "Россия", "Красноярск", "ул. Ленина, 115" },
-                TimeZone = "Asia/Krasnoyarsk",
-            },
-            new
-            {
-                Name = "Представительство в Перми",
-                AddressParts = new[] { "Россия", "Пермь", "ул. Ленина, 52" },
-                TimeZone = "Asia/Yekaterinburg",
-            },
-            new
-            {
-                Name = "Центр в Волгограде",
-                AddressParts = new[] { "Россия", "Волгоград", "просп. Ленина, 10" },
-                TimeZone = "Europe/Volgograd",
-            },
-            new
-            {
-                Name = "Офис в Саратове",
-                AddressParts = new[] { "Россия", "Саратов", "ул. Московская, 20" },
-                TimeZone = "Europe/Saratov",
-            },
-            new
-            {
-                Name = "Филиал в Тюмени",
-                AddressParts = new[] { "Россия", "Тюмень", "ул. Республики, 80" },
-                TimeZone = "Asia/Yekaterinburg",
-            },
-            new
-            {
-                Name = "Представительство в Омске",
-                AddressParts = new[] { "Россия", "Омск", "ул. Ленина, 23" },
-                TimeZone = "Asia/Omsk",
-            },
-            new
-            {
-                Name = "Центр в Уфе",
-                AddressParts = new[] { "Россия", "Уфа", "ул. Ленина, 14" },
-                TimeZone = "Asia/Yekaterinburg",
-            },
-            new
-            {
-                Name = "Офис в Калининграде",
-                AddressParts = new[] { "Россия", "Калининград", "ул. Дм. Донского, 1" },
-                TimeZone = "Europe/Kaliningrad",
-            },
-            new
-            {
-                Name = "Филиал в Мурманске",
-                AddressParts = new[] { "Россия", "Мурманск", "пр. Ленина, 50" },
-                TimeZone = "Europe/Moscow",
-            },
-            // === СНГ и соседние страны ===
-            new
-            {
-                Name = "Офис в Бишкеке",
-                AddressParts = new[] { "Киргизия", "Бишкек", "пр. Чуй, 100" },
-                TimeZone = "Asia/Bishkek",
-            },
-            new
-            {
-                Name = "Представительство в Ереване",
-                AddressParts = new[] { "Армения", "Ереван", "просп. Мясникяна, 20" },
-                TimeZone = "Asia/Yerevan",
-            },
-            new
-            {
-                Name = "Центр в Тбилиси",
-                AddressParts = new[] { "Грузия", "Тбилиси", "Руставели просп., 15" },
-                TimeZone = "Asia/Tbilisi",
-            },
-            new
-            {
-                Name = "Филиал в Душанбе",
-                AddressParts = new[] { "Таджикистан", "Душанбе", "пр. Рудаки, 30" },
-                TimeZone = "Asia/Dushanbe",
-            },
-            new
-            {
-                Name = "Офис в Ашхабаде",
-                AddressParts = new[] { "Туркменистан", "Ашхабад", "ул. Арчабиль, 50" },
-                TimeZone = "Asia/Ashgabat",
-            },
-            new
-            {
-                Name = "Представительство в Баку",
-                AddressParts = new[] { "Азербайджан", "Баку", "ул. Низами, 77" },
-                TimeZone = "Asia/Baku",
-            },
-            // === Европа ===
-            new
-            {
-                Name = "Офис в Амстердаме",
-                AddressParts = new[] { "Нидерланды", "Амстердам", "Damrak, 20" },
-                TimeZone = "Europe/Amsterdam",
-            },
-            new
-            {
-                Name = "Центр в Вене",
-                AddressParts = new[] { "Австрия", "Вена", "Stephansplatz, 3" },
-                TimeZone = "Europe/Vienna",
-            },
-            new
-            {
-                Name = "Филиал в Риме",
-                AddressParts = new[] { "Италия", "Рим", "Via del Corso, 100" },
-                TimeZone = "Europe/Rome",
-            },
-            new
-            {
-                Name = "Представительство в Мадриде",
-                AddressParts = new[] { "Испания", "Мадрид", "Gran Vía, 25" },
-                TimeZone = "Europe/Madrid",
-            },
-            new
-            {
-                Name = "Офис в Стокгольме",
-                AddressParts = new[] { "Швеция", "Стокгольм", "Drottninggatan, 30" },
-                TimeZone = "Europe/Stockholm",
-            },
-            new
-            {
-                Name = "Центр в Хельсинки",
-                AddressParts = new[] { "Финляндия", "Хельсинки", "Esplanadi, 10" },
-                TimeZone = "Europe/Helsinki",
-            },
-            new
-            {
-                Name = "Филиал в Варшаве",
-                AddressParts = new[] { "Польша", "Варшава", "Nowy Świat, 45" },
-                TimeZone = "Europe/Warsaw",
-            },
-            new
-            {
-                Name = "Представительство в Праге",
-                AddressParts = new[] { "Чехия", "Прага", "Wenceslas Square, 15" },
-                TimeZone = "Europe/Prague",
-            },
-            // === Азия и Океания ===
-            new
-            {
-                Name = "Офис в Сеуле",
-                AddressParts = new[] { "Южная Корея", "Сеул", "Myeongdong-gil, 12" },
-                TimeZone = "Asia/Seoul",
-            },
-            new
-            {
-                Name = "Центр в Бангкоке",
-                AddressParts = new[] { "Таиланд", "Бангкок", "Sukhumvit Road, 50" },
-                TimeZone = "Asia/Bangkok",
-            },
-            new
-            {
-                Name = "Филиал в Куала-Лумпуре",
-                AddressParts = new[] { "Малайзия", "Куала-Лумпур", "Jalan Bukit Bintang, 88" },
-                TimeZone = "Asia/Kuala_Lumpur",
-            },
-            new
-            {
-                Name = "Представительство в Джакарте",
-                AddressParts = new[] { "Индонезия", "Джакарта", "Jalan Thamrin, 1" },
-                TimeZone = "Asia/Jakarta",
-            },
-            new
-            {
-                Name = "Офис в Сиднее",
-                AddressParts = new[] { "Австралия", "Сидней", "George Street, 200" },
-                TimeZone = "Australia/Sydney",
-            },
-            new
-            {
-                Name = "Центр в Мельбурне",
-                AddressParts = new[] { "Австралия", "Мельбурн", "Flinders Street, 150" },
-                TimeZone = "Australia/Melbourne",
-            },
-            // === Америка ===
-            new
-            {
-                Name = "Филиал в Лос-Анджелесе",
-                AddressParts = new[] { "США", "Лос-Анджелес", "Sunset Boulevard, 6000" },
-                TimeZone = "America/Los_Angeles",
-            },
-            new
-            {
-                Name = "Представительство в Чикаго",
-                AddressParts = new[] { "США", "Чикаго", "Michigan Avenue, 875" },
-                TimeZone = "America/Chicago",
-            },
-            new
-            {
-                Name = "Офис в Торонто",
-                AddressParts = new[] { "Канада", "Торонто", "Yonge Street, 100" },
-                TimeZone = "America/Toronto",
-            },
-            new
-            {
-                Name = "Центр в Мехико",
-                AddressParts = new[] { "Мексика", "Мехико", "Paseo de la Reforma, 222" },
-                TimeZone = "America/Mexico_City",
-            },
-            new
-            {
-                Name = "Филиал в Сан-Паулу",
-                AddressParts = new[] { "Бразилия", "Сан-Паулу", "Avenida Paulista, 1000" },
-                TimeZone = "America/Sao_Paulo",
-            },
-            new
-            {
-                Name = "Представительство в Буэнос-Айресе",
-                AddressParts = new[] { "Аргентина", "Буэнос-Айрес", "Avenida 9 de Julio, 500" },
-                TimeZone = "America/Argentina/Buenos_Aires",
             },
         };
 

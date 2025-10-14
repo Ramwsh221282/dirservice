@@ -28,29 +28,22 @@ public sealed class GetLocationsQueryHandler
         IQueryClause departmentFilterClause = _connectionFactory.CreateClause();
         IQueryClause paginationClause = _connectionFactory.CreateClause();
 
-        if (!string.IsNullOrWhiteSpace(query.NameSortMode))
-            orderingClause = query.NameSortMode switch
+        if (query.SortOptions != null && query.SortOptions.Any())
+        {
+            string direction = query.SortDirection;
+            foreach (string sortOption in query.SortOptions)
             {
-                _ when query.NameSortMode.Equals("ASC", StringComparison.OrdinalIgnoreCase) =>
-                    orderingClause.AddClause("l.name ASC"),
-                _ when query.NameSortMode.Equals("DESC", StringComparison.OrdinalIgnoreCase) =>
-                    orderingClause.AddClause("l.name DESC"),
-                _ => orderingClause,
-            };
-
-        if (!string.IsNullOrWhiteSpace(query.DateCreatedSortMode))
-            orderingClause = query.DateCreatedSortMode switch
-            {
-                _ when query.DateCreatedSortMode.Equals(
-                        "ASC",
-                        StringComparison.OrdinalIgnoreCase
-                    ) => orderingClause.AddClause("l.created_at ASC"),
-                _ when query.DateCreatedSortMode.Equals(
-                        "DESC",
-                        StringComparison.OrdinalIgnoreCase
-                    ) => orderingClause.AddClause("l.created_at DESC"),
-                _ => orderingClause,
-            };
+                orderingClause = sortOption switch
+                {
+                    "name" => orderingClause.AddClause($"l.name {direction}"),
+                    "timezone" => orderingClause.AddClause($"l.time_zone {direction}"),
+                    "created" => orderingClause.AddClause($"l.created_at {direction}"),
+                    "deleted" => orderingClause.AddClause($"l.deleted_at {direction}"),
+                    "updated" => orderingClause.AddClause($"l.updated_at {direction}"),
+                    _ => orderingClause,
+                };
+            }
+        }
 
         if (!string.IsNullOrWhiteSpace(query.NameSearch))
             filterClause = filterClause.AddClause(
@@ -137,7 +130,7 @@ public sealed class GetLocationsQueryHandler
             response = response with
             {
                 TotalCount = data.First().TotalCount,
-                Locations = data.Select(d => d.ToLocationView()),
+                Locations = data.Select(d => d.ToLocationDto()),
             };
 
         return response;
@@ -162,7 +155,7 @@ public sealed class GetLocationsQueryHandler
 
         public int TotalCount { get; init; }
 
-        public LocationDto ToLocationView() =>
+        public LocationDto ToLocationDto() =>
             new()
             {
                 Id = Id,
@@ -178,11 +171,11 @@ public sealed class GetLocationsQueryHandler
 
         private IEnumerable<LocationDepartmentDto> ToDepartmentDto()
         {
-            IEnumerable<LocationDepartmentDto>? view = JsonSerializer.Deserialize<
+            IEnumerable<LocationDepartmentDto>? department = JsonSerializer.Deserialize<
                 IEnumerable<LocationDepartmentDto>
             >(DepartmentObjects, DepartmentSerializationOptions);
 
-            return view
+            return department
                 ?? throw new InvalidOperationException(
                     $"Invalid object: {DepartmentObjects} for mapping into: {nameof(LocationDepartmentDto)}"
                 );
@@ -190,20 +183,13 @@ public sealed class GetLocationsQueryHandler
 
         private LocationAddressDto ToAddressDto()
         {
-            using JsonDocument document = JsonDocument.Parse(AddressObject);
-            JsonElement arrayOfNodes = document.RootElement.GetProperty("Parts");
-            JsonElement[] array = arrayOfNodes.EnumerateArray().ToArray();
-            Queue<string> addressParts = GetNodesQueue(array);
-
-            string country = addressParts.Dequeue();
-            string city = addressParts.Dequeue();
-
-            return new LocationAddressDto()
-            {
-                Country = country,
-                City = city,
-                Additionals = [.. addressParts],
-            };
+            LocationAddressDto? address = JsonSerializer.Deserialize<LocationAddressDto>(
+                AddressObject
+            );
+            return address
+                ?? throw new InvalidOperationException(
+                    $"Invalid object: {AddressObject} for mapping into: {nameof(LocationAddressDto)}"
+                );
         }
 
         private Queue<string> GetNodesQueue(JsonElement[] array)

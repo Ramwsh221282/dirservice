@@ -7,24 +7,25 @@ public sealed record GetLocationsQuery : IQuery<GetLocationsResponse>
 {
     public int Page { get; }
     public int PageSize { get; }
-    public string? NameSortMode { get; }
-    public string? DateCreatedSortMode { get; }
     public string? NameSearch { get; }
     public bool? IsActive { get; }
     public IEnumerable<Guid>? DepartmentIds { get; }
+    public IEnumerable<string>? SortOptions { get; }
+    public string SortDirection { get; } = "ASC";
 
     public GetLocationsQuery(
-        string? nameSortMode,
-        string? dateCreatedSortMode,
         string? nameSearch,
         bool? isActive,
         IEnumerable<Guid>? departmentIds,
         int? page,
-        int? pageSize
+        int? pageSize,
+        IEnumerable<string>? sortOptions,
+        string? sortDirection
     )
     {
-        NameSortMode = nameSortMode;
-        DateCreatedSortMode = dateCreatedSortMode;
+        SortOptions = sortOptions;
+        if (sortDirection is "DESC")
+            SortDirection = "DESC";
         Page = page ?? 1;
         PageSize = pageSize ?? 20;
         NameSearch = nameSearch;

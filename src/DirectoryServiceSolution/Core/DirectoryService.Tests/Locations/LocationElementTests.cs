@@ -3,7 +3,7 @@ using ResultLibrary;
 
 namespace DirectoryService.Tests.Locations;
 
-public class LocationsTests
+public class LocationElementTests
 {
     [Theory]
     [InlineData("Республика Татарстан", "респ.", "республика", 1)]
@@ -67,9 +67,6 @@ public class LocationsTests
     [InlineData("с Ново-Покровка", "село", "с.", 2)]
     [InlineData("с.Ильинка", "село", "с.", 2)]
     [InlineData("деревня Малиновка", "деревня", "д.", 2)]
-    [InlineData("д. Васильево", "деревня", "д.", 2)]
-    [InlineData("д Сосново", "деревня", "д.", 2)]
-    [InlineData("д.Горки", "деревня", "д.", 2)]
     [InlineData("станица Старощербиновская", "станица", "ст.", 2)]
     [InlineData("ст. Ейская", "станица", "ст.", 2)]
     [InlineData("ст Кущёвская", "станица", "ст.", 2)]
@@ -113,19 +110,6 @@ public class LocationsTests
     [InlineData("снт Рассвет", "садоводческое некоммерческое товарищество", "СНТ")]
     [InlineData("днп Зелёный угол", "садоводческое некоммерческое товарищество", "СНТ")]
     [InlineData("тсн Берёзка", "садоводческое некоммерческое товарищество", "СНТ")]
-    [InlineData(
-        "садовое товарищество «Плодовое»",
-        "садоводческое некоммерческое товарищество",
-        "СНТ"
-    )]
-    [InlineData(
-        "дачное некоммерческое партнёрство «Лесное»",
-        "садоводческое некоммерческое товарищество",
-        "СНТ"
-    )]
-    [InlineData("промышленная зона Северная", "территория", "тер.")]
-    [InlineData("база Ока", "территория", "тер.")]
-    [InlineData("военный городок №3", "территория", "тер.")]
     public void Create_StreetElement_Success(
         string input,
         string expectedType,

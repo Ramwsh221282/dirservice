@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Core.LocationsContext.ValueObjects;
+﻿namespace DirectoryService.Core.LocationsContext.ValueObjects.LocationElements;
 
 public interface ILocationElement
 {

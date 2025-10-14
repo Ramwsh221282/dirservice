@@ -1,27 +1,57 @@
 using System.Text.Json;
 using DirectoryService.Core.Common.Extensions;
+using DirectoryService.Core.LocationsContext.ValueObjects.LocationElements;
 using ResultLibrary;
 
 namespace DirectoryService.Core.LocationsContext.ValueObjects;
 
 public sealed record LocationAddress
 {
+    public string FullPath { get; } = null!;
+
     private readonly List<LocationAddressPart> _parts = [];
     public IReadOnlyList<LocationAddressPart> Parts => _parts;
 
-    private LocationAddress()
+    private LocationAddress(IEnumerable<LocationAddressPart> parts, string fullPath)
     {
-        // ef core
+        FullPath = fullPath;
+        _parts = [.. parts];
     }
 
-    private LocationAddress(List<LocationAddressPart> parts) => _parts = parts;
+    private LocationAddress()
+    {
+        // ef
+    }
 
     public static Result<LocationAddress> Create(IEnumerable<LocationAddressPart> parts)
     {
-        List<LocationAddressPart> asList = [.. parts];
-        return asList.IsEmpty()
-            ? Error.ValidationError("Адрес не может состоять без частей адреса.")
-            : new LocationAddress(asList);
+        if (!ContainsAoLevel(parts, SubjectLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не содержит субъект.");
+
+        if (AoLevelRepeated(parts, SubjectLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не может содержать более 1 субъекта");
+
+        if (!ContainsAoLevel(parts, MunicipalLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не содержит населенный пункт.");
+
+        if (AoLevelRepeated(parts, MunicipalLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не может содержать более 1 населенного пункта");
+
+        if (!ContainsAoLevel(parts, StreetLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не содержит улицу");
+
+        if (AoLevelRepeated(parts, StreetLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не может содержать более 1 улицы");
+
+        if (!ContainsAoLevel(parts, BuildingLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не содержит строение");
+
+        if (AoLevelRepeated(parts, BuildingLocationElement.AoLevel))
+            return Error.ValidationError("Адрес не может содержать более 1 строения.");
+
+        LocationAddressPart[] sorted = [.. parts.OrderBy(p => p.AoLevel)];
+        string fullPath = string.Join(", ", sorted.Select(i => i.Name));
+        return new LocationAddress(sorted, fullPath);
     }
 
     public static Result<LocationAddress> Create(IEnumerable<string> parts)
@@ -36,14 +66,13 @@ public sealed record LocationAddress
             return Error.ValidationError(errorMessage);
         }
 
-        IEnumerable<Result<LocationAddressPart>> valid = parts.Select(LocationAddressPart.Create);
-        if (valid.Any(r => r.IsFailure))
-        {
-            Result<LocationAddressPart> failed = valid.First();
+        Result<LocationAddressPart>[] results = parts.Select(LocationAddressPart.Create).ToArray();
+        Result<LocationAddressPart>? failed = results.FirstOrDefault(r => r.IsFailure);
+        if (failed != null)
             return failed.Error;
-        }
 
-        return Create(valid.Select(p => p.Value));
+        LocationAddressPart[] valid = results.Select(r => r.Value).ToArray();
+        return Create(valid);
     }
 
     public static LocationAddress FromJson(string json)
@@ -62,6 +91,17 @@ public sealed record LocationAddress
             parts.Add(part);
         }
 
-        return new LocationAddress(parts);
+        return new LocationAddress([], string.Empty);
+    }
+
+    private static bool AoLevelRepeated(IEnumerable<LocationAddressPart> parts, short aoLevel)
+    {
+        bool repeated = parts.Count(p => p.AoLevel == aoLevel && p.AoLevel > 1) > 1;
+        return repeated;
+    }
+
+    private static bool ContainsAoLevel(IEnumerable<LocationAddressPart> parts, short aoLevel)
+    {
+        return parts.Any(p => p.AoLevel == aoLevel);
     }
 }

@@ -1,6 +1,11 @@
 ﻿namespace DirectoryService.Core.LocationsContext.ValueObjects.LocationElements;
 
-public class LocationElementAttribute
+public sealed class LocationElementAttribute : Attribute
 {
-    
+    public short AoLevel { get; }
+
+    public LocationElementAttribute(short aoLevel)
+    {
+        AoLevel = aoLevel;
+    }
 }
