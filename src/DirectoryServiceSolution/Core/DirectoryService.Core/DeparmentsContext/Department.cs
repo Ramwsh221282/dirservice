@@ -233,6 +233,33 @@ public sealed class Department : ISoftDeletable
         );
     }
 
+    public static Department CreateNew(
+        DepartmentName name,
+        DepartmentIdentifier identifier,
+        IEnumerable<Location> locations
+    )
+    {
+        DepartmentId id = new DepartmentId();
+        DepartmentPath path = new DepartmentPath(identifier);
+        DepartmentDepth depth = new DepartmentDepth();
+        EntityLifeCycle lifeCycle = new EntityLifeCycle();
+        DepartmentChildrensCount childrensCount = new DepartmentChildrensCount();
+        Department department = new Department(
+            id,
+            identifier,
+            lifeCycle,
+            name,
+            path,
+            depth,
+            childrensCount
+        );
+        IEnumerable<DepartmentLocation> departmentLocations = locations.Select(
+            l => new DepartmentLocation(department, l)
+        );
+        department._locations.AddRange(departmentLocations);
+        return department;
+    }
+
     public static Department CreateNew(DepartmentName name, DepartmentIdentifier identifier)
     {
         DepartmentId id = new DepartmentId();

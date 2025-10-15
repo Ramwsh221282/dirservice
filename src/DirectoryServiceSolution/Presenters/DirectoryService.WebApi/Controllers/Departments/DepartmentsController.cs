@@ -1,4 +1,6 @@
 ﻿using DirectoryService.Contracts.Departments;
+using DirectoryService.Contracts.Departments.CreateDepartment;
+using DirectoryService.Contracts.Departments.UpdateDepartment;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Departments.CreateDepartment;
 using DirectoryService.UseCases.Departments.UpdateDepartmentLocations;
