@@ -102,7 +102,7 @@ public sealed class GetDepartmentsPrefetchQueryHandler
         );
 
         using var connection = await _connectionFactory.Create(ct);
-        var data = await connection.QueryAsync<GetDepartmentsPrefetchDataModel>(command);
+        var data = await connection.QueryAsync<HierarchicalDepartmentDataModel>(command);
         return new HierarchicalDepartmentsMapper(data).Map();
     }
 }

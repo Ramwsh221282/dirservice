@@ -4,9 +4,9 @@ namespace DirectoryService.UseCases.Departments.GetHierarchicalDepartments.Commo
 
 internal sealed class HierarchicalDepartmentsMapper
 {
-    private readonly IEnumerable<GetDepartmentsPrefetchDataModel> _data;
+    private readonly IEnumerable<HierarchicalDepartmentDataModel> _data;
 
-    internal HierarchicalDepartmentsMapper(IEnumerable<GetDepartmentsPrefetchDataModel> data) =>
+    internal HierarchicalDepartmentsMapper(IEnumerable<HierarchicalDepartmentDataModel> data) =>
         _data = data;
 
     public GetHierarchicalDepartmentsPrefetchResponse Map()
@@ -15,7 +15,7 @@ internal sealed class HierarchicalDepartmentsMapper
 
         // маппинг иерархии, где узлы получают дочерние элементы.
         var departmentsDictionary = _data.ToDictionary(d => d.Id);
-        var roots = new List<GetDepartmentsPrefetchDataModel>();
+        var roots = new List<HierarchicalDepartmentDataModel>();
 
         foreach (var row in _data)
         {

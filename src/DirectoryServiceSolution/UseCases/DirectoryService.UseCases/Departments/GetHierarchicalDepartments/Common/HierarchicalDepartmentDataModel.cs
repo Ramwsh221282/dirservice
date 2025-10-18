@@ -2,7 +2,7 @@
 
 namespace DirectoryService.UseCases.Departments.GetHierarchicalDepartments.Common;
 
-internal sealed class GetDepartmentsPrefetchDataModel
+internal sealed class HierarchicalDepartmentDataModel
 {
     public required Guid Id { get; init; }
     public required string Identifier { get; init; }
@@ -13,7 +13,7 @@ internal sealed class GetDepartmentsPrefetchDataModel
     public required int ChildrensCount { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
-    public List<GetDepartmentsPrefetchDataModel> Childrens { get; } = [];
+    public List<HierarchicalDepartmentDataModel> Childrens { get; } = [];
     public required bool HasMoreChildren { get; init; }
     public required int TotalCount { get; init; }
 
