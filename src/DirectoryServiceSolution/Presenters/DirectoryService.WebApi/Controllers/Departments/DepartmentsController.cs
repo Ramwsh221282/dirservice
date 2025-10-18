@@ -5,7 +5,8 @@ using DirectoryService.Contracts.Departments.UpdateDepartment;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Departments.CreateDepartment;
 using DirectoryService.UseCases.Departments.GetDepartmentsPopularity;
-using DirectoryService.UseCases.Departments.GetDepartmentsPrefetch;
+using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepartmentsPrefetch;
+using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepartmentsPrefetchV2;
 using DirectoryService.UseCases.Departments.UpdateDepartmentLocations;
 using Microsoft.AspNetCore.Mvc;
 using ResultLibrary.AspNetCore;
@@ -42,12 +43,37 @@ public sealed class DepartmentsController : ControllerBase
         return result.FromResult(nameof(UpdateDepartmentLocationsCommand));
     }
 
+    [HttpGet("hierarchical-v2")]
+    public async Task<IResult> GetHierarchicalV2(
+        [FromQuery(Name = "page")] int? page,
+        [FromQuery(Name = "pageSize")] int? pageSize,
+        [FromQuery(Name = "prefetch")] int? prefetch,
+        IQueryHandler<
+            GetDepartmentsPrefetchV2Query,
+            GetHierarchicalDepartmentsPrefetchResponse
+        > handler,
+        CancellationToken ct
+    )
+    {
+        var request = new GetDepartmentsHierarchyPrefetchRequest(page, pageSize, prefetch);
+        var query = new GetDepartmentsPrefetchV2Query(
+            request.Page,
+            request.PageSize,
+            request.Prefetch
+        );
+        var result = await handler.Handle(query, ct);
+        return Results.Ok(result);
+    }
+
     [HttpGet("hierarchical")]
     public async Task<IResult> GetHierarchical(
         [FromQuery(Name = "page")] int? page,
         [FromQuery(Name = "pageSize")] int? pageSize,
         [FromQuery(Name = "prefetch")] int? prefetch,
-        IQueryHandler<GetDepartmentsPrefetchQuery, GetDepartmentsPrefetchResponse> handler,
+        IQueryHandler<
+            GetDepartmentsPrefetchQuery,
+            GetHierarchicalDepartmentsPrefetchResponse
+        > handler,
         CancellationToken ct
     )
     {

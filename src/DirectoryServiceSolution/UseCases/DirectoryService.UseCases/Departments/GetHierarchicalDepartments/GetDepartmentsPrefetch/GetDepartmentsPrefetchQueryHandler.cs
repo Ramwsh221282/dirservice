@@ -2,11 +2,12 @@
 using DirectoryService.Contracts.Departments.GetDepartmentsHierarchyPrefetch;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Database;
+using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.Common;
 
-namespace DirectoryService.UseCases.Departments.GetDepartmentsPrefetch;
+namespace DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepartmentsPrefetch;
 
 public sealed class GetDepartmentsPrefetchQueryHandler
-    : IQueryHandler<GetDepartmentsPrefetchQuery, GetDepartmentsPrefetchResponse>
+    : IQueryHandler<GetDepartmentsPrefetchQuery, GetHierarchicalDepartmentsPrefetchResponse>
 {
     private readonly IDbConnectionFactory _connectionFactory;
 
@@ -15,7 +16,7 @@ public sealed class GetDepartmentsPrefetchQueryHandler
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<GetDepartmentsPrefetchResponse> Handle(
+    public async Task<GetHierarchicalDepartmentsPrefetchResponse> Handle(
         GetDepartmentsPrefetchQuery query,
         CancellationToken ct = default
     )
@@ -101,23 +102,7 @@ public sealed class GetDepartmentsPrefetchQueryHandler
         );
 
         using var connection = await _connectionFactory.Create(ct);
-        var departments = await connection.QueryAsync<GetDepartmentsPrefetchDto>(command);
-        var totalCount = departments.Select(d => d.TotalCount).Max();
-
-        var departmentsDictionary = departments.ToDictionary(d => d.Id);
-        var roots = new List<GetDepartmentsPrefetchDto>();
-
-        foreach (var row in departments)
-        {
-            if (
-                row.ParentId != null
-                && departmentsDictionary.TryGetValue(row.ParentId.Value, out var parent)
-            )
-                parent.Childrens.Add(departmentsDictionary[row.Id]);
-            else
-                roots.Add(departmentsDictionary[row.Id]);
-        }
-
-        return new GetDepartmentsPrefetchResponse(totalCount, roots);
+        var data = await connection.QueryAsync<GetDepartmentsPrefetchDataModel>(command);
+        return new HierarchicalDepartmentsMapper(data).Map();
     }
 }

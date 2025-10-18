@@ -1,9 +1,10 @@
 ﻿using DirectoryService.Contracts.Departments.GetDepartmentsHierarchyPrefetch;
 using DirectoryService.UseCases.Common.Cqrs;
 
-namespace DirectoryService.UseCases.Departments.GetDepartmentsPrefetch;
+namespace DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepartmentsPrefetch;
 
-public sealed record GetDepartmentsPrefetchQuery : IQuery<GetDepartmentsPrefetchResponse>
+public sealed record GetDepartmentsPrefetchQuery
+    : IQuery<GetHierarchicalDepartmentsPrefetchResponse>
 {
     public int Page { get; }
     public int PageSize { get; }
