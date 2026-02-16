@@ -18,6 +18,11 @@ public sealed record DepartmentPath
         Value = identifier.Value;
     }
 
+    public DepartmentPath Copy()
+    {
+        return new DepartmentPath(Value);
+    }
+
     public bool ContainsIdentifier(DepartmentIdentifier identifier)
     {
         int identifierIndex = IndexOfIdentifier(identifier);

@@ -12,6 +12,11 @@ public sealed record DepartmentIdentifier
     {
         Value = value;
     }
+    
+    public DepartmentIdentifier IdentifierOfArchived()
+    {
+        return new DepartmentIdentifier("archived_" + Value);
+    }
 
     public static Result<DepartmentIdentifier> Create(string value)
     {

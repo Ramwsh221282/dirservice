@@ -36,15 +36,41 @@ public sealed class DeleteDepartmentHandler : ICommandHandler<Guid, DeleteDepart
         {
             return department.Error;
         }
-
+        
+        DepartmentPath copied = department.Value.Path.Copy();
         Result archivation = department.Value.Archive();
         if (archivation.IsFailure)
         {
             return archivation.Error;
+        }        
+
+        Result locationsArchivation = await ArchiveLocationsOnlyOwnedByDepartment(department, ct);
+        if (locationsArchivation.IsFailure)
+        {
+            return locationsArchivation.Error;
         }
 
-        IReadOnlyList<DepartmentLocation> singleTimeAttachedLocations = await _repository.GetSingleTimeAttachedDepartmentLocations(department, ct);
-        IReadOnlyList<DepartmentPosition> singleTimeAttachedPositions = await _repository.GetSingleTimeAttachedDepartmentPositions(department, ct);        
+        Result positionsArchivation = await ArchivePositionsOnlyOwnedByDepartment(department, ct);
+        if (positionsArchivation.IsFailure)
+        {
+            return positionsArchivation.Error;
+        }
+
+        await _repository.RefreshDepartmentChildPaths(department, copied, ct);
+
+        Result saving = await _unitOfWork.SaveChanges(ct: ct);
+        if (saving.IsFailure)
+        {
+            return saving.Error;
+        }
+
+        Result commiting = await txn.CommitChanges(nameof(DeleteDepartmentCommand), ct: ct);
+        if (commiting.IsFailure)
+        {
+            return commiting.Error;
+        }
+
+        return department.Value.Id.Value;
     }
 
     private async Task<Result<Department>> FindDepartment(Guid id, CancellationToken ct)
