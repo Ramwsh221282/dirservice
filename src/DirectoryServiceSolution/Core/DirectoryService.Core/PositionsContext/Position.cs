@@ -50,6 +50,17 @@ public sealed class Position : ISoftDeletable
         LifeCycle = lifeCycle ?? new EntityLifeCycle();
     }
 
+    public Result Archive()
+    {
+        if (Deleted)
+        {
+            return Error.ConflictError("Нельзя архивировать уже архивированную должность");
+        }
+
+        LifeCycle = LifeCycle.Delete();
+        return Result.Success();
+    }
+
     public static Result<Position> CreateNew(
         PositionName name,
         PositionDescription description,

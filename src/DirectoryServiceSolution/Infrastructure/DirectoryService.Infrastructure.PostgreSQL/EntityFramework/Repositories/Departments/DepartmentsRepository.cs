@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Dapper;
 using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.UseCases.Departments.Contracts;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,81 @@ namespace DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositorie
 public sealed class DepartmentsRepository : IDepartmentsRepository
 {
     private readonly ServiceDbContext _dbContext;
-
+    
     public DepartmentsRepository(ServiceDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    /// <summary>
+    /// возвращает связанные локации, которые только один раз присоединялись к указанному по id подразделению.
+    /// вернет пустой список, если локации присоединялись к другим подразделениим (т.е если куда-то еще присоединились)
+    /// </summary>    
+    public async Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(DepartmentId id, CancellationToken ct)
+    {
+        Guid rawDepartmentId = id.Value;
+        return await _dbContext.DepartmentLocations.FromSqlInterpolated<DepartmentLocation>(@$"
+                SELECT dl.* FROM (
+                    WITH owned_department_locations AS (        
+                        SELECT * FROM department_locations dl 
+                        WHERE dl.department_id = {rawDepartmentId}
+                    )
+                    SELECT     
+                        odl.location_id    
+                    FROM 
+                        owned_department_locations odl
+                    JOIN LATERAL (
+                            SELECT 
+                                dl.department_id as department_id 
+                            FROM department_locations dl
+                            WHERE 
+                            dl.location_id = odl.location_id
+                            ) department_location_records ON TRUE
+                    GROUP BY odl.location_id
+                    HAVING COUNT(odl.location_id) = 1
+                    ) owned_locations
+                    JOIN department_locations dl ON dl.location_id = owned_locations.location_id")
+                    .ToListAsync(cancellationToken: ct);
+    }
+
+    public Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct)
+    {
+        return GetSingleTimeAttachedDepartmentLocations(department.Id, ct);
+    }
+
+    /// <summary>
+    /// возвращает связанные должности, которые только один раз присоединялись к указанному по id подразделению.
+    /// вернет пустой список, если должности присоединялись к другим подразделениим (т.е если куда-то еще присоединились)
+    /// </summary>    
+    public async Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(DepartmentId id, CancellationToken ct)
+    {
+        Guid rawDepartmentId = id.Value;
+        return await _dbContext.DepartmentPositions.FromSqlInterpolated<DepartmentPosition>(@$"
+                SELECT dp.* FROM (
+                    WITH owned_department_positions AS (        
+                        SELECT * FROM department_positions dp 
+                        WHERE dp.department_id = {rawDepartmentId}
+                    )
+                    SELECT     
+                        odp.position_id    
+                    FROM 
+                        owned_department_positions odp
+                    JOIN LATERAL (
+                        SELECT 
+                            dp.department_id as department_id 
+                        FROM department_positions dp
+                        WHERE dp.position_id = odp.position_id) 
+                        department_position_records ON TRUE
+                    GROUP BY odp.position_id
+                    HAVING COUNT(odp.position_id) = 1) owned_positions
+                    JOIN department_positions dp ON dp.position_id = owned_positions.position_id
+            ")
+            .ToListAsync(cancellationToken: ct);        
+    }
+
+    public Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct)
+    {
+        return GetSingleTimeAttachedDepartmentPositions(department.Id, ct);
     }
 
     public void Attach(Department department)
@@ -22,13 +94,18 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         _dbContext.Departments.Attach(department);
     }
 
-    public async Task<Result<Department>> GetById(Guid id, CancellationToken ct = default)
+    public async Task<Result<Department>> GetById(Guid id, bool useLock = false, CancellationToken ct = default)
     {
         Result<DepartmentId> departmentId = DepartmentId.Create(id);
-        return departmentId.IsFailure ? departmentId.Error : await GetById(departmentId, ct);
+        if (departmentId.IsFailure)
+        {
+            return departmentId.Error;
+        }
+        
+        return await GetById(id, useLock, ct);
     }
 
-    public async Task<Result<Department>> GetById(DepartmentId id, CancellationToken ct = default)
+    public async Task<Result<Department>> GetById(DepartmentId id, bool useLock = false, CancellationToken ct = default)
     {
         Department? department = await _dbContext
             .Departments.Include(d => d.Locations)
@@ -38,9 +115,17 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
                 cancellationToken: ct
             );
 
-        return department == null
-            ? Error.NotFoundError($"Подразделения с ID - {id.Value} не существует.")
-            : department;
+        if (department is null)
+        {
+            return Error.NotFoundError($"Подразделения с ID - {id.Value} не существует.");
+        }
+
+        if (useLock)
+        {
+            await BlockDepartment(id.Value);
+        }
+
+        return department;
     }
 
     public async Task<IEnumerable<Department>> GetByIdArray(
@@ -92,8 +177,8 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         CancellationToken ct = default
     )
     {
-        await BlockDepartmentForMovement(parentId.Value);
-        await BlockDepartmentForMovement(childId.Value);
+        await BlockDepartment(parentId.Value);
+        await BlockDepartment(childId.Value);
 
         Department? ancestor = await _dbContext.Departments.FirstOrDefaultAsync(
             d => d.Id == parentId,
@@ -225,7 +310,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     /// <summary>
     /// Блокирование подразделения и его детей, чтобы безопасно выполнить перенос подразделения в другое подразделение.
     /// </summary>
-    private async Task BlockDepartmentForMovement(Guid id)
+    private async Task BlockDepartment(Guid id)
     {
         DbConnection connection = _dbContext.Database.GetDbConnection();
         const string sql = """

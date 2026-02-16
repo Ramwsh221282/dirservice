@@ -3,7 +3,6 @@ using Dapper;
 using DirectoryService.Contracts.Departments.GetDepartmentsHierarchyPrefetch;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Database;
-using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.Common;
 
 namespace DirectoryService.UseCases.Departments.GetDepartmentHierarchLazy;
 

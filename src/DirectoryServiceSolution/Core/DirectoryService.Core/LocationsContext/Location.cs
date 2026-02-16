@@ -78,4 +78,15 @@ public sealed class Location : ISoftDeletable
     {
         return new(address, name, timeZone, departments, id, lifeCycle);
     }
+
+    public Result Archive()
+    {
+        if (Deleted)
+        {
+            return Error.ConflictError("Нельзя архивировать уже архивированную локацию");
+        }
+
+        LifeCycle = LifeCycle.Delete();
+        return Result.Success();
+    }
 }

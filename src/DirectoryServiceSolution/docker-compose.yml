@@ -1,28 +1,28 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  database:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: database
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    restart: always
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    database:
+        image: postgres:latest
+        environment:
+            POSTGRES_DB: database
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+        restart: always
+        ports:
+            - "5432:5432"
+        volumes:
+            - pgdata:/var/lib/postgresql
 
-  seq:
-    image: datalust/seq:latest
-    container_name: seq
-    restart: always
-    environment:
-      - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORD=123456
-    ports:
-      - 5341:5341
-      - 8081:80
+    seq:
+        image: datalust/seq:latest
+        container_name: seq
+        restart: always
+        environment:
+            - ACCEPT_EULA=Y
+            - SEQ_FIRSTRUN_ADMINPASSWORD=123456
+        ports:
+            - 5341:5341
+            - 8081:80
 
 volumes:
-  pgdata:
+    pgdata:
