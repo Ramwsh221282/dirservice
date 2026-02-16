@@ -67,20 +67,24 @@ public sealed class UpdateDepartmentLocationsCommandHandler
             ct
         );
         if (department.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(department.Error);
+        }
 
         Result updating = department.Value.UpdateLocations(locations);
         if (updating.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(department.Error);
+        }
 
         Result saving = await _unitOfWork.SaveChanges(ct);
         if (saving.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(department.Error);
+        }
 
-        Result committing = await transaction.CommitChanges(
-            ct,
-            nameof(UpdateDepartmentLocationsCommand)
-        );
+        Result committing = await transaction.CommitChanges(nameof(UpdateDepartmentLocationsCommand), ct);
+        
         return committing.IsFailure
             ? _logger.ReturnLogged<Guid>(committing.Error)
             : department.Value.Id.Value;

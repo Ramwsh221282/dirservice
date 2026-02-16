@@ -22,7 +22,7 @@ public sealed class GetLocationsQueryHandler
         CancellationToken ct = default
     )
     {
-        DynamicParameters parameters = new DynamicParameters();
+        DynamicParameters parameters = new();
         IQueryClause filterClause = _connectionFactory.CreateClause();
         IQueryClause orderingClause = _connectionFactory.CreateClause();
         IQueryClause departmentFilterClause = _connectionFactory.CreateClause();
@@ -46,18 +46,22 @@ public sealed class GetLocationsQueryHandler
         }
 
         if (!string.IsNullOrWhiteSpace(query.NameSearch))
+        {
             filterClause = filterClause.AddClause(
                 "l.name ILIKE '%' || @nameSearch || '%'",
                 "nameSearch",
                 query.NameSearch.Trim()
             );
+        }
 
         if (query.IsActive != null)
+        {
             filterClause = query.IsActive.Value switch
             {
                 true => filterClause.AddClause("l.created_at IS NOT NULL"),
                 false => filterClause.AddClause("l.created_at IS NULL"),
             };
+        }
 
         if (query.DepartmentIds != null && query.DepartmentIds.Any())
         {
@@ -125,13 +129,15 @@ public sealed class GetLocationsQueryHandler
         IEnumerable<GetLocationsQueryData> data =
             await connection.QueryAsync<GetLocationsQueryData>(commandDefinition);
 
-        GetLocationsResponse response = new GetLocationsResponse([], 0, query.Page, query.PageSize);
+        GetLocationsResponse response = new([], 0, query.Page, query.PageSize);
         if (data.Any())
+        {
             response = response with
             {
                 TotalCount = data.First().TotalCount,
                 Locations = data.Select(d => d.ToLocationDto()),
             };
+        }
 
         return response;
     }
@@ -155,8 +161,9 @@ public sealed class GetLocationsQueryHandler
 
         public int TotalCount { get; init; }
 
-        public LocationDto ToLocationDto() =>
-            new()
+        public LocationDto ToLocationDto()
+        {
+            return  new()
             {
                 Id = Id,
                 Name = Name,
@@ -168,6 +175,8 @@ public sealed class GetLocationsQueryHandler
                 Departments = ToDepartmentDto(),
                 DepartmentsCount = DepartmentsCount,
             };
+
+        }           
 
         private IEnumerable<LocationDepartmentDto> ToDepartmentDto()
         {
@@ -191,19 +200,6 @@ public sealed class GetLocationsQueryHandler
                     $"Invalid object: {AddressObject} for mapping into: {nameof(LocationAddressDto)}"
                 );
         }
-
-        private Queue<string> GetNodesQueue(JsonElement[] array)
-        {
-            Queue<string> queue = [];
-            foreach (JsonElement node in array)
-            {
-                string? propertyValue = node.GetProperty("Node").GetString();
-                if (string.IsNullOrWhiteSpace(propertyValue))
-                    throw new ApplicationException("Address information has not valid parameters.");
-                queue.Enqueue(propertyValue);
-            }
-
-            return queue;
-        }
+       
     }
 }

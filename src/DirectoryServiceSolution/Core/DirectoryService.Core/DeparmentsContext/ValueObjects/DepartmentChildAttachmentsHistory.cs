@@ -30,14 +30,25 @@ public sealed record DepartmentChildAttachmentsHistory
         );
     }
 
-    public int Count() => _attachments.Count;
+    public int Count()
+    {
+        return _attachments.Count;
+    }
 
-    public bool IsAttached(DepartmentId departmentId) =>
-        _attachments.Any(a => a.Id == departmentId);
+    public bool IsAttached(DepartmentId departmentId)
+    {
+        return _attachments.Any(a => a.Id == departmentId);
+    }        
 
-    public bool IsAttached(Department department) => IsAttached(department.Id);
+    public bool IsAttached(Department department)
+    {
+        return IsAttached(department.Id);
+    }
 
-    public static DepartmentChildAttachmentsHistory Empty() => new();
+    public static DepartmentChildAttachmentsHistory Empty()
+    {
+        return new();
+    }
 
     public static DepartmentChildAttachmentsHistory FromJson(string json)
     {
@@ -48,13 +59,13 @@ public sealed record DepartmentChildAttachmentsHistory
 
         foreach (JsonElement entry in attachmentsJson.EnumerateArray())
         {
-            Result<DepartmentChildAttachment> attachment = DepartmentChildAttachment.FromJson(
-                entry
-            );
+            Result<DepartmentChildAttachment> attachment = DepartmentChildAttachment.FromJson(entry);
             if (attachment.IsFailure)
-                throw new ApplicationException(
-                    $"Некорректный JSON для {nameof(DepartmentChildAttachment)}"
-                );
+            {
+                string message = $"Некорректный JSON для {nameof(DepartmentChildAttachment)}";
+                throw new ApplicationException(message);
+            }
+
             attachments.Add(attachment);
         }
 

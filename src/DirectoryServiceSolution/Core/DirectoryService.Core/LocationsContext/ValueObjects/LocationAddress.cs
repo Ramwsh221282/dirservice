@@ -26,28 +26,44 @@ public sealed record LocationAddress
     public static Result<LocationAddress> Create(IEnumerable<LocationAddressPart> parts)
     {
         if (!ContainsAoLevel(parts, SubjectLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не содержит субъект.");
+        }
 
         if (AoLevelRepeated(parts, SubjectLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не может содержать более 1 субъекта");
+        }
 
         if (!ContainsAoLevel(parts, MunicipalLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не содержит населенный пункт.");
+        }
 
         if (AoLevelRepeated(parts, MunicipalLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не может содержать более 1 населенного пункта");
+        }
 
         if (!ContainsAoLevel(parts, StreetLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не содержит улицу");
+        }
 
         if (AoLevelRepeated(parts, StreetLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не может содержать более 1 улицы");
+        }
 
         if (!ContainsAoLevel(parts, BuildingLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не содержит строение");
+        }
 
         if (AoLevelRepeated(parts, BuildingLocationElement.AoLevel))
+        {
             return Error.ValidationError("Адрес не может содержать более 1 строения.");
+        }
 
         LocationAddressPart[] sorted = [.. parts.OrderBy(p => p.AoLevel)];
         string fullPath = string.Join(", ", sorted.Select(i => i.Name));
@@ -63,15 +79,18 @@ public sealed record LocationAddress
                 У адреса локации найдены дублирующиеся узлы: 
                 {string.Join(", ", duplicates)}
                 """;
+
             return Error.ValidationError(errorMessage);
         }
 
-        Result<LocationAddressPart>[] results = parts.Select(LocationAddressPart.Create).ToArray();
+        Result<LocationAddressPart>[] results = [.. parts.Select(LocationAddressPart.Create)];
         Result<LocationAddressPart>? failed = results.FirstOrDefault(r => r.IsFailure);
         if (failed != null)
+        {
             return failed.Error;
+        }
 
-        LocationAddressPart[] valid = results.Select(r => r.Value).ToArray();
+        LocationAddressPart[] valid = [.. results.Select(r => r.Value)];
         return Create(valid);
     }
 
@@ -84,10 +103,16 @@ public sealed record LocationAddress
         {
             string? addressNodeString = node.GetProperty("Node").GetString();
             if (string.IsNullOrWhiteSpace(addressNodeString))
+            {
                 throw new Exception("Invalid address part from json.");
+            }
+
             Result<LocationAddressPart> part = LocationAddressPart.Create(addressNodeString);
             if (part.IsFailure)
+            {
                 throw new Exception("Invalid address part from json.");
+            }
+            
             parts.Add(part);
         }
 

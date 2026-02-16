@@ -2,8 +2,8 @@
 
 public interface ILocationElement
 {
-    public string Value { get; }
-    public string Type { get; }
-    public string ShortValue { get; }
-    public short AoLevel { get; }
+    string Value { get; }
+    string Type { get; }
+    string ShortValue { get; }
+    short AoLevel { get; }
 }

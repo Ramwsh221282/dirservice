@@ -27,7 +27,9 @@ public sealed class DepartmentMovement
     {
         Result approve = approval.Approve(this);
         if (approve.IsFailure)
+        {
             return approve;
+        }
 
         Result detaching = oldAncestor.Detach(Movable);
         return detaching.IsFailure ? detaching.Error : MovingTo.AttachOtherDepartment(Movable);

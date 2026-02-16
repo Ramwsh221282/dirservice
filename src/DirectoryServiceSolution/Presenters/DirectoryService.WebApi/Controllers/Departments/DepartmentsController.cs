@@ -10,6 +10,7 @@ using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepart
 using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepartmentsPrefetchV2;
 using DirectoryService.UseCases.Departments.UpdateDepartmentLocations;
 using Microsoft.AspNetCore.Mvc;
+using ResultLibrary;
 using ResultLibrary.AspNetCore;
 
 namespace DirectoryService.WebApi.Controllers.Departments;
@@ -25,8 +26,8 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken ct
     )
     {
-        var command = new CreateDepartmentCommand(request);
-        var result = await handler.Handle(command, ct);
+        CreateDepartmentCommand command = new(request);
+        Result<Guid> result = await handler.Handle(command, ct);
         return result.FromResult(nameof(CreateDepartmentCommand));
     }
 
@@ -40,8 +41,8 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken ct
     )
     {
-        var query = new GetDepartmentHierarchyLazyQuery(id);
-        var result = await handler.Handle(query, ct);
+        GetDepartmentHierarchyLazyQuery query = new(id);
+        IEnumerable<LazyHierarchicalDepartmentDto> result = await handler.Handle(query, ct);
         return Results.Ok(result);
     }
 
@@ -54,8 +55,8 @@ public sealed class DepartmentsController : ControllerBase
     )
     {
         request = request with { DepartmentId = id };
-        var command = new UpdateDepartmentLocationsCommand(request);
-        var result = await handler.Handle(command, ct);
+        UpdateDepartmentLocationsCommand command = new(request);
+        Result<Guid> result = await handler.Handle(command, ct);
         return result.FromResult(nameof(UpdateDepartmentLocationsCommand));
     }
 
@@ -71,13 +72,13 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken ct
     )
     {
-        var request = new GetDepartmentsHierarchyPrefetchRequest(page, pageSize, prefetch);
-        var query = new GetDepartmentsPrefetchV2Query(
+        GetDepartmentsHierarchyPrefetchRequest request = new(page, pageSize, prefetch);
+        GetDepartmentsPrefetchV2Query query = new(
             request.Page,
             request.PageSize,
             request.Prefetch
         );
-        var result = await handler.Handle(query, ct);
+        GetHierarchicalDepartmentsPrefetchResponse result = await handler.Handle(query, ct);
         return Results.Ok(result);
     }
 
@@ -93,13 +94,14 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken ct
     )
     {
-        var request = new GetDepartmentsHierarchyPrefetchRequest(page, pageSize, prefetch);
-        var query = new GetDepartmentsPrefetchQuery(
+        GetDepartmentsHierarchyPrefetchRequest request = new(page, pageSize, prefetch);
+        GetDepartmentsPrefetchQuery query = new(
             request.Page,
             request.PageSize,
             request.Prefetch
         );
-        var result = await handler.Handle(query, ct);
+
+        GetHierarchicalDepartmentsPrefetchResponse result = await handler.Handle(query, ct);
         return Results.Ok(result);
     }
 
@@ -113,9 +115,9 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken ct = default
     )
     {
-        var request = new GetDepartmentsPopularityRequest(orderMode);
-        var query = new GetDepartmentsPopularityQuery(request.OrderMode);
-        var result = await handler.Handle(query, ct);
+        GetDepartmentsPopularityRequest request = new(orderMode);
+        GetDepartmentsPopularityQuery query = new(request.OrderMode);
+        IEnumerable<GetDepartmentsPopularityResponse> result = await handler.Handle(query, ct);
         return Results.Ok(result);
     }
 }

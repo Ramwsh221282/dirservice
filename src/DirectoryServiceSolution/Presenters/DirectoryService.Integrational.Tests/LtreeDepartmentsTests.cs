@@ -19,31 +19,26 @@ public sealed class LtreeDepartmentsTests : IClassFixture<RealDatabaseTestApplic
     [Fact]
     private async Task Update_Department_Levels_Success()
     {
-        (Guid aId, Guid bId, Guid cId, Guid dId, Guid eId) departments =
-            await CreateDepartmentFamily();
+        (Guid aId, Guid bId, Guid cId, Guid dId, Guid eId) = await CreateDepartmentFamily();
 
-        Result<Guid> moving = await _departmentsTests.MoveDepartment(
-            departments.aId,
-            departments.dId
-        );
+        Result<Guid> moving = await _departmentsTests.MoveDepartment(aId,dId);
         Assert.True(moving.IsSuccess);
 
-        Department changedResult = await _departmentsTests.GetDepartment(departments.dId);
+        Department changedResult = await _departmentsTests.GetDepartment(dId);
         Assert.Equal("department-a.department-d", changedResult.Path.Value);
 
-        Department changedChildResult = await _departmentsTests.GetDepartment(departments.eId);
+        Department changedChildResult = await _departmentsTests.GetDepartment(eId);
         Assert.Equal("department-a.department-d.department-e", changedChildResult.Path.Value);
     }
 
     [Fact]
     private async Task Update_Department_Level_To_Child_Department()
     {
-        (Guid aId, Guid bId, Guid cId, Guid dId, Guid eId) departments =
-            await CreateDepartmentFamily();
+        (Guid aId, Guid bId, Guid cId, Guid dId, Guid eId) = await CreateDepartmentFamily();
 
         Result<Guid> moving = await _departmentsTests.MoveDepartment(
-            departments.eId,
-            departments.dId
+            eId,
+            dId
         );
         Assert.True(moving.IsFailure);
     }

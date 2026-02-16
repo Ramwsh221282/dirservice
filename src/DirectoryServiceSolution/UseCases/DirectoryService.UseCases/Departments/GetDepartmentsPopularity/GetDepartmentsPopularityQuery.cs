@@ -10,9 +10,13 @@ public sealed record GetDepartmentsPopularityQuery
     public GetDepartmentsPopularityQuery(string? orderMode)
     {
         if (string.IsNullOrEmpty(orderMode))
+        {
             return;
+        }
 
         if (orderMode == "ASC")
+        {
             OrderMode = "ASC";
+        }
     }
 }

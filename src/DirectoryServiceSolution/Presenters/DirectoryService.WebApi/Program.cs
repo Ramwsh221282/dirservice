@@ -3,7 +3,7 @@ using DirectoryService.WebApi.Configurations;
 using DirectoryService.WebApi.DependencyInjection;
 using DirectoryService.WebApi.Middlewares;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.InjectUseCaseLayer();
 builder.InjectInfrastructureLayers();
@@ -16,7 +16,7 @@ builder.Services.AddScoped<ISeeder, LocationsSeeder>();
 builder.Services.AddScoped<ISeeder, DepartmentsSeeder>();
 builder.Services.AddScoped<ISeeder, PositionsSeeder>();
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-var app = builder.Build();
+WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -24,7 +24,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
     if (args.Contains("--seed"))
+    {
         await app.Services.RunSeeders();
+    }
 }
 
 app.UseExceptionHandleMiddleware();

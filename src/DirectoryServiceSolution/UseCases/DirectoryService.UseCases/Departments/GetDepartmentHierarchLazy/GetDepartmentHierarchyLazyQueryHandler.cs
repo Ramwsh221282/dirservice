@@ -12,8 +12,10 @@ public sealed class GetDepartmentHierarchyLazyQueryHandler
 {
     private readonly IDbConnectionFactory _connectionFactory;
 
-    public GetDepartmentHierarchyLazyQueryHandler(IDbConnectionFactory connectionFactory) =>
+    public GetDepartmentHierarchyLazyQueryHandler(IDbConnectionFactory connectionFactory)
+    {
         _connectionFactory = connectionFactory;
+    }
 
     public async Task<IEnumerable<LazyHierarchicalDepartmentDto>> Handle(
         GetDepartmentHierarchyLazyQuery query,
@@ -37,7 +39,7 @@ public sealed class GetDepartmentHierarchyLazyQueryHandler
               AND d.deleted_at IS NULL
             """;
 
-        var command = new CommandDefinition(sql, new { id = query.Id }, cancellationToken: ct);
+        CommandDefinition command = new(sql, new { id = query.Id }, cancellationToken: ct);
         using IDbConnection connection = await _connectionFactory.Create(ct);
         return await connection.QueryAsync<LazyHierarchicalDepartmentDto>(command);
     }

@@ -1,3 +1,3 @@
 ﻿namespace DirectoryService.Contracts.Departments.GetDepartmentHierarchyLazy;
 
-public sealed record GetDepartmentHierarchyLazy(Guid Id);
+public sealed record GetDepartmentHierarchyLaziest(Guid Id);

@@ -11,6 +11,6 @@ public sealed class HierarchicalDepartmentDto
     public required int ChildrensCount { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
-    public List<HierarchicalDepartmentDto> Childrens { get; } = [];
+    public IReadOnlyCollection<HierarchicalDepartmentDto> Childrens { get; init; } = [];
     public required bool HasMoreChildren { get; init; }
 }

@@ -17,7 +17,9 @@ public static class LoggingSeqConfigurationExtension
         IConfigurationSection hostSection = section.GetSection("Host");
         string? host = hostSection.Value;
         if (string.IsNullOrWhiteSpace(host))
+        {
             throw new ApplicationException("Seq hostname was not provided.");
+        }
 
         Serilog.ILogger logger = new LoggerConfiguration()
             .WriteTo.Console()

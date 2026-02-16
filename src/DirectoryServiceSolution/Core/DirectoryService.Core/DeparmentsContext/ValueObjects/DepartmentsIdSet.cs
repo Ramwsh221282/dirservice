@@ -9,8 +9,10 @@ public sealed class DepartmentsIdSet
     
     public IReadOnlyList<DepartmentId> DepartmentIds => _departmentIds;
     
-    private DepartmentsIdSet(IEnumerable<DepartmentId> departmentIds) =>
-        _departmentIds = departmentIds.ToList();
+    private DepartmentsIdSet(IEnumerable<DepartmentId> departmentIds)
+    {
+        _departmentIds = [.. departmentIds];
+    }
 
     public static Result<DepartmentsIdSet> Create(IEnumerable<Guid> ids)
     {
@@ -19,7 +21,10 @@ public sealed class DepartmentsIdSet
         {
             Result<DepartmentId> departmentId = DepartmentId.Create(id);
             if (departmentId.IsFailure)
+            {
                 return departmentId.Error;
+            }
+
             departmentIds.Add(departmentId);
         }
 
@@ -31,11 +36,13 @@ public sealed class DepartmentsIdSet
         IEnumerable<DepartmentId> duplicates = ids.ExtractDuplicates(i => i.Value);
         if (duplicates.Any())
         {
-            string[] duplicateIdsString = duplicates.Select(d => d.Value.ToString()).ToArray();
+            string[] duplicateIdsString = [.. duplicates.Select(d => d.Value.ToString())];
+
             string message = 
                 $"""
                 Найдены дубликаты идентификаторов подразделений: {string.Join(", ", duplicateIdsString)}
                 """;
+
             return Error.ConflictError(message);
         }
 

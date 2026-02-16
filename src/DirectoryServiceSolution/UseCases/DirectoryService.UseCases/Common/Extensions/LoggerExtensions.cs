@@ -19,14 +19,20 @@ public static class LoggerExtensions
     public static void LogError(this ILogger logger, Result result)
     {
         if (result.IsSuccess)
+        {
             return;
+        }
+
         logger.LogError(result.Error);
     }
 
     public static void LogError<T>(this ILogger logger, Result<T> result)
     {
         if (result.IsSuccess)
+        {
             return;
+        }
+        
         logger.LogError(result.Error);
     }
 

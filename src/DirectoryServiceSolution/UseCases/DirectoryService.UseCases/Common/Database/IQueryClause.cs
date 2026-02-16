@@ -18,9 +18,9 @@ public interface IQueryClause
     string FormRawClause(string sql);
     string FormSeperatedRawClause(string separator);
 
-    public void InjectParameters(DynamicParameters parameters);
+    void InjectParameters(DynamicParameters parameters);
 
-    public CommandDefinition FormCommand(
+    CommandDefinition FormCommand(
         string sql,
         DynamicParameters parameters,
         CancellationToken ct = default

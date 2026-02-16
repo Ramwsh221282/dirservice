@@ -57,10 +57,12 @@ public sealed class Position : ISoftDeletable
     )
     {
         if (!uniquesness.IsUnique(name))
+        {
             return uniquesness.NotUniqueNameError();
+        }
 
-        EntityLifeCycle lifeCycle = new EntityLifeCycle();
-        PositionId id = new PositionId();
+        EntityLifeCycle lifeCycle = new();
+        PositionId id = new();
         return new Position(name, description, lifeCycle, id);
     }
 
@@ -73,25 +75,28 @@ public sealed class Position : ISoftDeletable
     {
         Result<Position> position = CreateNew(name, description, uniquesness);
         if (position.IsFailure)
+        {
             return position.Error;
-
-        IEnumerable<DepartmentPosition> departmentPositions = departments.Select(
-            d => new DepartmentPosition(d, position)
-        );
-        position.Value._departments.AddRange(departmentPositions);
+        }
+        
+        position.Value._departments.AddRange(departments.Select(d => new DepartmentPosition(d, position)));
         return position;
     }
 
     public Result BindToDepartment(IEnumerable<Department> departments)
     {
         if (Deleted)
+        {
             return Error.EntityDeletedError();
+        }
 
         foreach (Department department in departments)
         {
             Result adding = department.AddPosition(this);
             if (adding.IsFailure)
+            {
                 return adding.Error;
+            }
         }
 
         return Result.Success();

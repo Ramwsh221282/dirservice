@@ -17,9 +17,9 @@ public sealed class TransactionScope : ITransactionScope
         _disposed = false;
     }
 
-    public async Task<Result> CommitChanges(
-        CancellationToken ct = default,
-        string? methodName = null
+    public async Task<Result> CommitChanges(        
+        string? methodName = null,
+        CancellationToken ct = default
     )
     {
         try

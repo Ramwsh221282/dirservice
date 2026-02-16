@@ -85,10 +85,12 @@ public sealed class Department : ISoftDeletable
     public Result Detach(Department child)
     {
         DepartmentChildAttachmentsHistory detached = Attachments.Detach(child);
-
         Result<DepartmentChildrensCount> reducing = ChildrensCount.Reduce();
+
         if (reducing.IsFailure)
+        {
             return reducing.Error;
+        }        
 
         LifeCycle = LifeCycle.Update();
         Attachments = detached;
@@ -99,24 +101,32 @@ public sealed class Department : ISoftDeletable
     public Result UpdateLocations(IEnumerable<Location> locations)
     {
         if (Deleted)
+        {
             return Error.EntityDeletedError();
+        }
 
         _locations.Clear();
-
         LifeCycle = LifeCycle.Update();
         return AddLocations(locations);
     }
 
-    public bool Includes(Department department) =>
-        Parent != null && Parent == department.Id && Path.ContainsIdentifier(department.Identifier);
+    public bool Includes(Department department)
+    {
+        bool containsChildIdentifier = Path.ContainsIdentifier(department.Identifier);
+        bool containsParent = Parent != null && Parent == department.Id;
+        return containsChildIdentifier && containsParent;
+    }        
 
     public Result AddLocations(IEnumerable<Location> locations)
     {
         if (Deleted)
+        {
             return Error.EntityDeletedError();
+        }
 
         Location[] duplicates = [.. locations.ExtractDuplicates(l => l.Id)];
-        if (duplicates.Any())
+        
+        if (duplicates.Length > 0)
         {
             string[] duplicateIdentifiers = [.. duplicates.Select(l => l.Id.Value.ToString())];
             string errorMessage = $"""
@@ -134,12 +144,15 @@ public sealed class Department : ISoftDeletable
     public Result AddPosition(Position position)
     {
         if (Deleted)
+        {
             return Error.EntityDeletedError();
+        }
 
         if (_positions.Any(p => p.DepartmentId == Id && p.PositionId == position.Id))
-            return Error.ConflictError(
-                $"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}."
-            );
+        {
+            string message = $"Позиция {position.Name.Value} уже есть у подразделения {Id.Value}.";
+            return Error.ConflictError(message);
+        }
 
         _positions.Add(new DepartmentPosition(this, position));
         LifeCycle.Update();
@@ -149,32 +162,36 @@ public sealed class Department : ISoftDeletable
     public Result AttachOtherDepartment(Department other)
     {
         if (Deleted)
+        {
             return Error.EntityDeletedError();
+        }
 
         if (Attachments.IsAttached(other))
-            return Error.ConflictError(
-                $"Подразделение {other.Identifier.Value} уже прикреплено к {Identifier.Value}."
-            );
+        {
+            string message = $"Подразделение {other.Identifier.Value} уже прикреплено к {Identifier.Value}.";
+            return Error.ConflictError(message);
+        }
 
         Result<DepartmentPath> childPath = Path.BindWithOther(other);
         if (childPath.IsFailure)
+        {
             return childPath.Error;
+        }
 
         Result<DepartmentChildrensCount> nextCount = ChildrensCount.Add(Path, other);
         if (nextCount.IsFailure)
+        {
             return childPath.Error;
+        }
 
         Result<DepartmentDepth> childDepth = childPath.Value.CalculateDepth();
         if (childDepth.IsFailure)
+        {
             return childDepth.Error;
+        }
 
-        DepartmentChildAttachment attachment = new DepartmentChildAttachment(
-            other.Id,
-            DateTime.UtcNow
-        );
-
+        DepartmentChildAttachment attachment = new(other.Id, DateTime.UtcNow);
         Attachments = Attachments.Attach(attachment);
-
         ChildrensCount = nextCount.Value;
         other.Parent = Id;
         other.Path = childPath.Value;
@@ -195,14 +212,13 @@ public sealed class Department : ISoftDeletable
         {
             Result attaching = parent.AttachOtherDepartment(child);
             if (attaching.IsFailure)
+            {
                 return attaching.Error;
+            }
         }
 
         Result addingLocations = child.AddLocations(locations);
-        if (addingLocations.IsFailure)
-            return addingLocations.Error;
-
-        return child;
+        return addingLocations.IsFailure ? addingLocations.Error : child;
     }
 
     public static Department Create(
@@ -216,8 +232,7 @@ public sealed class Department : ISoftDeletable
         DepartmentChildrensCount childrensCount,
         EntityLifeCycle lifeCycle
     )
-    {
-        DepartmentId? parent = parentId == null ? null : DepartmentId.Create(parentId.Value).Value;
+    {        
         return new Department(
             id,
             identifier,
@@ -229,7 +244,7 @@ public sealed class Department : ISoftDeletable
             attachments,
             [],
             [],
-            parent
+            parentId == null ? null : DepartmentId.Create(parentId.Value).Value
         );
     }
 
@@ -239,12 +254,13 @@ public sealed class Department : ISoftDeletable
         IEnumerable<Location> locations
     )
     {
-        DepartmentId id = new DepartmentId();
-        DepartmentPath path = new DepartmentPath(identifier);
-        DepartmentDepth depth = new DepartmentDepth();
-        EntityLifeCycle lifeCycle = new EntityLifeCycle();
-        DepartmentChildrensCount childrensCount = new DepartmentChildrensCount();
-        Department department = new Department(
+        DepartmentId id = new();
+        DepartmentPath path = new(identifier);
+        DepartmentDepth depth = new();
+        EntityLifeCycle lifeCycle = new();
+        DepartmentChildrensCount childrensCount = new();
+
+        Department department = new(
             id,
             identifier,
             lifeCycle,
@@ -253,20 +269,19 @@ public sealed class Department : ISoftDeletable
             depth,
             childrensCount
         );
-        IEnumerable<DepartmentLocation> departmentLocations = locations.Select(
-            l => new DepartmentLocation(department, l)
-        );
-        department._locations.AddRange(departmentLocations);
+        
+        department._locations.AddRange(locations.Select(l => new DepartmentLocation(department, l)));
         return department;
     }
 
     public static Department CreateNew(DepartmentName name, DepartmentIdentifier identifier)
     {
-        DepartmentId id = new DepartmentId();
-        DepartmentPath path = new DepartmentPath(identifier);
-        DepartmentDepth depth = new DepartmentDepth();
-        EntityLifeCycle lifeCycle = new EntityLifeCycle();
-        DepartmentChildrensCount childrensCount = new DepartmentChildrensCount();
+        DepartmentId id = new();
+        DepartmentPath path = new(identifier);
+        DepartmentDepth depth = new();
+        EntityLifeCycle lifeCycle = new();
+        DepartmentChildrensCount childrensCount = new();
+        
         return new Department(id, identifier, lifeCycle, name, path, depth, childrensCount, null);
     }
 }

@@ -66,7 +66,7 @@ public sealed record SubjectLocationElement : LocationElement
     private SubjectLocationElement(string name, string type, string shortName, short aoLevel)
         : base(name, type, shortName, aoLevel) { }
 
-    public static Result<LocationElement> Create(string input)
+    public static new Result<LocationElement> Create(string input)
     {
         foreach (LocationElementMatcher matcher in SubjectMatchers)
         {
@@ -75,20 +75,28 @@ public sealed record SubjectLocationElement : LocationElement
                 onError: () => InvalidLocationSubject(input),
                 onSuccess: Create
             );
+
             if (result.IsSuccess)
+            {
                 return result.Value;
+            }
         }
 
         return Error.ValidationError("Не удается распознать тип локации.");
     }
 
-    private static Error InvalidLocationSubject(string input) =>
-        Error.ValidationError($"Некорректный субъект в адресе - {input}");
+    private static Error InvalidLocationSubject(string input)
+    {
+        return Error.ValidationError($"Некорректный субъект в адресе - {input}");
+    }        
 
     private static SubjectLocationElement Create(
         string name,
         string type,
         string shortName,
         short aoLevel
-    ) => new(name, type, shortName, aoLevel);
+    )
+    {
+        return new(name, type, shortName, aoLevel);
+    }
 }

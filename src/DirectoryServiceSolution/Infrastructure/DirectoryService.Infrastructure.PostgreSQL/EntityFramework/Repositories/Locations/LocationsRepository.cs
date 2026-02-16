@@ -15,22 +15,27 @@ public sealed class LocationsRepository : ILocationsRepository
         _dbContext = dbContext;
     }
 
-    public async Task AddLocation(Location location, CancellationToken ct = default) =>
+    public async Task AddLocation(Location location, CancellationToken ct = default)
+    {
         await _dbContext.AddAsync(location, ct);
+    }
+        
 
     public async Task<IEnumerable<Location>> GetBySet(
         LocationsIdSet set,
         CancellationToken ct = default
-    ) =>
-        await _dbContext
+    )
+    {
+        return await _dbContext
             .Locations
             .Include(l => l.Departments)
             .Where(loc => set.Ids.Contains(loc.Id) && loc.LifeCycle.DeletedAt == null)
             .ToListAsync(cancellationToken: ct);
+    }        
 
     public async Task<Result<Location>> GetById(Guid id, CancellationToken ct = default)
     {
-        LocationId locationId = new LocationId(id);
+        LocationId locationId = new(id);
         return await GetById(locationId, ct);
     }
 

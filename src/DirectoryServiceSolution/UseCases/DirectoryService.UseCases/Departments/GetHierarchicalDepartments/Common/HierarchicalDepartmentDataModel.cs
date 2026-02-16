@@ -13,13 +13,13 @@ internal sealed class HierarchicalDepartmentDataModel
     public required int ChildrensCount { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
-    public List<HierarchicalDepartmentDataModel> Childrens { get; } = [];
+    public List<HierarchicalDepartmentDataModel> Childrens { get; init; } = [];
     public required bool HasMoreChildren { get; init; }
     public required int TotalCount { get; init; }
 
     public HierarchicalDepartmentDto ToResponse()
     {
-        var dto = new HierarchicalDepartmentDto()
+        HierarchicalDepartmentDto dto = new()
         {
             Id = Id,
             Identifier = Identifier,
@@ -31,9 +31,9 @@ internal sealed class HierarchicalDepartmentDataModel
             CreatedAt = CreatedAt,
             UpdatedAt = UpdatedAt,
             HasMoreChildren = HasMoreChildren,
+            Childrens = [..Childrens.Select(c => c.ToResponse())],
         };
-
-        dto.Childrens.AddRange(Childrens.Select(c => c.ToResponse()));
+        
         return dto;
     }
 }

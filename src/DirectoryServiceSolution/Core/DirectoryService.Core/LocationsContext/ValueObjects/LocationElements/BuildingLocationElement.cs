@@ -7,7 +7,7 @@ public sealed record BuildingLocationElement : LocationElement
 {
     public new const short AoLevel = 4;
 
-    // Матчеры для домов и строений
+    // Матчеры (сопоставители) для домов и строений
     private static readonly LocationElementMatcher[] BuildingMatchers =
     [
         // Дом
@@ -89,7 +89,7 @@ public sealed record BuildingLocationElement : LocationElement
 
     public static new Result<LocationElement> Create(string input)
     {
-        foreach (var matcher in BuildingMatchers)
+        foreach (LocationElementMatcher matcher in BuildingMatchers)
         {
             Result<LocationElement> result = matcher.TryMap(
                 input,
@@ -98,19 +98,26 @@ public sealed record BuildingLocationElement : LocationElement
             );
 
             if (result.IsSuccess)
+            {
                 return result.Value;
+            }
         }
 
         return Error.ValidationError("Не удалось распознать здание, корпус или строение.");
     }
 
-    private static Error InvalidBuilding(string input) =>
-        Error.ValidationError($"Некорректное обозначение здания: {input}");
+    private static Error InvalidBuilding(string input)
+    {
+        return Error.ValidationError($"Некорректное обозначение здания: {input}");
+    }
 
     private static BuildingLocationElement Create(
         string name,
         string type,
         string shortName,
         short aoLevel
-    ) => new(name, type, shortName, aoLevel);
+    )
+    {
+        return new(name, type, shortName, aoLevel);
+    }    
 }

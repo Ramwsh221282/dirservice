@@ -46,18 +46,25 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     public async Task<IEnumerable<Department>> GetByIdArray(
         IEnumerable<DepartmentId> ids,
         CancellationToken ct = default
-    ) =>
-        await _dbContext
+    )
+    {
+        return await _dbContext
             .Departments.Where(d => ids.Contains(d.Id) && d.LifeCycle.DeletedAt == null)
             .ToListAsync(ct);
+    }        
 
     public async Task<IEnumerable<Department>> GetByIdArray(
         DepartmentsIdSet ids,
         CancellationToken ct = default
-    ) => await GetByIdArray(ids.DepartmentIds, ct);
+    )
+    {
+        return await GetByIdArray(ids.DepartmentIds, ct);
+    }
 
-    public async Task Add(Department department, CancellationToken ct = default) =>
+    public async Task Add(Department department, CancellationToken ct = default)
+    {
         await _dbContext.Departments.AddAsync(department, ct);
+    }        
 
     /// <summary>
     /// Получение "разрешения" на передвижение подразделения в другое подразделение путем сравнения путей.
@@ -93,14 +100,20 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
             cancellationToken: ct
         );
         if (ancestor == null)
-            return Error.NotFoundError($"Не найдено новое подразделение для передвижения.");
+        {
+            string message = $"Не найдено новое подразделение для передвижения.";
+            return Error.NotFoundError(message);
+        }
 
         Department? descendant = await _dbContext.Departments.FirstOrDefaultAsync(
             d => d.Id == childId,
             ct
         );
         if (descendant == null)
-            return Error.NotFoundError($"Не найдено дочернее подразделение для передвижения.");
+        {
+            string message = $"Не найдено дочернее подразделение для передвижения.";
+            return Error.NotFoundError(message);
+        }
 
         return new DepartmentMovement(ancestor, descendant);
     }
@@ -123,12 +136,18 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     public async Task<Result<Department>> GetParentDeparmentByChildPath(
         DepartmentPath path,
         CancellationToken cancellationToken = default
-    ) => await GetParentDeparmentByChildPath(path.Value, cancellationToken);
+    )
+    {
+        return await GetParentDeparmentByChildPath(path.Value, cancellationToken);
+    }
 
     public async Task<Result<Department>> GetParentDeparmentByChildPath(
         Department department,
         CancellationToken ct = default
-    ) => await GetParentDeparmentByChildPath(department.Path.Value, ct);
+    )
+    {
+        return await GetParentDeparmentByChildPath(department.Path.Value, ct);
+    }
 
     /// <summary>
     /// Получение родительского подразделения дочернего подразделения по пути дочернего подразделения
@@ -161,7 +180,10 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
             .FirstOrDefaultAsync(cancellationToken: ct);
 
         if (department == null)
+        {
             return Error.NotFoundError("Не найдено родительское подразделение.");
+        }
+
         return department;
     }
 

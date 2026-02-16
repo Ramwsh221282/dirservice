@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using DirectoryService.Contracts.Departments.GetDepartmentsHierarchyPrefetch;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Database;
@@ -21,7 +22,7 @@ public sealed class GetDepartmentsPrefetchQueryHandler
         CancellationToken ct = default
     )
     {
-        var sql = """
+        string sql = """
             WITH
                 root_departments AS
                     (SELECT
@@ -86,11 +87,11 @@ public sealed class GetDepartmentsPrefetchQueryHandler
                 LIMIT @childsLimit) childs
             """;
 
-        var rootsOffset = (query.Page - 1) * query.PageSize;
-        var rootsLimit = query.PageSize;
-        var childsLimit = query.Prefetch;
+        int rootsOffset = (query.Page - 1) * query.PageSize;
+        int rootsLimit = query.PageSize;
+        int childsLimit = query.Prefetch;
 
-        var command = new CommandDefinition(
+        CommandDefinition command = new(
             sql,
             new
             {
@@ -101,8 +102,8 @@ public sealed class GetDepartmentsPrefetchQueryHandler
             cancellationToken: ct
         );
 
-        using var connection = await _connectionFactory.Create(ct);
-        var data = await connection.QueryAsync<HierarchicalDepartmentDataModel>(command);
+        using IDbConnection connection = await _connectionFactory.Create(ct);
+        IEnumerable<HierarchicalDepartmentDataModel> data = await connection.QueryAsync<HierarchicalDepartmentDataModel>(command);
         return new HierarchicalDepartmentsMapper(data).Map();
     }
 }

@@ -9,18 +9,30 @@ public sealed record LocationName
     public const int MaxLength = 120;
     public string Value { get; }
 
-    private LocationName(string value) => Value = value;
+    private LocationName(string value)
+    {
+        Value = value;
+    }
 
     public static Result<LocationName> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Error.ValidationError($"Наименование локации было пустым.");
+        {
+            string message = $"Наименование локации было пустым.";
+            return Error.ValidationError(message);
+        }
 
         if (value.GreaterThan(MaxLength))
-            return Error.ValidationError($"Наименование превышает длину {MaxLength} символов.");
+        {
+            string message = $"Наименование превышает длину {MaxLength} символов.";
+            return Error.ValidationError(message);
+        }
 
         if (value.LessThan(MinLength))
-            return Error.ValidationError($"Наименование менее длины {MinLength} символов.");
+        {
+            string message = $"Наименование менее длины {MinLength} символов.";
+            return Error.ValidationError(message);
+        }
 
         return new LocationName(value);
     }

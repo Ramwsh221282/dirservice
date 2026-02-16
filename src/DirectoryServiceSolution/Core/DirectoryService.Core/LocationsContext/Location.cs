@@ -58,10 +58,12 @@ public sealed class Location : ISoftDeletable
     )
     {
         if (!uniquesness.IsUnique(name))
+        {
             return uniquesness.NonUniqueLocationError();
+        }
 
-        LocationId id = new LocationId();
-        EntityLifeCycle lifeCycle = new EntityLifeCycle();
+        LocationId id = new();
+        EntityLifeCycle lifeCycle = new();
         return new Location(address, name, timeZone, id, lifeCycle);
     }
 
@@ -72,5 +74,8 @@ public sealed class Location : ISoftDeletable
         IEnumerable<DepartmentLocation> departments,
         LocationId? id = null,
         EntityLifeCycle? lifeCycle = null
-    ) => new(address, name, timeZone, departments, id, lifeCycle);
+    )
+    {
+        return new(address, name, timeZone, departments, id, lifeCycle);
+    }
 }

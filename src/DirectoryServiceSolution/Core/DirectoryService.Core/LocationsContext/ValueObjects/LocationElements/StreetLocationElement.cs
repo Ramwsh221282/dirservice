@@ -121,27 +121,35 @@ public sealed record StreetLocationElement : LocationElement
 
     public static new Result<LocationElement> Create(string input)
     {
-        foreach (var matcher in StreetMatchers)
+        foreach (LocationElementMatcher matcher in StreetMatchers)
         {
             Result<LocationElement> result = matcher.TryMap(
                 input,
                 onError: () => InvalidStreet(input),
                 onSuccess: Create
             );
+
             if (result.IsSuccess)
+            {
                 return result.Value;
+            }
         }
 
         return Error.ValidationError("Не удается распознать улицу в адресе.");
     }
 
-    private static Error InvalidStreet(string input) =>
-        Error.ValidationError($"Некорректный элемент улично-дорожной сети: {input}");
+    private static Error InvalidStreet(string input)
+    {
+        return Error.ValidationError($"Некорректный элемент улично-дорожной сети: {input}");
+    }        
 
     private static StreetLocationElement Create(
         string name,
         string type,
         string shortName,
         short aoLevel
-    ) => new(name, type, shortName, aoLevel);
+    )
+    {
+        return new(name, type, shortName, aoLevel);
+    }
 }

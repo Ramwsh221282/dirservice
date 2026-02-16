@@ -38,7 +38,9 @@ public sealed class CreateLocationCommandHandler : ICommandHandler<Guid, CreateL
     {
         ValidationResult validationResult = await _validator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
+        {
             return validationResult.AsFailureResult<Guid>();
+        }
 
         LocationAddress address = LocationAddress.Create(command.AddressParts);
         LocationName name = LocationName.Create(command.Name);

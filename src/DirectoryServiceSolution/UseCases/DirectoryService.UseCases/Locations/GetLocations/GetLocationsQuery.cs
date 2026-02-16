@@ -25,7 +25,10 @@ public sealed record GetLocationsQuery : IQuery<GetLocationsResponse>
     {
         SortOptions = sortOptions;
         if (sortDirection is "DESC")
+        {
             SortDirection = "DESC";
+        }
+        
         Page = page ?? 1;
         PageSize = pageSize ?? 20;
         NameSearch = nameSearch;

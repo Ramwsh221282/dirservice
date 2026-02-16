@@ -40,14 +40,17 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<Guid, Creat
     {
         ValidationResult validation = await _validator.ValidateAsync(command, ct);
         if (!validation.IsValid)
+        {
             return validation.AsFailureResult<Guid>();
+        }
 
         LocationsIdSet locationIds = LocationsIdSet.Create(command.LocationIds);
         IEnumerable<Location> locations = await _locationsRepository.GetBySet(locationIds, ct);
         if (!locations.Any())
-            return Error.ConflictError(
-                "Для создания подразделения необходимо указать его локацию/локации."
-            );
+        {
+            string message = "Для создания подразделения необходимо указать его локацию/локации.";
+            return Error.ConflictError(message);
+        }
 
         DepartmentName name = DepartmentName.Create(command.Name);
         DepartmentIdentifier identifier = DepartmentIdentifier.Create(command.Identifier);
@@ -58,9 +61,11 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<Guid, Creat
             Result<Department> parentResult = await _departmentsRepository.GetById(
                 command.ParentId.Value,
                 ct
-            );
+            );            
             if (parentResult.IsFailure)
+            {
                 return parentResult.Error;
+            }
 
             parent = parentResult.Value;
         }

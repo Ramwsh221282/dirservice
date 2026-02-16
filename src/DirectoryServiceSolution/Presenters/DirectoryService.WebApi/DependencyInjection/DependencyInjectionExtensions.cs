@@ -77,17 +77,21 @@ public static class DependencyInjectionExtensions
         }
     }
 
-    private static bool ImplementsHandler(this Type type) =>
-        type.IsGenericType
+    private static bool ImplementsHandler(this Type type)
+    {
+        return type.IsGenericType
         && (
             type.GetGenericTypeDefinition() == typeof(ICommandHandler<,>)
             || type.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
         );
+    }
 
-    private static bool ImplementsQueryHandler(this Type type) =>
-        type.IsGenericType
+    private static bool ImplementsQueryHandler(this Type type)
+    {
+        return type.IsGenericType
         && (
             type.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
             || type.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
         );
+    }
 }

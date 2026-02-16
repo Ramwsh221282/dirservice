@@ -45,16 +45,16 @@ public sealed class PositionsSeeder : ISeeder
     {
         List<Department> allDepartments = await _context.Departments.ToListAsync();
 
-        if (!allDepartments.Any())
+        if (allDepartments.Count == 0)
         {
             _logger.Warning("No departments found. Skipping position seeding.");
             return;
         }
 
-        var positionsToSeed = new List<Position>();
+        List<Position> positionsToSeed = [];
 
-        var seedPositions = new[]
-        {
+        (string, string)[] seedPositions =
+        [
             (
                 "Руководитель отдела",
                 "Руководит работой отдела, координирует задачи и отвечает за результаты команды."
@@ -103,9 +103,9 @@ public sealed class PositionsSeeder : ISeeder
             ("Специалист по информационной безопасности", "Защищает данные и системы от угроз."),
             ("Администратор офиса", "Обеспечивает работу офисной инфраструктуры."),
             ("Корпоративный тренер", "Проводит обучение сотрудников по ключевым компетенциям."),
-        };
+        ];
 
-        foreach (var (nameStr, descStr) in seedPositions)
+        foreach ((string? nameStr, string? descStr) in seedPositions)
         {
             Result<PositionName> nameResult = PositionName.Create(nameStr);
             if (nameResult.IsFailure)
@@ -133,10 +133,9 @@ public sealed class PositionsSeeder : ISeeder
 
             // Выбираем случайные подразделения: от 1 до 3
             int deptCount = _random.Next(1, Math.Min(4, allDepartments.Count + 1));
-            var selectedDepartments = allDepartments
+            List<Department> selectedDepartments = [.. allDepartments
                 .OrderBy(_ => _random.Next())
-                .Take(deptCount)
-                .ToList();
+                .Take(deptCount)];
 
             // Создаём должность и связываем с подразделениями
             Result<Position> positionResult = Position.CreateNew(

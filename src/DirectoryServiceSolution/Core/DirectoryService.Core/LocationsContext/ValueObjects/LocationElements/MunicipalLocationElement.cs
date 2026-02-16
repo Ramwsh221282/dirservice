@@ -109,23 +109,29 @@ public sealed record MunicipalLocationElement : LocationElement
         {
             Result<LocationElement> result = matcher.TryMap(
                 input,
-                onError: () => InvalidLocationSubject(input),
-                onSuccess: Create
-            );
+                onError: () => InvalidLocationSubject(input), onSuccess: Create);
+
             if (result.IsSuccess)
+            {
                 return result.Value;
+            }
         }
 
         return Error.ValidationError("Не удается распознать тип локации.");
     }
 
-    private static Error InvalidLocationSubject(string input) =>
-        Error.ValidationError($"Некорректный субъект в адресе - {input}");
+    private static Error InvalidLocationSubject(string input)
+    {
+        return Error.ValidationError($"Некорректный субъект в адресе - {input}");
+    }        
 
     private static MunicipalLocationElement Create(
         string name,
         string type,
         string shortName,
         short aoLevel
-    ) => new(name, type, shortName, aoLevel);
+    )
+    {
+        return new(name, type, shortName, aoLevel);
+    }
 }

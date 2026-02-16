@@ -29,16 +29,20 @@ public sealed class LocationsIdSet
     public static Result<LocationsIdSet> Create(IEnumerable<LocationId> ids)
     {
         if (!ids.Any())
+        {
             return Error.ValidationError("Список идентификаторов локаций был пустым.");
+        }
 
         IEnumerable<LocationId> duplicates = ids.ExtractDuplicates(i => i);
         if (duplicates.Any())
         {
             string[] nonUniqueIdentifiers = [.. duplicates.Select(v => v.Value.ToString())];
+
             string errorMessage = $"""
                 Список идентификаторов локаций должен быть уникален. 
                 Повторяющиеся значения: {string.Join(',', nonUniqueIdentifiers)}
                 """;
+                
             return Error.ValidationError(errorMessage);
         }
 

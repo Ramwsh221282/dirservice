@@ -36,13 +36,24 @@ public readonly record struct EntityLifeCycle
             : new EntityLifeCycle(deletedAt, createdAt, updatedAt);
     }
 
-    public Result<EntityLifeCycle> Update() =>
-        IsDeleted
-            ? Error.ConflictError("Запись была удалена. Нельзя обновить.")
-            : new EntityLifeCycle(DeletedAt, CreatedAt, DateTime.UtcNow);
+    public Result<EntityLifeCycle> Update()
+    {
+        if (IsDeleted)
+        {
+            return Error.ConflictError("Запись была удалена. Нельзя обновить.");
+        }
 
-    public Result<EntityLifeCycle> Delete() =>
-        IsDeleted
-            ? Error.ConflictError("Запись уже было удалена. Нельзя удалить.")
-            : new EntityLifeCycle(DateTime.UtcNow, CreatedAt, UpdatedAt);
+        return new EntityLifeCycle(DeletedAt, CreatedAt, DateTime.UtcNow);
+    }        
+
+    public Result<EntityLifeCycle> Delete()
+    {
+        if (IsDeleted)
+        {
+            return Error.ConflictError("Запись уже было удалена. Нельзя удалить.");
+        }
+
+        return new EntityLifeCycle(DateTime.UtcNow, CreatedAt, UpdatedAt);
+    }
+        
 }

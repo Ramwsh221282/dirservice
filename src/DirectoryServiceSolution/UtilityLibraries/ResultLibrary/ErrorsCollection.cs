@@ -6,20 +6,30 @@ public sealed class ErrorsCollection : Result, IEnumerable<Error>
 {
     private readonly List<Error> _errors = [];
 
-    public IEnumerator<Error> GetEnumerator() => _errors.GetEnumerator();
+    public IEnumerator<Error> GetEnumerator()
+    {
+        return _errors.GetEnumerator();
+    }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     public void Add(Error error)
     {
         if (error.Any())
+        {
             _errors.Add(error);
+        }
     }
 
     public void Add<T>(Result<T> result)
     {
         if (result.IsFailure)
+        {
             _errors.Add(result.Error);
+        }
     }
 
     public override bool IsFailure => Contains();
@@ -28,16 +38,23 @@ public sealed class ErrorsCollection : Result, IEnumerable<Error>
 
     public override Error Error => AsSingleError();
 
-    public void Add(IEnumerable<Result> results) =>
+    public void Add(IEnumerable<Result> results)
+    {
         _errors.AddRange(results.Where(r => r.IsFailure).Select(r => r.Error));
+    }        
 
     public void Add(Result result)
     {
         if (result.IsFailure)
+        {
             _errors.Add(result.Error);
+        }
     }
 
-    public bool Contains() => _errors.Count > 0;
+    public bool Contains()
+    {
+        return _errors.Count > 0;
+    }
 
     public Error AsSingleError()
     {
@@ -51,10 +68,15 @@ public sealed class ErrorsCollection : Result, IEnumerable<Error>
         ErrorType[] distinctErrorTypes = [.. _errors.Select(er => er.Type).Distinct()];
 
         if (_errors.Count == 0)
-            throw new ApplicationException("Список ошибок должен содержать ошибки.");
+        {
+            string message = "Список ошибок должен содержать ошибки.";
+            throw new ApplicationException(message);
+        }
 
         if (distinctErrorTypes.Length > 0)
+        {
             return _errors[0].Type;
+        }
 
         throw new ApplicationException("Список ошибок не должен содержать различные типы ошибок.");
     }
@@ -66,7 +88,7 @@ public sealed class ErrorsCollection : Result, IEnumerable<Error>
 
     private string ErrorsListing()
     {
-        string[] errors = _errors.Select(er => er.Message).ToArray();
+        string[] errors = [.. _errors.Select(er => er.Message)];
         return string.Join('\n', errors);
     }
 }

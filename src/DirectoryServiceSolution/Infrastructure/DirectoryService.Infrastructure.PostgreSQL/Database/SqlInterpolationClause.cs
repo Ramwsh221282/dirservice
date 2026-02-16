@@ -20,9 +20,13 @@ public sealed class SqlParameter
     public void Inject(DynamicParameters parameters)
     {
         if (_dbType != null)
+        {
             parameters.Add(_name, _value);
+        }
         else
+        {
             parameters.Add(_name, _value, _dbType);
+        }
     }
 }
 
@@ -67,23 +71,35 @@ public sealed class SqlInterpolationClause : IQueryClause
         return this;
     }
 
-    public string FormSqlClause(string prefix, string separator) =>
-        _sqlAdditions.Count == 0 ? string.Empty : prefix + string.Join(separator, _sqlAdditions);
+    public string FormSqlClause(string prefix, string separator)
+    {
+        return _sqlAdditions.Count == 0 ? string.Empty : prefix + string.Join(separator, _sqlAdditions);
+    }
 
-    public string FormRawClause(string sql) => _sqlAdditions.Count == 0 ? string.Empty : sql;
+    public string FormRawClause(string sql)
+    {
+        return _sqlAdditions.Count == 0 ? string.Empty : sql;
+    }
 
-    public string FormSeperatedRawClause(string separator) =>
-        _sqlAdditions.Count == 0 ? string.Empty : string.Join(separator, _sqlAdditions);
+    public string FormSeperatedRawClause(string separator)
+    {
+        return _sqlAdditions.Count == 0 ? string.Empty : string.Join(separator, _sqlAdditions);
+    }
 
     public void InjectParameters(DynamicParameters parameters)
     {
         foreach (SqlParameter parameter in _parameters)
+        {
             parameter.Inject(parameters);
+        }
     }
 
     public CommandDefinition FormCommand(
         string sql,
         DynamicParameters parameters,
         CancellationToken ct = default
-    ) => new(sql, parameters, cancellationToken: ct);
+    )
+    {
+        return new(sql, parameters, cancellationToken: ct);
+    }
 }

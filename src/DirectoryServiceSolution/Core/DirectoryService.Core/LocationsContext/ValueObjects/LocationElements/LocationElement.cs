@@ -23,11 +23,13 @@ public abstract record LocationElement : ILocationElement
 
     public static Result<LocationElement> Create(string input)
     {
-        foreach (var factory in Factories)
+        foreach (LocationElementFactory factory in Factories)
         {
             Result<LocationElement> result = factory(input);
             if (result.IsSuccess)
+            {
                 return result;
+            }
         }
 
         return Error.ValidationError($"Некорректный узел адреса - {input}");
@@ -36,12 +38,11 @@ public abstract record LocationElement : ILocationElement
     private static LocationElementFactory[] InspectFactories()
     {
         Type currentType = typeof(LocationElement);
-        Type[] subTypes = currentType
+        Type[] subTypes = [.. currentType
             .Assembly.GetTypes()
             .Where(s => !s.IsAbstract & s.IsSubclassOf(currentType))
             .Where(s => s.GetCustomAttribute<LocationElementAttribute>() != null)
-            .OrderBy(s => s.GetCustomAttribute<LocationElementAttribute>()!.AoLevel)
-            .ToArray();
+            .OrderBy(s => s.GetCustomAttribute<LocationElementAttribute>()!.AoLevel)];
 
         List<LocationElementFactory> factories = [];
         foreach (Type subType in subTypes)
@@ -64,6 +65,6 @@ public abstract record LocationElement : ILocationElement
             factories.Add(Factory);
         }
 
-        return factories.ToArray();
+        return [.. factories];
     }
 }

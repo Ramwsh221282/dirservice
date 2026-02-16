@@ -9,23 +9,31 @@ public sealed record DepartmentName
     public const short MaxLength = 150;
     public string Value { get; }
 
-    private DepartmentName(string value) => Value = value;
+    private DepartmentName(string value)
+    {
+        Value = value;
+    }
 
     public static Result<DepartmentName> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Error.ValidationError("Название подразделения не может быть пустым"); 
+        {
+            string message = "Название подразделения не может быть пустым";
+            return Error.ValidationError(message); 
+        }
         
         
         if (value.LessThan(MinLength))
-            return Error.ValidationError(
-                $"Название подразделения не может быть менее {MinLength} символов"
-            );
+        {
+            string message = $"Название подразделения не может быть менее {MinLength} символов";
+            return Error.ValidationError(message);
+        }
         
         if (value.GreaterThan(MaxLength))
-            return Error.ValidationError(
-                $"Название подразделения не может быть более {MaxLength} символов"
-            );
+        {
+            string message = $"Название подразделения не может быть более {MaxLength} символов";
+            return Error.ValidationError(message);
+        }
         
         return new DepartmentName(value);
     }

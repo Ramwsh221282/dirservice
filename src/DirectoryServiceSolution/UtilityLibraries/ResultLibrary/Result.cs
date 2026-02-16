@@ -27,19 +27,31 @@ public class Result
         Error = error;
     }
 
-    public static Result Success() => new Result();
+    public static Result Success()
+    {
+        return new Result();
+    }
 
     public static Result Fail(string message, ErrorType errorType)
     {
-        Error error = new Error(message, errorType);
+        Error error = new(message, errorType);
         return Fail(error);
     }
 
-    public static Result Fail(Error error) => new Result(error);
+    public static Result Fail(Error error)
+    {
+        return new Result(error);
+    }
 
-    public static implicit operator Result(Error error) => Result.Fail(error);
+    public static implicit operator Result(Error error)
+    {
+        return Fail(error);
+    }
 
-    public static implicit operator Error(Result result) => result.Error;
+    public static implicit operator Error(Result result)
+    {
+        return result.Error;
+    }
 }
 
 public sealed class Result<TValue> : Result
@@ -49,10 +61,13 @@ public sealed class Result<TValue> : Result
     public TValue Value =>
         IsSuccess
             ? _value
-            : throw new ApplicationException("Нельзя получить доступ к неуспешному результату.");
+            : throw new InvalidOperationException("Нельзя получить доступ к неуспешному результату.");
 
     private Result(TValue value)
-        : base(true, false, new Error("", new NoErrorType())) => _value = value;
+        : base(true, false, new Error("", new NoErrorType()))
+    {
+        _value = value;
+    }
 
     private Result(Error error)
         : base(error) { }
@@ -63,18 +78,38 @@ public sealed class Result<TValue> : Result
     private Result(Result other)
         : base(other.IsSuccess, other.IsFailure, other.Error) { }
 
-    public static Result<TValue> Success(TValue value) => new Result<TValue>(value);
+    public static Result<TValue> Success(TValue value)
+    {
+        return new Result<TValue>(value);
+    }
 
-    public static new Result<TValue> Fail(string message, ErrorType errorType) =>
-        new Result<TValue>(new Error(message, errorType));
+    public static new Result<TValue> Fail(string message, ErrorType errorType)
+    {
+        return new Result<TValue>(new Error(message, errorType));
+    }        
 
-    public static new Result<TValue> Fail(Error error) => new Result<TValue>(error);
+    public static new Result<TValue> Fail(Error error)
+    {
+        return new Result<TValue>(error);
+    }
 
-    public static implicit operator Result<TValue>(TValue value) => Result<TValue>.Success(value);
+    public static implicit operator Result<TValue>(TValue value)
+    {
+        return Result<TValue>.Success(value);
+    }
 
-    public static implicit operator Result<TValue>(Error error) => Result<TValue>.Fail(error);
+    public static implicit operator Result<TValue>(Error error)
+    {
+        return Result<TValue>.Fail(error);
+    }
 
-    public static implicit operator Error(Result<TValue> result) => result.Error;
+    public static implicit operator Error(Result<TValue> result)
+    {
+        return result.Error;
+    }
 
-    public static implicit operator TValue(Result<TValue> result) => result.Value;
+    public static implicit operator TValue(Result<TValue> result)
+    {
+        return result.Value;
+    }
 }

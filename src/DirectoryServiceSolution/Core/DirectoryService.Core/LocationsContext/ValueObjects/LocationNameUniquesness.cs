@@ -15,7 +15,7 @@ public class LocationNameUniquesness
 
     public bool IsUnique(LocationName name)
     {
-        return !name.Value.Equals(_nameOfExisting) || _isUnique;
+        return !name.Value.Equals(_nameOfExisting, StringComparison.Ordinal) || _isUnique;
     }
 
     public Error NonUniqueLocationError()

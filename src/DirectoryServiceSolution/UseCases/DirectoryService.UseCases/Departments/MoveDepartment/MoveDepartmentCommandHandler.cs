@@ -55,7 +55,9 @@ public sealed class MoveDepartmentCommandHandler : ICommandHandler<Guid, MoveDep
             ct
         );
         if (movement.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(movement.Error);
+        }
 
         // получить разрешение на передвижение подразделений.
         DepartmentMovementApproval approval = await _departments.GetMovementApproval(
@@ -68,24 +70,32 @@ public sealed class MoveDepartmentCommandHandler : ICommandHandler<Guid, MoveDep
         DepartmentPath path = DepartmentPath.Create(movement.Value.Movable.Path.Value);
         Result<Department> oldAncestor = await _departments.GetParentDeparmentByChildPath(path, ct);
         if (oldAncestor.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(oldAncestor.Error);
+        }
 
         // процесс передвижения подразделения в качестве логики домена
         Result moving = movement.Value.PerformMovement(oldAncestor, approval);
         if (moving.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(moving.Error);
+        }
 
         // сохранение изменений после логики домена для change tracker
         Result saving = await _unitOfWork.SaveChanges(ct);
         if (saving.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(saving.Error);
+        }
 
         // обновление пути у дочерних подразделений движимого подразделения.
         await _departments.RefreshDepartmentChildPaths(movement.Value.Movable, path, ct);
 
-        Result committing = await transaction.CommitChanges(ct);
+        Result committing = await transaction.CommitChanges(ct: ct);
         if (committing.IsFailure)
+        {
             return _logger.ReturnLogged<Guid>(committing.Error);
+        }
 
         _logger.Information(
             "Department {Id} has been moved to {NewParentId}",

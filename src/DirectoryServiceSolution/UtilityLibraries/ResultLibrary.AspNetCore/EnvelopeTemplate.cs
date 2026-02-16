@@ -22,12 +22,14 @@ public record EnvelopeTemplate
         OperationStatus = operationStatus;
     }
 
-    public static EnvelopeTemplate FromResult(Result result, string methodName) =>
-        result switch
+    public static EnvelopeTemplate FromResult(Result result, string methodName)
+    {
+        return result switch
         {
             ErrorsCollection col => FromErrorsCollection(col, methodName),
             _ => FromSingleResult(result, methodName),
         };
+    }        
 
     private static EnvelopeTemplate FromSingleResult(Result result, string methodName)
     {
@@ -37,8 +39,10 @@ public record EnvelopeTemplate
         return new EnvelopeTemplate(methodName, errors, timeGenerated, code);
     }
 
-    private static EnvelopeTemplate FromSingleResult<T>(Result<T> result, string methodName) =>
-        FromResult(result, methodName);
+    private static EnvelopeTemplate FromSingleResult<T>(Result<T> result, string methodName)
+    {
+        return FromResult(result, methodName);
+    }        
 
     private static EnvelopeTemplate FromErrorsCollection(ErrorsCollection errors, string methodName)
     {
@@ -48,10 +52,14 @@ public record EnvelopeTemplate
         return new EnvelopeTemplate(methodName, errorStrings, timeGenerated, code);
     }
 
-    private static int StatusCodeAsInteger(HttpStatusCode code) => (int)code;
+    private static int StatusCodeAsInteger(HttpStatusCode code)
+    {
+        return (int)code;
+    }
 
-    private static HttpStatusCode DispatchOperationStatus(ErrorType errorType) =>
-        errorType switch
+    private static HttpStatusCode DispatchOperationStatus(ErrorType errorType)
+    {
+        return errorType switch
         {
             ConflictErrorType => HttpStatusCode.Conflict,
             ExceptionalErrorType => HttpStatusCode.InternalServerError,
@@ -59,6 +67,7 @@ public record EnvelopeTemplate
             ValidationErrorType => HttpStatusCode.BadRequest,
             _ => HttpStatusCode.OK,
         };
+    }        
 }
 
 public sealed record EnvelopeTemplate<T> : EnvelopeTemplate
@@ -72,19 +81,19 @@ public sealed record EnvelopeTemplate<T> : EnvelopeTemplate
         DateTime timeGenerated,
         int operationStatus
     )
-        : base(methodName, errors, timeGenerated, operationStatus) { }
-
-    private EnvelopeTemplate(T value, EnvelopeTemplate template)
-        : base(template) { }
+        : base(methodName, errors, timeGenerated, operationStatus)
+    {
+        Value = value;
+    }
 
     private EnvelopeTemplate(EnvelopeTemplate template)
-        : base(template) { }
+        : base(template) { }    
 
     public static EnvelopeTemplate<T> FromResult(Result<T> result, string methodName)
     {
         EnvelopeTemplate template = EnvelopeTemplate.FromResult(result, methodName);
         return result.IsFailure
             ? new EnvelopeTemplate<T>(template)
-            : new EnvelopeTemplate<T>(result.Value, template);
+            : new EnvelopeTemplate<T>(result.Value, template.MethodName, template.Errors, template.TimeGenerated, template.OperationStatus);
     }
 }

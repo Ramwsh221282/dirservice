@@ -157,9 +157,9 @@ public class LocationElementTests
         string expectedShortName
     )
     {
-        var result = BuildingLocationElement.Create(input);
+        Result<LocationElement> result = BuildingLocationElement.Create(input);
         Assert.True(result.IsSuccess);
-        var element = result.Value;
+        LocationElement element = result.Value;
         Assert.Equal(input, element.Value);
         Assert.Equal(expectedType, element.Type);
         Assert.Equal(expectedShortName, element.ShortValue);

@@ -15,7 +15,7 @@ public sealed class PositionUniquesnessStub
 
     public async Task<PositionNameUniquesness> IsUnique(PositionName name)
     {
-        bool hasAny = !(await _context.Positions.AsNoTracking().AnyAsync(p => p.Name == name));
+        bool hasAny = !await _context.Positions.AsNoTracking().AnyAsync(p => p.Name == name);
         return new PositionNameUniquesness(hasAny, name.Value);
     }
 }

@@ -10,11 +10,16 @@ public static class ValidatorExtensions
     {
         List<ValidationFailure> failures = result.Errors;
         if (failures.Count == 1)
+        {
             return failures[0].ErrorFromValidationFailure();
+        }
 
-        ErrorsCollection collection = new ErrorsCollection();
+        ErrorsCollection collection = [];
         foreach (ValidationFailure failure in failures)
+        {
             collection.Add(failure.ErrorFromValidationFailure());
+        }
+
         return Result<T>.Fail(collection);
     }
 
@@ -22,11 +27,16 @@ public static class ValidatorExtensions
     {
         List<ValidationFailure> failures = result.Errors;
         if (failures.Count == 1)
+        {
             return failures[0].ErrorFromValidationFailure();
+        }
 
-        ErrorsCollection collection = new ErrorsCollection();
+        ErrorsCollection collection = [];
         foreach (ValidationFailure failure in failures)
+        {
             collection.Add(failure.ErrorFromValidationFailure());
+        }
+
         return collection;
     }
 
@@ -46,8 +56,10 @@ public static class ValidatorExtensions
         return rule.Custom(
             (properties, context) =>
             {
-                foreach (var property in properties)
+                foreach (TU? property in properties)
+                {
                     property.ManageResult(resultFactory, context);
+                }
             }
         );
     }
@@ -57,12 +69,13 @@ public static class ValidatorExtensions
         string code = failure.ErrorCode;
         string message = failure.ErrorMessage;
         ErrorType type = code.DispatchErrorTypeByCode();
-        Error error = new Error(message, type);
+        Error error = new(message, type);
         return error;
     }
 
-    private static ErrorType DispatchErrorTypeByCode(this string code) =>
-        code switch
+    private static ErrorType DispatchErrorTypeByCode(this string code)
+    {
+        return code switch
         {
             nameof(ConflictErrorType) => new ConflictErrorType(),
             nameof(ExceptionalErrorType) => new ExceptionalErrorType(),
@@ -72,6 +85,7 @@ public static class ValidatorExtensions
                 "Код ошибки либо не содержит ошибку, либо не поддерживается."
             ),
         };
+    }        
 
     private static void ManageResult<T, TU>(
         this TU property,
@@ -81,7 +95,10 @@ public static class ValidatorExtensions
     {
         Result result = resultFactory(property);
         if (!result.IsFailure)
+        {
             return;
+        }
+        
         ValidationFailure failure = result.Error.ValidationFailureFromError();
         context.AddFailure(failure);
     }

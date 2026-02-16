@@ -28,9 +28,18 @@ public sealed class NpgSqlConnectionFactory : IDbConnectionFactory, IAsyncDispos
         return connection;
     }
 
-    public IQueryClause CreateClause() => new SqlInterpolationClause();
+    public IQueryClause CreateClause()
+    {
+        return new SqlInterpolationClause();
+    }
 
-    public void Dispose() => _dataSource.Dispose();
+    public void Dispose()
+    {
+        _dataSource.Dispose();
+    }
 
-    public async ValueTask DisposeAsync() => await _dataSource.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        await _dataSource.DisposeAsync();
+    }
 }

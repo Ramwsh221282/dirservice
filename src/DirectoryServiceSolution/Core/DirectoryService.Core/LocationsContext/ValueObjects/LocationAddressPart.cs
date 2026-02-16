@@ -16,6 +16,9 @@ public sealed record LocationAddressPart
 
     private LocationAddressPart()
     {
+        Name = null!;
+        ShortName = null!;
+        Type = null!;
         // ef core
     }
 
@@ -30,15 +33,22 @@ public sealed record LocationAddressPart
     public static Result<LocationAddressPart> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Error.ValidationError("Часть адреса локации была пустой.");
+        {
+            string message = "Часть адреса локации была пустой.";
+            return Error.ValidationError(message);
+        }
 
         if (value.GreaterThan(MaxLength))
-            return Error.ValidationError(
-                $"Часть адреса локации превышает длину {MaxLength} символов."
-            );
+        {
+            string message = $"Часть адреса локации превышает длину {MaxLength} символов.";
+            return Error.ValidationError(message);
+        }
 
         if (value.LessThan(MinLength))
-            return Error.ValidationError($"Часть адреса локации менее длины {MinLength} символов.");
+        {
+            string message = $"Часть адреса локации менее длины {MinLength} символов.";
+            return Error.ValidationError(message);
+        }
 
         return CreateFromMatch(value);
     }
@@ -47,7 +57,9 @@ public sealed record LocationAddressPart
     {
         Result<LocationElement> elementResult = LocationElement.Create(value);
         if (elementResult.IsFailure)
+        {
             return elementResult.Error;
+        }
 
         LocationElement element = elementResult;
         return new LocationAddressPart(

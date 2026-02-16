@@ -47,8 +47,8 @@ public sealed class DepartmentsSeeder : ISeeder
 
         List<Department> departments = [];
 
-        var seedDepartments = new[]
-        {
+        (string, string)[] seedDepartments =
+        [
             // IT и разработка
             ("Отдел разработки", "dev"),
             ("Отдел тестирования", "qa"),
@@ -589,11 +589,11 @@ public sealed class DepartmentsSeeder : ISeeder
             ("Отдел корпоративного управления", "corpmanagement100"),
             ("Отдел корпоративной культуры", "culture102"),
             ("Отдел корпоративной стратегии", "corpstrat100"),
-        };
+        ];
 
         Dictionary<string, Department> departmentMap = [];
 
-        foreach (var (name, identifier) in seedDepartments)
+        foreach ((string? name, string? identifier) in seedDepartments)
         {
             Result<DepartmentName> nameResult = DepartmentName.Create(name);
             if (nameResult.IsFailure)
@@ -629,12 +629,12 @@ public sealed class DepartmentsSeeder : ISeeder
 
             // Выбираем случайное количество локаций: от 1 до 3
             int locationCount = _random.Next(1, Math.Min(4, locations.Count + 1));
-            var selectedLocations = locations
+            List<Location> selectedLocations = locations
                 .OrderBy(_ => _random.Next())
                 .Take(locationCount)
                 .ToList();
 
-            var department = Department.CreateNew(
+            Department department = Department.CreateNew(
                 nameResult.Value,
                 identifierResult.Value,
                 selectedLocations
@@ -645,13 +645,12 @@ public sealed class DepartmentsSeeder : ISeeder
         }
 
         // Список родитель-дочерние отношения
-        var departmentRelationships = new[]
-        {
+        (string, string[])[] departmentRelationships =
+        [
             // Группа разработки
             (
                 "dev",
-                new[]
-                {
+                [
                     "mobile",
                     "frontend",
                     "backend",
@@ -683,24 +682,22 @@ public sealed class DepartmentsSeeder : ISeeder
                     "processaudit",
                     "bizanalyst",
                     "pmo",
-                }
+                ]
             ),
             (
                 "marketing",
-                new[]
-                {
+                [
                     "advertising",
                     "content",
                     "socialmedia",
                     "marketinganalytics",
                     "branding",
                     "stratmarketing",
-                }
+                ]
             ),
             (
                 "hr",
-                new[]
-                {
+                [
                     "recruitment",
                     "lnd",
                     "compben",
@@ -713,12 +710,11 @@ public sealed class DepartmentsSeeder : ISeeder
                     "wellness",
                     "corptraining",
                     "leaddev",
-                }
+                ]
             ),
             (
                 "finance",
-                new[]
-                {
+                [
                     "accounting",
                     "tax",
                     "audit",
@@ -729,12 +725,11 @@ public sealed class DepartmentsSeeder : ISeeder
                     "corpreporting",
                     "insurance",
                     "risk",
-                }
+                ]
             ),
             (
                 "legal",
-                new[]
-                {
+                [
                     "ip",
                     "contracts",
                     "compliance",
@@ -745,16 +740,15 @@ public sealed class DepartmentsSeeder : ISeeder
                     "legalrisk",
                     "corpgov",
                     "corpgovernance",
-                }
+                ]
             ),
             (
                 "support",
-                new[] { "customerservice", "usersupport", "techsupport", "feedback", "cx" }
+                ["customerservice", "usersupport", "techsupport", "feedback", "cx"]
             ),
             (
                 "admin",
-                new[]
-                {
+                [
                     "docs",
                     "facilities",
                     "travel",
@@ -763,12 +757,11 @@ public sealed class DepartmentsSeeder : ISeeder
                     "internalcontrol",
                     "accesscontrol",
                     "incident",
-                }
+                ]
             ),
             (
                 "compliance",
-                new[]
-                {
+                [
                     "ethics",
                     "internalcomms",
                     "safety",
@@ -777,24 +770,22 @@ public sealed class DepartmentsSeeder : ISeeder
                     "sustdev",
                     "corpsec",
                     "intsec",
-                }
+                ]
             ),
             (
                 "strategy",
-                new[]
-                {
+                [
                     "corpdev",
                     "stratplan",
                     "corpstrategy",
                     "stratinitiatives",
                     "corpchanges",
                     "changemgmt",
-                }
+                ]
             ),
             (
                 "ops",
-                new[]
-                {
+                [
                     "procurement",
                     "logistics",
                     "supplychain",
@@ -803,27 +794,27 @@ public sealed class DepartmentsSeeder : ISeeder
                     "resourceplanning",
                     "budgetmgmt",
                     "projectmgmt",
-                }
+                ]
             ),
-        };
+        ];
 
-        foreach (var (parentIdentifier, childIdentifiers) in departmentRelationships)
+        foreach ((string? parentIdentifier, string[]? childIdentifiers) in departmentRelationships)
         {
-            if (!departmentMap.TryGetValue(parentIdentifier, out var parent))
+            if (!departmentMap.TryGetValue(parentIdentifier, out Department? parent))
             {
                 _logger.Warning("Parent department '{ParentId}' not found.", parentIdentifier);
                 continue;
             }
 
-            foreach (var childId in childIdentifiers)
+            foreach (string? childId in childIdentifiers)
             {
-                if (!departmentMap.TryGetValue(childId, out var child))
+                if (!departmentMap.TryGetValue(childId, out Department? child))
                 {
                     _logger.Warning("Child department '{ChildId}' not found.", childId);
                     continue;
                 }
 
-                var attachResult = parent.AttachOtherDepartment(child);
+                Result attachResult = parent.AttachOtherDepartment(child);
                 if (attachResult.IsFailure)
                 {
                     _logger.Warning(

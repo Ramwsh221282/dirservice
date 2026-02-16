@@ -45,7 +45,7 @@ public sealed class DepartmentsTestsHelper
     public async Task<Result<Guid>> MoveDepartment(Guid parentId, Guid movableId)
     {
         MoveDepartmentCommand createDepartment = new(parentId, movableId);
-        await using var scope = _services.CreateAsyncScope();
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
         ICommandHandler<Guid, MoveDepartmentCommand> moveHandler = scope.GetService<
             ICommandHandler<Guid, MoveDepartmentCommand>
         >();

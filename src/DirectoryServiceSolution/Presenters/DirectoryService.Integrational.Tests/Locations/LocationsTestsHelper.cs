@@ -1,5 +1,4 @@
 ﻿using DirectoryService.Core.LocationsContext;
-using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Locations.Contracts;
 using DirectoryService.UseCases.Locations.CreateLocation;
@@ -32,8 +31,8 @@ public sealed class LocationsTestsHelper
     )
     {
         CreateLocationCommand command = new(name, addressParts, timeZone);
-        await using var scope = _services.CreateAsyncScope();
-        var createLocationHandler = scope.GetService<
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
+        ICommandHandler<Guid, CreateLocationCommand> createLocationHandler = scope.GetService<
             ICommandHandler<Guid, CreateLocationCommand>
         >();
         return await createLocationHandler.Handle(command);

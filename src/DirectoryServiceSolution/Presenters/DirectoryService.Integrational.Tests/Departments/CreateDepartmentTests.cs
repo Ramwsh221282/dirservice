@@ -1,4 +1,6 @@
-﻿using DirectoryService.Integrational.Tests.Locations;
+﻿using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Integrational.Tests.Locations;
+using ResultLibrary;
 
 namespace DirectoryService.Integrational.Tests.Departments;
 
@@ -23,13 +25,13 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
         const string expectedDepartmentPath = "test-identifier";
         const int expectedDepartmentDepthLevel = 0;
 
-        var firstLocationId = await _locationsHelper.CreateNewLocation(
+        Result<Guid> firstLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location First",
             "Test/Location",
             ["Test", "Location", "First"]
         );
 
-        var secondLocationId = await _locationsHelper.CreateNewLocation(
+        Result<Guid> secondLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location Second",
             "Test/Location",
             ["Test", "Location", "Second"]
@@ -39,7 +41,7 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
         Assert.True(secondLocationId.IsSuccess);
         IEnumerable<Guid> createdLocationIds = [firstLocationId, secondLocationId];
 
-        var createdDepartment = await _departmentsHelper.CreateNewDepartment(
+        Result<Guid> createdDepartment = await _departmentsHelper.CreateNewDepartment(
             expectedDepartmentName,
             expectedDepartmentIdentifier,
             createdLocationIds
@@ -47,10 +49,10 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
 
         Assert.True(createdDepartment.IsSuccess);
 
-        var created = await _departmentsHelper.GetDepartment(createdDepartment);
+        Result<Department> created = await _departmentsHelper.GetDepartment(createdDepartment);
         Assert.True(created.IsSuccess);
 
-        var department = created.Value;
+        Department department = created.Value;
         Assert.Equal(expectedDepartmentName, department.Name.Value);
         Assert.Equal(expectedDepartmentIdentifier, department.Identifier.Value);
         Assert.Equal(expectedDepartmentPath, department.Path.Value);
@@ -66,13 +68,13 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
     [Fact]
     private async Task Create_Child_Department_Success()
     {
-        var firstLocationId = await _locationsHelper.CreateNewLocation(
+        Result<Guid> firstLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location First",
             "Test/Location",
             ["Test", "Location", "First"]
         );
 
-        var secondLocation = await _locationsHelper.CreateNewLocation(
+        Result<Guid> secondLocation = await _locationsHelper.CreateNewLocation(
             "Test Location Second",
             "Test/Location",
             ["Test", "Location", "Second"]
@@ -84,7 +86,7 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
 
         IEnumerable<Guid> locationIds = [firstLocationId, secondLocation];
 
-        var createdParentId = await _departmentsHelper.CreateNewDepartment(
+        Result<Guid> createdParentId = await _departmentsHelper.CreateNewDepartment(
             "First Department",
             "first",
             locationIds
@@ -92,7 +94,7 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
 
         Assert.True(createdParentId.IsSuccess);
 
-        var childDepartmentId = await _departmentsHelper.CreateNewDepartment(
+        Result<Guid> childDepartmentId = await _departmentsHelper.CreateNewDepartment(
             "Second department",
             "second",
             locationIds,
@@ -101,9 +103,9 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
 
         Assert.True(childDepartmentId.IsSuccess);
 
-        var created = await _departmentsHelper.GetDepartment(createdParentId);
+        Result<Department> created = await _departmentsHelper.GetDepartment(createdParentId);
         Assert.True(created.IsSuccess);
-        var department = created.Value;
+        Department department = created.Value;
         Assert.Equal(1, department.Attachments.Count());
         Assert.Equal(1, department.ChildrensCount.Value);
     }
@@ -111,17 +113,16 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
     [Fact]
     private async Task Create_Child_Department_Twice_Failure()
     {
-        const int expectedLocationsCount = 2;
         const string expectedDepartmentName = "Test Department";
         const string expectedDepartmentIdentifier = "test-identifier";
 
-        var firstLocationId = await _locationsHelper.CreateNewLocation(
+        Result<Guid> firstLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location First",
             "Test/Location",
             ["Test", "Location", "First"]
         );
 
-        var secondLocation = await _locationsHelper.CreateNewLocation(
+        Result<Guid> secondLocation = await _locationsHelper.CreateNewLocation(
             "Test Location Second",
             "Test/Location",
             ["Test", "Location", "Second"]
@@ -132,14 +133,14 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
 
         IEnumerable<Guid> locationIds = [firstLocationId, secondLocation];
 
-        var createDepartment = await _departmentsHelper.CreateNewDepartment(
+        Result<Guid> createDepartment = await _departmentsHelper.CreateNewDepartment(
             expectedDepartmentName,
             expectedDepartmentIdentifier,
             locationIds
         );
         Assert.True(createDepartment.IsSuccess);
 
-        var createChild = await _departmentsHelper.CreateNewDepartment(
+        Result<Guid> createChild = await _departmentsHelper.CreateNewDepartment(
             "Child Dep",
             "child-dep",
             locationIds,
@@ -147,7 +148,7 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
         );
         Assert.True(createChild.IsSuccess);
 
-        var createChildAgain = await _departmentsHelper.CreateNewDepartment(
+        Result<Guid> createChildAgain = await _departmentsHelper.CreateNewDepartment(
             "Child Dep",
             "child-dep",
             locationIds,

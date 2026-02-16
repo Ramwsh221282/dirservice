@@ -12,7 +12,9 @@ public static class SeederExtensions
         IEnumerable<ISeeder> seeders = scope.ServiceProvider.GetServices<ISeeder>();
 
         foreach (ISeeder seeder in seeders)
+        {
             await seeder.SeedAsync();
+        }
 
         return serviceProvider;
     }

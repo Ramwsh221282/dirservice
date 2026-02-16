@@ -15,7 +15,7 @@ public sealed class LocationNameUniquesnessStub
 
     public async Task<LocationNameUniquesness> IsUnique(LocationName name)
     {
-        bool isUnique = !(await _context.Locations.AsNoTracking().AnyAsync(l => l.Name == name));
+        bool isUnique = !await _context.Locations.AsNoTracking().AnyAsync(l => l.Name == name);
         return new LocationNameUniquesness(isUnique, name.Value);
     }
 }

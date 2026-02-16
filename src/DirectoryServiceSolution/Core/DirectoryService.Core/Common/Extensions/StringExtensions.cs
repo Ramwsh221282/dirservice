@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace DirectoryService.Core.Common.Extensions;
 
 public static class StringExtensions
@@ -24,7 +26,7 @@ public static class StringExtensions
 
     public static string FormatForName(this string input)
     {
-        return input.Trim().ToLower().MakeFirstLetterCapital();
+        return input.Trim().ToLower(CultureInfo.InvariantCulture).MakeFirstLetterCapital();
     }
 
     public static string MakeFirstLetterCapital(this string input)
@@ -34,9 +36,9 @@ public static class StringExtensions
 
     public static string MakeFirstLetterCapital(this ReadOnlySpan<char> input)
     {
-        char firstLetter = char.ToUpper(input[0]);
-        ReadOnlySpan<char> otherPart = input.Slice(1, input.Length - 1);
-        return $"{firstLetter}{otherPart.ToString()}";
+        char firstLetter = char.ToUpper(input[0], CultureInfo.InvariantCulture);
+        ReadOnlySpan<char> otherPart = input[1..];
+        return $"{firstLetter}{otherPart}";
     }
 
     public static bool IsLatinOnly(this string input)

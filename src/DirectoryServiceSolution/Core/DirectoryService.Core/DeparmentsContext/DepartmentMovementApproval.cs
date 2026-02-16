@@ -21,17 +21,23 @@ public sealed class DepartmentMovementApproval
     public Result Approve(DepartmentMovement movement)
     {
         if (_newParent.Id != movement.MovingTo.Id)
-            return Error.ConflictError(
-                "Не удается согласовать движение подразделения. Разные ID новых родительских подразделений."
-            );
+        {
+            string message = "Не удается согласовать движение подразделения. Разные ID новых родительских подразделений.";
+            return Error.ConflictError(message);
+        }
+
         if (_movingChild.Id != movement.Movable.Id)
-            return Error.ConflictError(
-                "Не удается согласовать движение подразделения. Разный ID движимого подразделения."
-            );
-        if (_approved == false)
-            return Error.ConflictError(
-                "Нельзя передвинуть подразделение в его дочернее подразделение."
-            );
+        {
+            string message = "Не удается согласовать движение подразделения. Разный ID движимого подразделения.";
+            return Error.ConflictError(message);
+        }
+
+        if (!_approved)
+        {
+            string message = "Нельзя передвинуть подразделение в его дочернее подразделение.";
+            return Error.ConflictError(message);
+        }
+
         return Result.Success();
     }
 }

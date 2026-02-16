@@ -58,7 +58,7 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         Location location = created.Value;
         Assert.Equal(location.Name.Value, name);
         Assert.Equal(location.TimeZone.Value, timeZone);
-        Assert.Contains(location.Address.Parts, p => addressParts.Any(ap => ap.Equals(p.Name)));
+        Assert.Contains(location.Address.Parts, p => addressParts.Any(ap => ap.Equals(p.Name, StringComparison.Ordinal)));
     }
 
     [Fact]

@@ -29,8 +29,8 @@ public sealed class PositionsTestsHelper
     )
     {
         CreatePositionCommand command = new(name, description, departmentIds);
-        await using var scope = _services.CreateAsyncScope();
-        var handler = scope.GetService<
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
+        ICommandHandler<Guid, CreatePositionCommand> handler = scope.GetService<
             ICommandHandler<Guid, CreatePositionCommand>
         >();
         return await handler.Handle(command);

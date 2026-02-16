@@ -7,9 +7,15 @@ public readonly record struct DepartmentId
 {
     public Guid Value { get; }
 
-    public DepartmentId() => Value = Guid.NewGuid();
+    public DepartmentId()
+    {
+        Value = Guid.NewGuid();
+    }
 
-    private DepartmentId(Guid value) => Value = value;
+    private DepartmentId(Guid value)
+    {
+        Value = value;
+    }
 
     public static Result<DepartmentId> Create(Guid value)
     {

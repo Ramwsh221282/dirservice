@@ -91,7 +91,7 @@ public sealed class GetDepartmentsPrefetchV2QueryHandler
         int offset = (query.Page - 1) * query.PageSize;
         int prefetch = query.Prefetch;
 
-        var command = new CommandDefinition(
+        CommandDefinition command = new(
             sql,
             new
             {
@@ -102,7 +102,7 @@ public sealed class GetDepartmentsPrefetchV2QueryHandler
         );
 
         using IDbConnection connection = await _connectionFactory.Create(ct);
-        var data = await connection.QueryAsync<HierarchicalDepartmentDataModel>(command);
+        IEnumerable<HierarchicalDepartmentDataModel> data = await connection.QueryAsync<HierarchicalDepartmentDataModel>(command);
         return new HierarchicalDepartmentsMapper(data).Map();
     }
 }

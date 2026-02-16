@@ -12,8 +12,10 @@ public sealed class GetDepartmentsPopularityQueryHandler
 {
     private readonly IDbConnectionFactory _connectionFactory;
 
-    public GetDepartmentsPopularityQueryHandler(IDbConnectionFactory connectionFactory) =>
+    public GetDepartmentsPopularityQueryHandler(IDbConnectionFactory connectionFactory)
+    {
         _connectionFactory = connectionFactory;
+    }
 
     public async Task<IEnumerable<GetDepartmentsPopularityResponse>> Handle(
         GetDepartmentsPopularityQuery query,
@@ -128,8 +130,9 @@ public sealed class GetDepartmentsPopularityQueryHandler
         public required string DepartmentPositions { get; init; } // json
         public required string DepartmentLocations { get; init; } // json
 
-        public GetDepartmentsPopularityResponse ToResponseModel() =>
-            new()
+        public GetDepartmentsPopularityResponse ToResponseModel()
+        {
+            return new()
             {
                 Id = Id,
                 PositionsPercentage = PositionStats,
@@ -146,15 +149,16 @@ public sealed class GetDepartmentsPopularityQueryHandler
                 Locations = ToLocationsDto(),
                 Positions = ToPositionsDto(),
             };
+        }            
 
         private IEnumerable<DepartmentsPopularityAttachmentsDto> ToAttachmentsDto()
         {
             using JsonDocument document = JsonDocument.Parse(Attachments);
             List<DepartmentsPopularityAttachmentsDto> dtos = [];
-            var array = document.RootElement.GetProperty(nameof(Attachments));
-            foreach (var entry in array.EnumerateArray())
+            JsonElement array = document.RootElement.GetProperty(nameof(Attachments));
+            foreach (JsonElement entry in array.EnumerateArray())
             {
-                Guid id = entry.GetProperty("Id").GetGuid();
+                Guid id = entry.GetProperty(nameof(Id)).GetGuid();
                 DateTime attachedAt = entry.GetProperty("AttachedAt").GetDateTime();
 
                 DepartmentsPopularityAttachmentsDto dto = new()
@@ -171,10 +175,10 @@ public sealed class GetDepartmentsPopularityQueryHandler
         private IEnumerable<DepartmentLocationEntryPopularityDto> ToLocationsDto()
         {
             using JsonDocument document = JsonDocument.Parse(DepartmentLocations);
-            var array = document.RootElement;
+            JsonElement array = document.RootElement;
             List<DepartmentLocationEntryPopularityDto> dtos = [];
 
-            foreach (var entry in array.EnumerateArray())
+            foreach (JsonElement entry in array.EnumerateArray())
             {
                 Guid id = entry.GetProperty("id").GetGuid();
                 string name = entry.GetProperty("name").GetString()!;
@@ -205,10 +209,10 @@ public sealed class GetDepartmentsPopularityQueryHandler
         private IEnumerable<DepartmentPositionEntryPopularityDto> ToPositionsDto()
         {
             using JsonDocument document = JsonDocument.Parse(DepartmentPositions);
-            var array = document.RootElement;
+            JsonElement array = document.RootElement;
             List<DepartmentPositionEntryPopularityDto> dtos = [];
 
-            foreach (var entry in array.EnumerateArray())
+            foreach (JsonElement entry in array.EnumerateArray())
             {
                 Guid id = entry.GetProperty("id").GetGuid();
                 string name = entry.GetProperty("name").GetString()!;
