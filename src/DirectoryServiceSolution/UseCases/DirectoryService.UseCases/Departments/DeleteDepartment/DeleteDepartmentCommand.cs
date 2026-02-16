@@ -56,7 +56,7 @@ public sealed class DeleteDepartmentHandler : ICommandHandler<Guid, DeleteDepart
             return positionsArchivation.Error;
         }
 
-        await _repository.RefreshDepartmentChildPaths(department, copied, ct);
+        await _repository.RefreshDepartmentPathsFromDelete(department, copied, ct);
 
         Result saving = await _unitOfWork.SaveChanges(ct: ct);
         if (saving.IsFailure)

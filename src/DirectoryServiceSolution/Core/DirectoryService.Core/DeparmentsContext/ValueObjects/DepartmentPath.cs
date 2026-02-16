@@ -23,6 +23,11 @@ public sealed record DepartmentPath
         return new DepartmentPath(Value);
     }
 
+    public DepartmentPath PathOfArchived()
+    {
+        return new DepartmentPath("deleted_" + Value);
+    }
+
     public bool ContainsIdentifier(DepartmentIdentifier identifier)
     {
         int identifierIndex = IndexOfIdentifier(identifier);

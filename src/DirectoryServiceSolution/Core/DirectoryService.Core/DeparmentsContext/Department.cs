@@ -148,7 +148,7 @@ public sealed class Department : ISoftDeletable
             return Error.ConflictError("Нельзя архивировать уже архивированную запись.");
         }
 
-        Identifier = Identifier.IdentifierOfArchived();
+        Path = Path.PathOfArchived();        
         LifeCycle = LifeCycle.Delete();
         return Result.Success();
     }

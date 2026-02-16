@@ -12,7 +12,7 @@ namespace DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositorie
 public sealed class DepartmentsRepository : IDepartmentsRepository
 {
     private readonly ServiceDbContext _dbContext;
-    
+
     public DepartmentsRepository(ServiceDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -81,7 +81,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
                     HAVING COUNT(odp.position_id) = 1) owned_positions
                     JOIN department_positions dp ON dp.position_id = owned_positions.position_id
             ")
-            .ToListAsync(cancellationToken: ct);        
+            .ToListAsync(cancellationToken: ct);
     }
 
     public Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct)
@@ -101,8 +101,8 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         {
             return departmentId.Error;
         }
-        
-        return await GetById(id, useLock, ct);
+
+        return await GetById(departmentId.Value, useLock, ct);
     }
 
     public async Task<Result<Department>> GetById(DepartmentId id, bool useLock = false, CancellationToken ct = default)
@@ -136,7 +136,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         return await _dbContext
             .Departments.Where(d => ids.Contains(d.Id) && d.LifeCycle.DeletedAt == null)
             .ToListAsync(ct);
-    }        
+    }
 
     public async Task<IEnumerable<Department>> GetByIdArray(
         DepartmentsIdSet ids,
@@ -149,7 +149,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     public async Task Add(Department department, CancellationToken ct = default)
     {
         await _dbContext.Departments.AddAsync(department, ct);
-    }        
+    }
 
     /// <summary>
     /// Получение "разрешения" на передвижение подразделения в другое подразделение путем сравнения путей.
@@ -270,6 +270,20 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         }
 
         return department;
+    }    
+
+    public async Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath oldPath, CancellationToken ct)
+    {        
+        string refreshedPath = $"deleted_{oldPath.Value}";
+        string oldPathValue = oldPath.Value;
+        Guid id = department.Id.Value;
+        const string sql = """
+        UPDATE departments SET path = (@refreshed || '.' || (subpath(path, 1)::ltree)::text)::ltree 
+        WHERE path <@ @oldpath::ltree AND id != @id;
+        """;
+        CommandDefinition command = new(sql, new { oldPath = oldPathValue, refreshed = refreshedPath, id }, cancellationToken: ct);
+        DbConnection connection = _dbContext.Database.GetDbConnection();
+        await connection.ExecuteAsync(command);
     }
 
     /// <summary>

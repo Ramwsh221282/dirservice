@@ -20,6 +20,8 @@ public interface IDepartmentsRepository
     Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct);
     Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct);
 
+    Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath oldPath, CancellationToken ct);
+
     Task RefreshDepartmentChildPaths(
         Department department,
         DepartmentPath oldPath,
