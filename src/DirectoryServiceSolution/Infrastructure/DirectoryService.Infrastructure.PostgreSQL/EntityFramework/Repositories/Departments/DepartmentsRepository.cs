@@ -272,18 +272,20 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         return department;
     }    
 
-    public async Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath oldPath, CancellationToken ct)
+    public async Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath copy, CancellationToken ct)
     {        
-        string refreshedPath = $"deleted_{oldPath.Value}";
-        string oldPathValue = oldPath.Value;
-        Guid id = department.Id.Value;
-        const string sql = """
-        UPDATE departments SET path = (@refreshed || '.' || (subpath(path, 1)::ltree)::text)::ltree 
-        WHERE path <@ @oldpath::ltree AND id != @id;
-        """;
-        CommandDefinition command = new(sql, new { oldPath = oldPathValue, refreshed = refreshedPath, id }, cancellationToken: ct);
-        DbConnection connection = _dbContext.Database.GetDbConnection();
-        await connection.ExecuteAsync(command);
+        string refreshedPathString = department.Path.Value;
+        string oldPathString = copy.Value;
+        Guid id = department.Id.Value;        
+
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"
+        UPDATE
+            departments 
+        SET 
+            path = ({refreshedPathString}::text || '.' || (subpath(path, 1)::ltree)::text)::ltree 
+        WHERE 
+            path <@ {oldPathString}::ltree AND id != {id};", 
+            ct);
     }
 
     /// <summary>
