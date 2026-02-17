@@ -1,5 +1,4 @@
 using DirectoryService.Core.DeparmentsContext;
-using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Transaction;
@@ -44,20 +43,9 @@ public sealed class DeleteDepartmentHandler : ICommandHandler<Guid, DeleteDepart
             return archivation.Error;
         }        
 
-        Result locationsArchivation = await ArchiveLocationsOnlyOwnedByDepartment(department, ct);
-        if (locationsArchivation.IsFailure)
-        {
-            return locationsArchivation.Error;
-        }
-
-        Result positionsArchivation = await ArchivePositionsOnlyOwnedByDepartment(department, ct);
-        if (positionsArchivation.IsFailure)
-        {
-            return positionsArchivation.Error;
-        }
-
+        await ArchiveLocationsOnlyOwnedByDepartment(department, ct);        
+        await ArchivePositionsOnlyOwnedByDepartment(department, ct);        
         await _repository.RefreshDepartmentPathsFromDelete(department, copied, ct);
-
         Result saving = await _unitOfWork.SaveChanges(ct: ct);
         if (saving.IsFailure)
         {
@@ -79,31 +67,13 @@ public sealed class DeleteDepartmentHandler : ICommandHandler<Guid, DeleteDepart
         return department;
     }
 
-    private async Task<Result> ArchiveLocationsOnlyOwnedByDepartment(Department department, CancellationToken ct)
+    private async Task ArchiveLocationsOnlyOwnedByDepartment(Department department, CancellationToken ct)
     {        
-        foreach (DepartmentLocation loc in await _repository.GetSingleTimeAttachedDepartmentLocations(department, ct))
-        {
-            Result archivation = loc.Archive();
-            if (archivation.IsFailure)
-            {
-                return archivation.Error;
-            }
-        }
-
-        return Result.Success();
+        await _repository.DeleteSingleTimeAttachedDepartmentLocations(department, ct);
     }
 
-    private async Task<Result> ArchivePositionsOnlyOwnedByDepartment(Department department, CancellationToken ct)
+    private async Task ArchivePositionsOnlyOwnedByDepartment(Department department, CancellationToken ct)
     {
-        foreach (DepartmentPosition pos in await _repository.GetSingleTimeAttachedDepartmentPositions(department, ct))
-        {
-            Result archivation = pos.Archive();
-            if (archivation.IsFailure)
-            {
-                return archivation.Error;
-            }
-        }
-
-        return Result.Success();
+        await _repository.DeleteSingleTimeAttachedDepartmentPositions(department, ct);
     }
 }

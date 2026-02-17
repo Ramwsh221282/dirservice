@@ -22,71 +22,54 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     /// возвращает связанные локации, которые только один раз присоединялись к указанному по id подразделению.
     /// вернет пустой список, если локации присоединялись к другим подразделениим (т.е если куда-то еще присоединились)
     /// </summary>    
-    public async Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(DepartmentId id, CancellationToken ct)
+    public async Task DeleteSingleTimeAttachedDepartmentLocations(DepartmentId id, CancellationToken ct)
     {
-        Guid rawDepartmentId = id.Value;
-        return await _dbContext.DepartmentLocations.FromSqlInterpolated<DepartmentLocation>(@$"
-                SELECT dl.* FROM (
-                    WITH owned_department_locations AS (        
-                        SELECT * FROM department_locations dl 
-                        WHERE dl.department_id = {rawDepartmentId}
-                    )
-                    SELECT     
-                        odl.location_id    
-                    FROM 
-                        owned_department_locations odl
-                    JOIN LATERAL (
-                            SELECT 
-                                dl.department_id as department_id 
-                            FROM department_locations dl
-                            WHERE 
-                            dl.location_id = odl.location_id
-                            ) department_location_records ON TRUE
-                    GROUP BY odl.location_id
-                    HAVING COUNT(odl.location_id) = 1
-                    ) owned_locations
-                    JOIN department_locations dl ON dl.location_id = owned_locations.location_id")
-                    .ToListAsync(cancellationToken: ct);
+        Guid rawDepartmentId = id.Value;        
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync(@$"
+            DELETE FROM 
+                department_locations            
+            WHERE 
+                location_id IN (
+                SELECT odl.location_id    
+                FROM (
+                    SELECT * FROM department_locations dl 
+                WHERE 
+                    dl.department_id = {rawDepartmentId}
+            ) odl
+            GROUP BY odl.location_id
+            HAVING COUNT(*) = 1)", ct);        
     }
 
-    public Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct)
+    public Task DeleteSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct)
     {
-        return GetSingleTimeAttachedDepartmentLocations(department.Id, ct);
+        return DeleteSingleTimeAttachedDepartmentLocations(department.Id, ct);
     }
 
     /// <summary>
     /// возвращает связанные должности, которые только один раз присоединялись к указанному по id подразделению.
     /// вернет пустой список, если должности присоединялись к другим подразделениим (т.е если куда-то еще присоединились)
     /// </summary>    
-    public async Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(DepartmentId id, CancellationToken ct)
+    public async Task DeleteSingleTimeAttachedDepartmentPositions(DepartmentId id, CancellationToken ct)
     {
-        Guid rawDepartmentId = id.Value;
-        return await _dbContext.DepartmentPositions.FromSqlInterpolated<DepartmentPosition>(@$"
-                SELECT dp.* FROM (
-                    WITH owned_department_positions AS (        
-                        SELECT * FROM department_positions dp 
-                        WHERE dp.department_id = {rawDepartmentId}
-                    )
-                    SELECT     
-                        odp.position_id    
-                    FROM 
-                        owned_department_positions odp
-                    JOIN LATERAL (
-                        SELECT 
-                            dp.department_id as department_id 
-                        FROM department_positions dp
-                        WHERE dp.position_id = odp.position_id) 
-                        department_position_records ON TRUE
-                    GROUP BY odp.position_id
-                    HAVING COUNT(odp.position_id) = 1) owned_positions
-                    JOIN department_positions dp ON dp.position_id = owned_positions.position_id
-            ")
-            .ToListAsync(cancellationToken: ct);
+        Guid rawDepartmentId = id.Value;        
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync(@$"
+            DELETE FROM 
+                department_positions            
+            WHERE 
+                position_id IN (
+                SELECT odp.position_id    
+                FROM (
+                    SELECT * FROM department_positions dp 
+                WHERE 
+                    dp.department_id = {rawDepartmentId}
+            ) odp
+            GROUP BY odp.position_id
+            HAVING COUNT(*) = 1)", ct);   
     }
 
-    public Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct)
+    public Task DeleteSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct)
     {
-        return GetSingleTimeAttachedDepartmentPositions(department.Id, ct);
+        return DeleteSingleTimeAttachedDepartmentPositions(department.Id, ct);
     }
 
     public void Attach(Department department)
@@ -270,13 +253,13 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         }
 
         return department;
-    }    
+    }
 
     public async Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath copy, CancellationToken ct)
-    {        
+    {
         string refreshedPathString = department.Path.Value;
         string oldPathString = copy.Value;
-        Guid id = department.Id.Value;        
+        Guid id = department.Id.Value;
 
         await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"
         UPDATE
@@ -284,7 +267,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         SET 
             path = ({refreshedPathString}::text || '.' || (subpath(path, 1)::ltree)::text)::ltree 
         WHERE 
-            path <@ {oldPathString}::ltree AND id != {id};", 
+            path <@ {oldPathString}::ltree AND id != {id};",
             ct);
     }
 

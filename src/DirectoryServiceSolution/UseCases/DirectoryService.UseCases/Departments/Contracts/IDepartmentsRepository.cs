@@ -15,10 +15,10 @@ public interface IDepartmentsRepository
         CancellationToken ct = default
     );
 
-    Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(DepartmentId id, CancellationToken ct);
-    Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(DepartmentId id, CancellationToken ct);
-    Task<IReadOnlyList<DepartmentLocation>> GetSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct);
-    Task<IReadOnlyList<DepartmentPosition>> GetSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct);
+    Task DeleteSingleTimeAttachedDepartmentLocations(DepartmentId id, CancellationToken ct);
+    Task DeleteSingleTimeAttachedDepartmentPositions(DepartmentId id, CancellationToken ct);
+    Task DeleteSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct);
+    Task DeleteSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct);
 
     Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath oldPath, CancellationToken ct);
 
