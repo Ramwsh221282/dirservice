@@ -19,6 +19,7 @@ dotnet_diagnostic.CS0718.severity = none
 dotnet_diagnostic.CS9003.severity = none
 dotnet_diagnostic.IDE0039.severity = none
 dotnet_diagnostic.CA1851.severity = none
+dotnet_diagnostic.EF1002.severity = none
 
 # Remove unnecessary 'else'
 dotnet_diagnostic.rcs1211.severity = suggestion

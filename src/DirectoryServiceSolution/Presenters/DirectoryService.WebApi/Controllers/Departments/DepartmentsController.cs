@@ -4,6 +4,7 @@ using DirectoryService.Contracts.Departments.GetDepartmentsPopularity;
 using DirectoryService.Contracts.Departments.UpdateDepartment;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Departments.CreateDepartment;
+using DirectoryService.UseCases.Departments.DeleteDepartment;
 using DirectoryService.UseCases.Departments.GetDepartmentHierarchLazy;
 using DirectoryService.UseCases.Departments.GetDepartmentsPopularity;
 using DirectoryService.UseCases.Departments.GetHierarchicalDepartments.GetDepartmentsPrefetch;
@@ -44,6 +45,18 @@ public sealed class DepartmentsController : ControllerBase
         GetDepartmentHierarchyLazyQuery query = new(id);
         IEnumerable<LazyHierarchicalDepartmentDto> result = await handler.Handle(query, ct);
         return Results.Ok(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IResult> RemoveDepartment(
+        [FromRoute(Name = "id")] Guid id,
+        [FromServices] ICommandHandler<Guid, DeleteDepartmentCommand> handler,
+        CancellationToken ct
+    )
+    {
+        DeleteDepartmentCommand command = new(id);
+        Result<Guid> result = await handler.Handle(command, ct);
+        return result.FromResult(nameof(DeleteDepartmentCommand));
     }
 
     [HttpPut("{id:guid}/locations")]

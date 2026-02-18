@@ -64,7 +64,7 @@ public sealed class UpdateDepartmentLocationsCommandHandler
 
         Result<Department> department = await _departmentsRepository.GetById(
             command.DepartmentId,
-            ct
+            ct: ct
         );
         if (department.IsFailure)
         {

@@ -35,7 +35,7 @@ public sealed class LocationsSeeder : ISeeder
     private async Task SeedData()
     {
         List<Location> locationsToSeed = [];
-        LocationNameUniquesnessStub stub = new LocationNameUniquesnessStub(_context);
+        LocationNameUniquesnessStub stub = new(_context);
 
         var seedData = new[]
         {

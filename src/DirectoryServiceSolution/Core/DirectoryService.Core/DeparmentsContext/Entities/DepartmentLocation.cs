@@ -1,6 +1,7 @@
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
+using ResultLibrary;
 
 namespace DirectoryService.Core.DeparmentsContext.Entities;
 
@@ -22,5 +23,10 @@ public sealed class DepartmentLocation
         Location = location;
         DepartmentId = department.Id;
         LocationId = location.Id;
+    }
+
+    public Result Archive()
+    {
+        return Location.Archive();
     }
 }

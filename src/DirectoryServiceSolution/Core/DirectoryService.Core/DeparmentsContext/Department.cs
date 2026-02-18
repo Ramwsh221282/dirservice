@@ -141,6 +141,18 @@ public sealed class Department : ISoftDeletable
         return Result.Success();
     }
 
+    public Result Archive()
+    {
+        if (Deleted)
+        {
+            return Error.ConflictError("Нельзя архивировать уже архивированную запись.");
+        }
+
+        Path = Path.PathOfArchived();        
+        LifeCycle = LifeCycle.Delete();
+        return Result.Success();
+    }
+
     public Result AddPosition(Position position)
     {
         if (Deleted)

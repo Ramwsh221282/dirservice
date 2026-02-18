@@ -93,7 +93,7 @@ public sealed record EnvelopeTemplate<T> : EnvelopeTemplate
     {
         EnvelopeTemplate template = EnvelopeTemplate.FromResult(result, methodName);
         return result.IsFailure
-            ? new EnvelopeTemplate<T>(template)
+            ? new EnvelopeTemplate<T>(template) 
             : new EnvelopeTemplate<T>(result.Value, template.MethodName, template.Errors, template.TimeGenerated, template.OperationStatus);
     }
 }

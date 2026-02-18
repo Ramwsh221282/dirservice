@@ -1,6 +1,7 @@
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.Core.PositionsContext;
 using DirectoryService.Core.PositionsContext.ValueObjects;
+using ResultLibrary;
 
 namespace DirectoryService.Core.DeparmentsContext.Entities;
 
@@ -19,5 +20,10 @@ public sealed class DepartmentPosition
         Position = position;
         DepartmentId = department.Id;
         PositionId = position.Id;
+    }
+
+    public Result Archive()
+    {
+        return Position.Archive();
     }
 }

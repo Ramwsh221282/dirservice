@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Dapper;
 using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.UseCases.Departments.Contracts;
 using Microsoft.EntityFrameworkCore;
@@ -17,18 +18,77 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         _dbContext = dbContext;
     }
 
+    /// <summary>
+    /// возвращает связанные локации, которые только один раз присоединялись к указанному по id подразделению.
+    /// вернет пустой список, если локации присоединялись к другим подразделениим (т.е если куда-то еще присоединились)
+    /// </summary>    
+    public async Task DeleteSingleTimeAttachedDepartmentLocations(DepartmentId id, CancellationToken ct)
+    {
+        Guid rawDepartmentId = id.Value;        
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync(@$"
+            DELETE FROM 
+                department_locations            
+            WHERE 
+                location_id IN (
+                SELECT odl.location_id    
+                FROM (
+                    SELECT * FROM department_locations dl 
+                WHERE 
+                    dl.department_id = {rawDepartmentId}
+            ) odl
+            GROUP BY odl.location_id
+            HAVING COUNT(*) = 1)", ct);        
+    }
+
+    public Task DeleteSingleTimeAttachedDepartmentLocations(Department department, CancellationToken ct)
+    {
+        return DeleteSingleTimeAttachedDepartmentLocations(department.Id, ct);
+    }
+
+    /// <summary>
+    /// возвращает связанные должности, которые только один раз присоединялись к указанному по id подразделению.
+    /// вернет пустой список, если должности присоединялись к другим подразделениим (т.е если куда-то еще присоединились)
+    /// </summary>    
+    public async Task DeleteSingleTimeAttachedDepartmentPositions(DepartmentId id, CancellationToken ct)
+    {
+        Guid rawDepartmentId = id.Value;        
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync(@$"
+            DELETE FROM 
+                department_positions            
+            WHERE 
+                position_id IN (
+                SELECT odp.position_id    
+                FROM (
+                    SELECT * FROM department_positions dp 
+                WHERE 
+                    dp.department_id = {rawDepartmentId}
+            ) odp
+            GROUP BY odp.position_id
+            HAVING COUNT(*) = 1)", ct);   
+    }
+
+    public Task DeleteSingleTimeAttachedDepartmentPositions(Department department, CancellationToken ct)
+    {
+        return DeleteSingleTimeAttachedDepartmentPositions(department.Id, ct);
+    }
+
     public void Attach(Department department)
     {
         _dbContext.Departments.Attach(department);
     }
 
-    public async Task<Result<Department>> GetById(Guid id, CancellationToken ct = default)
+    public async Task<Result<Department>> GetById(Guid id, bool useLock = false, CancellationToken ct = default)
     {
         Result<DepartmentId> departmentId = DepartmentId.Create(id);
-        return departmentId.IsFailure ? departmentId.Error : await GetById(departmentId, ct);
+        if (departmentId.IsFailure)
+        {
+            return departmentId.Error;
+        }
+
+        return await GetById(departmentId.Value, useLock, ct);
     }
 
-    public async Task<Result<Department>> GetById(DepartmentId id, CancellationToken ct = default)
+    public async Task<Result<Department>> GetById(DepartmentId id, bool useLock = false, CancellationToken ct = default)
     {
         Department? department = await _dbContext
             .Departments.Include(d => d.Locations)
@@ -38,9 +98,17 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
                 cancellationToken: ct
             );
 
-        return department == null
-            ? Error.NotFoundError($"Подразделения с ID - {id.Value} не существует.")
-            : department;
+        if (department is null)
+        {
+            return Error.NotFoundError($"Подразделения с ID - {id.Value} не существует.");
+        }
+
+        if (useLock)
+        {
+            await BlockDepartment(id.Value);
+        }
+
+        return department;
     }
 
     public async Task<IEnumerable<Department>> GetByIdArray(
@@ -51,7 +119,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         return await _dbContext
             .Departments.Where(d => ids.Contains(d.Id) && d.LifeCycle.DeletedAt == null)
             .ToListAsync(ct);
-    }        
+    }
 
     public async Task<IEnumerable<Department>> GetByIdArray(
         DepartmentsIdSet ids,
@@ -64,7 +132,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     public async Task Add(Department department, CancellationToken ct = default)
     {
         await _dbContext.Departments.AddAsync(department, ct);
-    }        
+    }
 
     /// <summary>
     /// Получение "разрешения" на передвижение подразделения в другое подразделение путем сравнения путей.
@@ -92,8 +160,8 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         CancellationToken ct = default
     )
     {
-        await BlockDepartmentForMovement(parentId.Value);
-        await BlockDepartmentForMovement(childId.Value);
+        await BlockDepartment(parentId.Value);
+        await BlockDepartment(childId.Value);
 
         Department? ancestor = await _dbContext.Departments.FirstOrDefaultAsync(
             d => d.Id == parentId,
@@ -187,6 +255,22 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
         return department;
     }
 
+    public async Task RefreshDepartmentPathsFromDelete(Department department, DepartmentPath copy, CancellationToken ct)
+    {
+        string refreshedPathString = department.Path.Value;
+        string oldPathString = copy.Value;
+        Guid id = department.Id.Value;
+
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"
+        UPDATE
+            departments 
+        SET 
+            path = ({refreshedPathString}::text || '.' || (subpath(path, 1)::ltree)::text)::ltree 
+        WHERE 
+            path <@ {oldPathString}::ltree AND id != {id};",
+            ct);
+    }
+
     /// <summary>
     /// Обовление путей у дочерних подразделений для подразделения, которое переносится в другое подразделение на основи копии предыдущего пути.
     /// </summary>
@@ -225,7 +309,7 @@ public sealed class DepartmentsRepository : IDepartmentsRepository
     /// <summary>
     /// Блокирование подразделения и его детей, чтобы безопасно выполнить перенос подразделения в другое подразделение.
     /// </summary>
-    private async Task BlockDepartmentForMovement(Guid id)
+    private async Task BlockDepartment(Guid id)
     {
         DbConnection connection = _dbContext.Database.GetDbConnection();
         const string sql = """
