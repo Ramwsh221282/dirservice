@@ -6,6 +6,16 @@
 # dotenv files
 .env
 
+.zed/
+.zed/*
+**/.zed/*
+**/.zed/
+
+.config/
+.config/*
+**/.config/*
+**/.config/
+
 .idea/
 .idea
 *.idea
