@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DirectoryService.Contracts.Locations;
 using DirectoryService.Infrastructure.PostgreSQL.Database;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
@@ -12,7 +11,6 @@ using DirectoryService.UseCases.Common.Transaction;
 using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
-using DirectoryService.UseCases.Locations.GetLocations;
 using DirectoryService.UseCases.Positions.Contracts;
 using FluentValidation;
 

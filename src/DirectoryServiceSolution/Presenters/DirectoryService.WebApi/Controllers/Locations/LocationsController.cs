@@ -2,6 +2,7 @@ using DirectoryService.Contracts.Locations.CreateLocation;
 using DirectoryService.Contracts.Locations.GetLocations;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Locations.CreateLocation;
+using DirectoryService.UseCases.Locations.GetLocation;
 using DirectoryService.UseCases.Locations.GetLocations;
 using DirectoryService.WebApi.Filters;
 using Microsoft.AspNetCore.Mvc;
@@ -51,5 +52,17 @@ public sealed class LocationsController : ControllerBase
         );
         GetLocationsResponse response = await handler.Handle(query, ct);
         return Results.Ok(response);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IResult> GetLocation(
+        [FromRoute] Guid id,
+        [FromServices] IQueryHandler<GetLocationQuery, GetLocationQueryResponse?> handler,
+        CancellationToken ct
+    )
+    {
+        GetLocationQuery query = new(id);
+        GetLocationQueryResponse? response = await handler.Handle(query, ct);
+        return response is null ? Results.NotFound() : Results.Ok(response);
     }
 }
