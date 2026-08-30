@@ -1,3 +1,5 @@
+using DirectoryService.Infrastructure.Identity.Configuration;
+
 public sealed class DatabaseConfig
 {
     public const string HostNameKey = "DB_HOST";
@@ -48,11 +50,18 @@ public sealed class ApplicationConfig
 
     public SeedConfig Seed { get; }
 
-    private ApplicationConfig(DatabaseConfig database, SeqConfig seq, SeedConfig seed)
+    public IdentityConfig Identity { get; }
+
+    private ApplicationConfig(
+        DatabaseConfig database,
+        SeqConfig seq,
+        SeedConfig seed,
+        IdentityConfig identity)
     {
         Database = database;
         Seq = seq;
         Seed = seed;
+        Identity = identity;
     }
 
     public static ApplicationConfig CreateFromEnvironment()
@@ -87,7 +96,7 @@ public sealed class ApplicationConfig
             throw new ApplicationException(string.Format("{0} is not specified in environment variables", DatabaseConfig.DatabaseNameKey));
         }
 
-        string seqHost = Environment.GetEnvironmentVariable(SeqConfig.HostKey);
+        string? seqHost = Environment.GetEnvironmentVariable(SeqConfig.HostKey);
         if (string.IsNullOrWhiteSpace(seqHost))
         {
             throw new ApplicationException(string.Format("{0} is not specified in environment variables", SeqConfig.HostKey));
@@ -95,10 +104,12 @@ public sealed class ApplicationConfig
 
         bool useSeed = Environment.GetEnvironmentVariable(SeedConfig.Key)?.ToLower() == "true";
 
+        IdentityConfig identity = IdentityConfig.CreateFromEnvironment();
+
         DatabaseConfig config = new(hostName, port, userName, password, databaseName);
         SeqConfig seq = new(seqHost);
         SeedConfig seed = new(useSeed);
-        return new ApplicationConfig(config, seq, seed);
+        return new ApplicationConfig(config, seq, seed, identity);
     }
 
     public static ApplicationConfig CreateFromEnvFile(string path)
@@ -112,13 +123,41 @@ public sealed class ApplicationConfig
         DatabaseConfig database = CreateDbConfiguration(configuration);
         SeqConfig seq = CreateSeqConfiguration(configuration);
         SeedConfig seed = CreateSeedConfiguration(configuration);
-        return new ApplicationConfig(database, seq, seed);
+        IdentityConfig identity = CreateIdentityConfiguration(configuration);
+        return new ApplicationConfig(database, seq, seed, identity);
     }
 
     private static SeedConfig CreateSeedConfiguration(Dictionary<string, string> configuration)
     {
         bool useSeed = configuration.ContainsKey(SeedConfig.Key) && configuration[SeedConfig.Key].ToLower() == "true";
         return new SeedConfig(useSeed);
+    }
+
+    private static IdentityConfig CreateIdentityConfiguration(Dictionary<string, string> configuration)
+    {
+        if (!configuration.ContainsKey(IdentityConfig.JwtHashKeyKey))
+        {
+            throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.JwtHashKeyKey));
+        }
+
+        if (!configuration.ContainsKey(IdentityConfig.IdentityDbConnectionStringKey))
+        {
+            throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.IdentityDbConnectionStringKey));
+        }
+
+        string jwtHashkey = configuration[IdentityConfig.JwtHashKeyKey];
+        if (string.IsNullOrWhiteSpace(jwtHashkey))
+        {
+            throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.JwtHashKeyKey));
+        }
+
+        string identityDbConnectionString = configuration[IdentityConfig.IdentityDbConnectionStringKey];
+        if (string.IsNullOrWhiteSpace(identityDbConnectionString))
+        {
+            throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.IdentityDbConnectionStringKey));
+        }
+
+        return new IdentityConfig(jwtHashkey, identityDbConnectionString);
     }
 
     private static SeqConfig CreateSeqConfiguration(Dictionary<string, string> configuration)

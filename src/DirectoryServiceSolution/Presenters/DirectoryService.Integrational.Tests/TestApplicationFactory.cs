@@ -29,9 +29,7 @@ public class TestApplicationFactory : WebApplicationFactory<Program>, IAsyncLife
         {
             sp.RemoveAll<ServiceDbContext>();
             string connectionString = _dbContainer.GetConnectionString();
-            IOptions<NpgSqlConnectionOptions> options = Options.Create(
-                new NpgSqlConnectionOptions() { ConnectionString = connectionString }
-            );
+            NpgSqlConnectionOptions options = new() { ConnectionString = connectionString };
             ILoggerFactory loggerFactory = new SerilogLoggerFactory();
             sp.AddScoped<ServiceDbContext>(_ => new ServiceDbContext(options, loggerFactory));
         });

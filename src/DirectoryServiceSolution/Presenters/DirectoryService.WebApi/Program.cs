@@ -1,3 +1,4 @@
+using DirectoryService.Infrastructure.Identity.DependencyInjection;
 using DirectoryService.Infrastructure.PostgreSQL.Seeding;
 using DirectoryService.WebApi.Configurations;
 using DirectoryService.WebApi.DependencyInjection;
@@ -42,6 +43,8 @@ builder.Services.AddSingleton<SeqConfig>(config.Seq);
 builder.AddSeqLogging(config);
 builder.InjectInfrastructureLayers(config);
 builder.InjectUseCaseLayer();
+builder.AddIdentity(config);
+builder.Services.EnsureIdentitySchemaCreated();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

@@ -22,6 +22,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\DirectoryService.Infrastructure.Identity\DirectoryService.Infrastructure.Identity.csproj" />
     <ProjectReference Include="..\..\Infrastructure\DirectoryService.Infrastructure.PostgreSQL\DirectoryService.Infrastructure.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\Contracts\DirectoryService.Contracts\DirectoryService.Contracts.csproj" />
     <ProjectReference Include="..\..\UtilityLibraries\ResultLibrary.AspNetCore\ResultLibrary.AspNetCore.csproj" />

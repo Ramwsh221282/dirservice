@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResultLibrary", "UtilityLib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResultLibrary.AspNetCore", "UtilityLibraries\ResultLibrary.AspNetCore\ResultLibrary.AspNetCore.csproj", "{C79EF114-29E0-4714-93BE-A47BCE793E54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Infrastructure.Identity", "Infrastructure\DirectoryService.Infrastructure.Identity\DirectoryService.Infrastructure.Identity.csproj", "{78A5EF05-52B5-4857-8012-72D04CE3E2F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,18 @@ Global
 		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x64.Build.0 = Release|Any CPU
 		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x86.ActiveCfg = Release|Any CPU
 		{C79EF114-29E0-4714-93BE-A47BCE793E54}.Release|x86.Build.0 = Release|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Debug|x64.Build.0 = Debug|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Debug|x86.Build.0 = Debug|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Release|x64.ActiveCfg = Release|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Release|x64.Build.0 = Release|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Release|x86.ActiveCfg = Release|Any CPU
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -165,5 +179,6 @@ Global
 		{9EA9AB60-FAA8-41D5-BF4E-7AED22682AF8} = {E4546324-3847-858E-0144-6DBA837604EB}
 		{1EA369CD-007D-444E-83CE-C9693FE99FA7} = {1A6AE1B8-27DE-8B63-4072-4ECAA2734F07}
 		{C79EF114-29E0-4714-93BE-A47BCE793E54} = {1A6AE1B8-27DE-8B63-4072-4ECAA2734F07}
+		{78A5EF05-52B5-4857-8012-72D04CE3E2F5} = {96A8A59A-C5D9-D438-0347-CE95BA874BBD}
 	EndGlobalSection
 EndGlobal
