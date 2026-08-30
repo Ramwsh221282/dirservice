@@ -59,8 +59,8 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<Guid, Creat
         if (command.ParentId != null)
         {
             Result<Department> parentResult = await _departmentsRepository.GetById(
-                command.ParentId.Value, ct: ct                
-            );            
+                command.ParentId.Value, ct: ct
+            );
             if (parentResult.IsFailure)
             {
                 return parentResult.Error;

@@ -9,18 +9,9 @@ public sealed class LoggingSeqConfiguration
 
 public static class LoggingSeqConfigurationExtension
 {
-    public static void AddSeqLogging(this WebApplicationBuilder builder)
+    public static void AddSeqLogging(this WebApplicationBuilder builder, ApplicationConfig config)
     {
-        IConfigurationSection section = builder.Configuration.GetSection(
-            nameof(LoggingSeqConfiguration)
-        );
-        IConfigurationSection hostSection = section.GetSection("Host");
-        string? host = hostSection.Value;
-        if (string.IsNullOrWhiteSpace(host))
-        {
-            throw new ApplicationException("Seq hostname was not provided.");
-        }
-
+        string host = config.Seq.Host;
         Serilog.ILogger logger = new LoggerConfiguration()
             .WriteTo.Console()
             .WriteTo.Debug()

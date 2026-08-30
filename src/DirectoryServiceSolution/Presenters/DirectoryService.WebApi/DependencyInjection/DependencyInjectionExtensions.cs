@@ -28,11 +28,16 @@ public static class DependencyInjectionExtensions
         builder.Services.AddValidatorsFromAssembly(typeof(ICommand).Assembly);
     }
 
-    public static void InjectInfrastructureLayers(this WebApplicationBuilder builder)
+    public static void InjectInfrastructureLayers(this WebApplicationBuilder builder, ApplicationConfig config)
     {
-        builder
-            .Services.AddOptions<NpgSqlConnectionOptions>()
-            .Bind(builder.Configuration.GetSection(nameof(NpgSqlConnectionOptions)));
+        string connectionString = string.Format("Host={0};Port={1};Username={2};Password={3};Database={4}",
+            config.Database.HostName,
+            config.Database.Port,
+            config.Database.UserName,
+            config.Database.Password,
+            config.Database.DatabaseName);
+        NpgSqlConnectionOptions options = new() { ConnectionString = connectionString };
+        builder.Services.AddSingleton<NpgSqlConnectionOptions>(options);
         builder.Services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
         builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
         builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();

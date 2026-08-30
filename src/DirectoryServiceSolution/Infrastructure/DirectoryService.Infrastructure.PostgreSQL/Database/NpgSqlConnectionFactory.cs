@@ -2,7 +2,6 @@
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Database;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.Database;
@@ -11,13 +10,9 @@ public sealed class NpgSqlConnectionFactory : IDbConnectionFactory, IAsyncDispos
 {
     private readonly NpgsqlDataSource _dataSource;
 
-    public NpgSqlConnectionFactory(
-        IOptions<NpgSqlConnectionOptions> connectionOptions,
-        ILoggerFactory loggerFactory
-    )
+    public NpgSqlConnectionFactory(NpgSqlConnectionOptions connectionOptions, ILoggerFactory loggerFactory)
     {
-        NpgSqlConnectionOptions options = connectionOptions.Value;
-        _dataSource = new NpgsqlDataSourceBuilder(options.ConnectionString)
+        _dataSource = new NpgsqlDataSourceBuilder(connectionOptions.ConnectionString)
             .UseLoggerFactory(loggerFactory)
             .Build();
     }

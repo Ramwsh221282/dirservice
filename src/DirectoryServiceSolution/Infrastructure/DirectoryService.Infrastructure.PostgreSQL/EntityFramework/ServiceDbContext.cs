@@ -5,19 +5,18 @@ using DirectoryService.Core.PositionsContext;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
 
 public sealed class ServiceDbContext : DbContext
 {
-    private readonly NpgSqlConnectionOptions _options;
+    private readonly string _connectionString;
     private readonly ILoggerFactory _loggerFactory;
 
-    public ServiceDbContext(IOptions<NpgSqlConnectionOptions> options, ILoggerFactory loggerFactory)
+    public ServiceDbContext(NpgSqlConnectionOptions options, ILoggerFactory loggerFactory)
     {
-        _options = options.Value;
+        _connectionString = options.ConnectionString;
         _loggerFactory = loggerFactory;
     }
 
@@ -29,7 +28,7 @@ public sealed class ServiceDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_options.ConnectionString);
+        optionsBuilder.UseNpgsql(_connectionString);
         optionsBuilder.UseLoggerFactory(_loggerFactory);
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder.EnableDetailedErrors();
