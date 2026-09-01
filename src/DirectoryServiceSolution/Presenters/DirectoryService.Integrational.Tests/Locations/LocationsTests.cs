@@ -3,13 +3,25 @@ using ResultLibrary;
 
 namespace DirectoryService.Integrational.Tests.Locations;
 
-public class LocationsTests : IClassFixture<TestApplicationFactory>
+public class LocationsTests : IClassFixture<TestApplicationFactory>, IAsyncLifetime
 {
+    private readonly TestApplicationFactory _factory;
     private readonly LocationsTestsHelper _helper;
 
     public LocationsTests(TestApplicationFactory factory)
     {
+        _factory = factory;
         _helper = new LocationsTestsHelper(factory);
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _factory.ResetDatabase();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -19,7 +31,6 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         string timeZone = "Big/City";
         IEnumerable<string> additionals =
         [
-            "Ленинградская область",
             "г. Санкт-Петербург",
             "проспект Невский",
             "д. 25",
@@ -43,7 +54,6 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         string timeZone = "Big/City";
         IEnumerable<string> addressParts =
         [
-            "Ленинградская область",
             "г. Санкт-Петербург",
             "проспект Невский",
             "д. 25",
@@ -68,7 +78,6 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         string timeZone = "Big/City";
         IEnumerable<string> addressParts =
         [
-            "Ленинградская область",
             "г. Санкт-Петербург",
             "проспект Невский",
             "д. 25",
@@ -84,7 +93,6 @@ public class LocationsTests : IClassFixture<TestApplicationFactory>
         string name = "Test Location";
         IEnumerable<string> addressParts =
         [
-            "Ленинградская область",
             "г. Санкт-Петербург",
             "проспект Невский",
             "д. 25",

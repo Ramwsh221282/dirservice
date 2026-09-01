@@ -1,28 +1,53 @@
-version: "3.8"
-
 services:
-    database:
-        image: postgres:latest
-        environment:
-            POSTGRES_DB: database
-            POSTGRES_USER: user
-            POSTGRES_PASSWORD: password
-        restart: always
-        ports:
-            - "5432:5432"
-        volumes:
-            - pgdata:/var/lib/postgresql
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: database
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-    seq:
-        image: datalust/seq:latest
-        container_name: seq
-        restart: always
-        environment:
-            - ACCEPT_EULA=Y
-            - SEQ_FIRSTRUN_ADMINPASSWORD=123456
-        ports:
-            - 5341:5341
-            - 8081:80
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=123456
+    ports:
+      - 5341:5341
+      - 8081:80
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: development
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USERNAME: user
+      DB_PASSWORD: password
+      DB_DATABASE: database
+      SEQ_HOST: http://seq:5341
+      USE_SEED: "true"
+      JWT_HASH_KEY: docker-compose-jwt-hash-key-change-me-0123456789
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:8082
+    ports:
+      - "5000:8080"
 
 volumes:
-    pgdata:
+  pgdata:

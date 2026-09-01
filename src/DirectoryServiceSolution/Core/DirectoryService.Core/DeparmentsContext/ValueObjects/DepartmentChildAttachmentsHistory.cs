@@ -1,7 +1,4 @@
-﻿using System.Text.Json;
-using ResultLibrary;
-
-namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
+﻿namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
 
 public sealed record DepartmentChildAttachmentsHistory
 {
@@ -38,7 +35,7 @@ public sealed record DepartmentChildAttachmentsHistory
     public bool IsAttached(DepartmentId departmentId)
     {
         return _attachments.Any(a => a.Id == departmentId);
-    }        
+    }
 
     public bool IsAttached(Department department)
     {
@@ -48,27 +45,5 @@ public sealed record DepartmentChildAttachmentsHistory
     public static DepartmentChildAttachmentsHistory Empty()
     {
         return new();
-    }
-
-    public static DepartmentChildAttachmentsHistory FromJson(string json)
-    {
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement attachmentsJson = document.RootElement.GetProperty(nameof(Attachments));
-
-        List<DepartmentChildAttachment> attachments = [];
-
-        foreach (JsonElement entry in attachmentsJson.EnumerateArray())
-        {
-            Result<DepartmentChildAttachment> attachment = DepartmentChildAttachment.FromJson(entry);
-            if (attachment.IsFailure)
-            {
-                string message = $"Некорректный JSON для {nameof(DepartmentChildAttachment)}";
-                throw new ApplicationException(message);
-            }
-
-            attachments.Add(attachment);
-        }
-
-        return new DepartmentChildAttachmentsHistory(attachments);
     }
 }

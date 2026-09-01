@@ -2,9 +2,7 @@
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Locations.Contracts;
 using DirectoryService.UseCases.Locations.CreateLocation;
-using DirectoryService.WebApi;
 using DirectoryService.WebApi.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
 
@@ -19,10 +17,6 @@ public sealed class LocationsTestsHelper
         _services = factory.Services;
     }
 
-    public LocationsTestsHelper(WebApplicationFactory<Program> factory)
-    {
-        _services = factory.Services;
-    }
 
     public async Task<Result<Guid>> CreateNewLocation(
         string name,

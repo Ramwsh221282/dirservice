@@ -19,22 +19,24 @@ public sealed record DepartmentName
         if (string.IsNullOrWhiteSpace(value))
         {
             string message = "Название подразделения не может быть пустым";
-            return Error.ValidationError(message); 
+            return Error.ValidationError(message);
         }
-        
-        
-        if (value.LessThan(MinLength))
+
+
+        string formatted = value.Trim();
+
+        if (formatted.LessThan(MinLength))
         {
             string message = $"Название подразделения не может быть менее {MinLength} символов";
             return Error.ValidationError(message);
         }
-        
-        if (value.GreaterThan(MaxLength))
+
+        if (formatted.GreaterThan(MaxLength))
         {
             string message = $"Название подразделения не может быть более {MaxLength} символов";
             return Error.ValidationError(message);
         }
-        
-        return new DepartmentName(value);
+
+        return new DepartmentName(formatted);
     }
 }

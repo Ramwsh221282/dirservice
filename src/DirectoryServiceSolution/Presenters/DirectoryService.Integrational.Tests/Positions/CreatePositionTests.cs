@@ -1,20 +1,33 @@
-﻿using DirectoryService.Integrational.Tests.Departments;
+﻿using DirectoryService.Core.DeparmentsContext.Entities;
+using DirectoryService.Integrational.Tests.Departments;
 using DirectoryService.Integrational.Tests.Locations;
 using ResultLibrary;
 
 namespace DirectoryService.Integrational.Tests.Positions;
 
-public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>
+public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>, IAsyncLifetime
 {
+    private readonly TestApplicationFactory _factory;
     private readonly DepartmentsTestsHelper _departments;
     private readonly LocationsTestsHelper _locations;
     private readonly PositionsTestsHelper _positions;
 
     public CreatePositionTests(TestApplicationFactory factory)
     {
+        _factory = factory;
         _departments = new DepartmentsTestsHelper(factory);
         _locations = new LocationsTestsHelper(factory);
         _positions = new PositionsTestsHelper(factory);
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _factory.ResetDatabase();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -24,9 +37,9 @@ public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>
         const string expectedDepartmentIdentifier = "test-identifier";
 
         Result<Guid> createLocationFirst =
-            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Test", "Location", "First"]);
+            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]);
         Result<Guid> createLocationSecond =
-            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Test", "Location", "Second"]);
+            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Московская область", "г. Химки", "проспект Мира", "д. 2"]);
 
         Assert.True(createLocationFirst.IsSuccess);
         Assert.True(createLocationSecond.IsSuccess);
@@ -57,9 +70,9 @@ public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>
         const string expectedDepartmentIdentifier = "test-identifier";
 
         Result<Guid> createLocationFirst =
-            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Test", "Location", "First"]);
+            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]);
         Result<Guid> createLocationSecond =
-            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Test", "Location", "Second"]);
+            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Московская область", "г. Химки", "проспект Мира", "д. 2"]);
 
         Assert.True(createLocationFirst.IsSuccess);
         Assert.True(createLocationSecond.IsSuccess);
@@ -110,9 +123,9 @@ public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>
         const string expectedDepartmentIdentifier = "test-identifier";
 
         Result<Guid> createLocationFirst =
-            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Test", "Location", "First"]);
+            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]);
         Result<Guid> createLocationSecond =
-            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Test", "Location", "Second"]);
+            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Московская область", "г. Химки", "проспект Мира", "д. 2"]);
 
         Assert.True(createLocationFirst.IsSuccess);
         Assert.True(createLocationSecond.IsSuccess);
@@ -134,6 +147,16 @@ public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>
             await _positions.CreateNewPosition("Test Position Name", "Test Position Description", createdDepartmentIds);
 
         Assert.True(createPosition.IsSuccess);
+
+        IEnumerable<DepartmentPosition> departmentPositions =
+            await _positions.GetDepartmentPositions(createPosition);
+
+        Assert.Equal(createdDepartmentIds.Length, departmentPositions.Count());
+        Assert.True(
+            departmentPositions.All(dp =>
+                createdDepartmentIds.Any(id => id == dp.DepartmentId.Value)
+            )
+        );
     }
 
     [Fact]
@@ -143,9 +166,9 @@ public sealed class CreatePositionTests : IClassFixture<TestApplicationFactory>
         const string expectedDepartmentIdentifier = "test-identifier";
 
         Result<Guid> createLocationFirst =
-            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Test", "Location", "First"]);
+            await _locations.CreateNewLocation("Test Location First", "Test/Location", ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]);
         Result<Guid> createLocationSecond =
-            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Test", "Location", "Second"]);
+            await _locations.CreateNewLocation("Test Location Second", "Test/Location", ["Московская область", "г. Химки", "проспект Мира", "д. 2"]);
 
         Assert.True(createLocationFirst.IsSuccess);
         Assert.True(createLocationSecond.IsSuccess);

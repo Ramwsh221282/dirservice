@@ -21,7 +21,7 @@ public sealed record PositionName
             return Error.ValidationError($"Наименование должности не должно быть пустым.");
         }
 
-        string formatted = value.FormatForName();
+        string formatted = value.Trim();
         if (formatted.GreaterThan(MaxLength))
         {
             return Error.ValidationError($"Наименование превышает длину {MaxLength} символов.");
@@ -32,6 +32,6 @@ public sealed record PositionName
             return Error.ValidationError($"Наименование менее {MinLength} символов.");
         }
 
-        return new PositionName(value);
+        return new PositionName(formatted);
     }
 }

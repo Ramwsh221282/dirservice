@@ -4,15 +4,27 @@ using ResultLibrary;
 
 namespace DirectoryService.Integrational.Tests.Departments;
 
-public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory>
+public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory>, IAsyncLifetime
 {
+    private readonly TestApplicationFactory _factory;
     private readonly DepartmentsTestsHelper _departmentsHelper;
     private readonly LocationsTestsHelper _locationsHelper;
 
     public CreateDepartmentTests(TestApplicationFactory factory)
     {
+        _factory = factory;
         _departmentsHelper = new DepartmentsTestsHelper(factory);
         _locationsHelper = new LocationsTestsHelper(factory);
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _factory.ResetDatabase();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -28,13 +40,13 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
         Result<Guid> firstLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location First",
             "Test/Location",
-            ["Test", "Location", "First"]
+            ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]
         );
 
         Result<Guid> secondLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location Second",
             "Test/Location",
-            ["Test", "Location", "Second"]
+            ["Московская область", "г. Химки", "проспект Мира", "д. 2"]
         );
 
         Assert.True(firstLocationId.IsSuccess);
@@ -71,13 +83,13 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
         Result<Guid> firstLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location First",
             "Test/Location",
-            ["Test", "Location", "First"]
+            ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]
         );
 
         Result<Guid> secondLocation = await _locationsHelper.CreateNewLocation(
             "Test Location Second",
             "Test/Location",
-            ["Test", "Location", "Second"]
+            ["Московская область", "г. Химки", "проспект Мира", "д. 2"]
         );
 
 
@@ -119,13 +131,13 @@ public sealed class CreateDepartmentTests : IClassFixture<TestApplicationFactory
         Result<Guid> firstLocationId = await _locationsHelper.CreateNewLocation(
             "Test Location First",
             "Test/Location",
-            ["Test", "Location", "First"]
+            ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]
         );
 
         Result<Guid> secondLocation = await _locationsHelper.CreateNewLocation(
             "Test Location Second",
             "Test/Location",
-            ["Test", "Location", "Second"]
+            ["Московская область", "г. Химки", "проспект Мира", "д. 2"]
         );
 
         Assert.True(firstLocationId.IsSuccess);

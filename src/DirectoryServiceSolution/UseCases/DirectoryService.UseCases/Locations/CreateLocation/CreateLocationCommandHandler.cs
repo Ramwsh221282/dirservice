@@ -2,7 +2,7 @@ using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Extensions;
-using DirectoryService.UseCases.Common.UnitOfWork;
+using DirectoryService.UseCases.Common.Transaction;
 using DirectoryService.UseCases.Locations.Contracts;
 using FluentValidation;
 using FluentValidation.Results;
@@ -15,20 +15,20 @@ public sealed class CreateLocationCommandHandler : ICommandHandler<Guid, CreateL
 {
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILocationsRepository _repository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransactionSource _transactionSource;
     private readonly ILogger _logger;
 
     public CreateLocationCommandHandler(
         ILocationsRepository repository,
+        ITransactionSource transactionSource,
         ILogger logger,
-        IUnitOfWork unitOfWork,
         IValidator<CreateLocationCommand> validator
     )
     {
         _repository = repository;
+        _transactionSource = transactionSource;
         _logger = logger.ForContext<CreateLocationCommandHandler>();
         _validator = validator;
-        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -42,6 +42,8 @@ public sealed class CreateLocationCommandHandler : ICommandHandler<Guid, CreateL
             return validationResult.AsFailureResult<Guid>();
         }
 
+        await using ITransactionScope transaction = await _transactionSource.ReceiveTransaction(ct);
+
         LocationAddress address = LocationAddress.Create(command.AddressParts);
         LocationName name = LocationName.Create(command.Name);
         LocationTimeZone timeZone = LocationTimeZone.Create(command.TimeZone);
@@ -53,13 +55,13 @@ public sealed class CreateLocationCommandHandler : ICommandHandler<Guid, CreateL
             _logger.Error("Error: {Err}", location.Error.Message);
             return location.Error;
         }
-        
+
         await _repository.AddLocation(location, ct);
-        Result result = await _unitOfWork.SaveChanges(ct);
-        if (result.IsFailure)
+
+        Result committing = await transaction.CommitChanges(nameof(CreateLocationCommand), ct);
+        if (committing.IsFailure)
         {
-            _logger.Error("Error: {Err}", result.Error.Message);
-            return result.Error;
+            return committing.Error;
         }
 
         _logger.Information("Создана локация: {Id} - {Name}", location.Value.Id.Value, command.Name);

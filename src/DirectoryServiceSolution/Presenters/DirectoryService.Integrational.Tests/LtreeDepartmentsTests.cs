@@ -5,15 +5,27 @@ using ResultLibrary;
 
 namespace DirectoryService.Integrational.Tests;
 
-public sealed class LtreeDepartmentsTests : IClassFixture<RealDatabaseTestApplicationFactory>
+public sealed class LtreeDepartmentsTests : IClassFixture<TestApplicationFactory>, IAsyncLifetime
 {
+    private readonly TestApplicationFactory _factory;
     private readonly DepartmentsTestsHelper _departmentsTests;
     private readonly LocationsTestsHelper _locationsTests;
 
-    public LtreeDepartmentsTests(RealDatabaseTestApplicationFactory factory)
+    public LtreeDepartmentsTests(TestApplicationFactory factory)
     {
+        _factory = factory;
         _departmentsTests = new DepartmentsTestsHelper(factory);
         _locationsTests = new LocationsTestsHelper(factory);
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _factory.ResetDatabase();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -21,7 +33,7 @@ public sealed class LtreeDepartmentsTests : IClassFixture<RealDatabaseTestApplic
     {
         (Guid aId, Guid bId, Guid cId, Guid dId, Guid eId) = await CreateDepartmentFamily();
 
-        Result<Guid> moving = await _departmentsTests.MoveDepartment(aId,dId);
+        Result<Guid> moving = await _departmentsTests.MoveDepartment(aId, dId);
         Assert.True(moving.IsSuccess);
 
         Department changedResult = await _departmentsTests.GetDepartment(dId);
@@ -48,7 +60,7 @@ public sealed class LtreeDepartmentsTests : IClassFixture<RealDatabaseTestApplic
         Guid locationId = await _locationsTests.CreateNewLocation(
             "Test Location",
             "Test/Location",
-            ["Some", "Big", "City"]
+            ["Ленинградская область", "г. Всеволожск", "улица Ленина", "д. 1"]
         );
         Guid aId = await _departmentsTests.CreateNewDepartment(
             "Department A",

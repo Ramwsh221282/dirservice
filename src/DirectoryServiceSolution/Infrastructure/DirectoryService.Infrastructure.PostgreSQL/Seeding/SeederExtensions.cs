@@ -1,4 +1,5 @@
-﻿using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+﻿using System.Data;
+using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.Seeding;
@@ -7,7 +8,7 @@ public static class SeederExtensions
 {
     public static async Task<IServiceProvider> RunSeeders(this IServiceProvider serviceProvider)
     {
-        await serviceProvider.RecreateDatabase();
+        await serviceProvider.ClearDatabase();
         await using AsyncServiceScope scope = serviceProvider.CreateAsyncScope();
         IEnumerable<ISeeder> seeders = scope.ServiceProvider.GetServices<ISeeder>();
 
@@ -19,11 +20,19 @@ public static class SeederExtensions
         return serviceProvider;
     }
 
-    private static async Task RecreateDatabase(this IServiceProvider serviceProvider)
+    private static async Task ClearDatabase(this IServiceProvider serviceProvider)
     {
+        const string sql =
+            """
+            TRUNCATE TABLE
+                department_positions, department_locations,
+                positions, departments, locations,
+                sessions, users
+            RESTART IDENTITY CASCADE
+            """;
+
         await using AsyncServiceScope scope = serviceProvider.CreateAsyncScope();
-        ServiceDbContext dbContext = scope.ServiceProvider.GetRequiredService<ServiceDbContext>();
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.EnsureCreatedAsync();
+        IDbConnection connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
+        await connection.ExecuteAsync(new CommandDefinition(sql));
     }
 }

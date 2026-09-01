@@ -6,9 +6,19 @@ namespace DirectoryService.Core.LocationsContext.ValueObjects.LocationElements;
 public sealed record SubjectLocationElement : LocationElement
 {
     public new const short AoLevel = 1;
+    public const string FederalCityType = "город федерального значения";
 
     private static readonly LocationElementMatcher[] SubjectMatchers =
     [
+        // Город федерального значения
+        new(
+            new SingleLocationRegexMatch(
+                @"^(?:г\.?\s*|город\s+)?(?:москва|санкт-петербург|санкт\sпетербург|севастополь)\.?$"
+            ),
+            FederalCityType,
+            "г.",
+            AoLevel
+        ),
         // Республика
         new(
             new CompositeLocationRegexMatch(
@@ -88,7 +98,7 @@ public sealed record SubjectLocationElement : LocationElement
     private static Error InvalidLocationSubject(string input)
     {
         return Error.ValidationError($"Некорректный субъект в адресе - {input}");
-    }        
+    }
 
     private static SubjectLocationElement Create(
         string name,

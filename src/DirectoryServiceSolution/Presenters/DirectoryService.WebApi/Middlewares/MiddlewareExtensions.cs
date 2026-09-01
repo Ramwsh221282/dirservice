@@ -6,4 +6,9 @@ public static class MiddlewareExtensions
     {
         builder.UseMiddleware<ExceptionHandleMiddleware>();
     }
+
+    public static void UseAuthenticationMiddleware(this IApplicationBuilder builder)
+    {
+        builder.UseMiddleware<AuthenticationMiddleware>();
+    }
 }

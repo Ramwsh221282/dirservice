@@ -21,12 +21,12 @@ public sealed record PositionDescription
             return Error.ValidationError($"Описание должности не должно быть пустым.");
         }
 
-        string formatted = value.MakeFirstLetterCapital();
+        string formatted = value.Trim();
         if (formatted.GreaterThan(MaxLength))
         {
             return Error.ValidationError($"Описание превышает длину {MaxLength} символов.");
         }
 
-        return formatted.LessThan(MinLength) ? Error.ValidationError($"Описание менее {MinLength} символов.") : new PositionDescription(value);
+        return formatted.LessThan(MinLength) ? Error.ValidationError($"Описание менее {MinLength} символов.") : new PositionDescription(formatted);
     }
 }

@@ -1,18 +1,18 @@
 ﻿using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
+using DirectoryService.UseCases.Locations.Contracts;
 using ResultLibrary;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.Seeding;
 
 public sealed class LocationsSeeder : ISeeder
 {
-    private readonly ServiceDbContext _context;
+    private readonly ILocationsRepository _repository;
     private readonly Serilog.ILogger _logger;
 
-    public LocationsSeeder(ServiceDbContext context, Serilog.ILogger logger)
+    public LocationsSeeder(ILocationsRepository repository, Serilog.ILogger logger)
     {
-        _context = context;
+        _repository = repository;
         _logger = logger.ForContext<LocationsSeeder>();
     }
 
@@ -35,7 +35,6 @@ public sealed class LocationsSeeder : ISeeder
     private async Task SeedData()
     {
         List<Location> locationsToSeed = [];
-        LocationNameUniquesnessStub stub = new(_context);
 
         var seedData = new[]
         {
@@ -56,7 +55,6 @@ public sealed class LocationsSeeder : ISeeder
                 Name = "Филиал в Санкт-Петербурге",
                 AddressParts = new[]
                 {
-                    "Московская область",
                     "город Москва",
                     "улица Тверская",
                     "дом 13",
@@ -68,7 +66,6 @@ public sealed class LocationsSeeder : ISeeder
                 Name = "Офис в Екатеринбурге",
                 AddressParts = new[]
                 {
-                    "Ленинградская область",
                     "г. Санкт-Петербург",
                     "проспект Невский",
                     "д. 25",
@@ -245,7 +242,9 @@ public sealed class LocationsSeeder : ISeeder
                 continue;
             }
 
-            LocationNameUniquesness uniquesness = await stub.IsUnique(nameResult);
+            LocationNameUniquesness uniquesness = await _repository.IsLocationNameUnique(
+                nameResult.Value
+            );
             Result<Location> locationResult = Location.CreateNew(
                 nameResult.Value,
                 addressResult.Value,
@@ -272,8 +271,10 @@ public sealed class LocationsSeeder : ISeeder
             return;
         }
 
-        _context.Locations.AddRange(locationsToSeed);
-        await _context.SaveChangesAsync();
+        foreach (Location location in locationsToSeed)
+        {
+            await _repository.AddLocation(location);
+        }
 
         _logger.Information("Successfully seeded {Count} locations.", locationsToSeed.Count);
     }

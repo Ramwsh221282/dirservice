@@ -1,4 +1,3 @@
-using System.Text.Json;
 using DirectoryService.Core.Common.Extensions;
 using DirectoryService.Core.LocationsContext.ValueObjects.LocationElements;
 using ResultLibrary;
@@ -35,7 +34,7 @@ public sealed record LocationAddress
             return Error.ValidationError("Адрес не может содержать более 1 субъекта");
         }
 
-        if (!ContainsAoLevel(parts, MunicipalLocationElement.AoLevel))
+        if (!ContainsAoLevel(parts, MunicipalLocationElement.AoLevel) && !ContainsFederalCity(parts))
         {
             return Error.ValidationError("Адрес не содержит населенный пункт.");
         }
@@ -76,7 +75,7 @@ public sealed record LocationAddress
         if (duplicates.Any())
         {
             string errorMessage = $"""
-                У адреса локации найдены дублирующиеся узлы: 
+                У адреса локации найдены дублирующиеся узлы:
                 {string.Join(", ", duplicates)}
                 """;
 
@@ -94,35 +93,26 @@ public sealed record LocationAddress
         return Create(valid);
     }
 
-    public static LocationAddress FromJson(string json)
+    public static LocationAddress Create(
+        IEnumerable<LocationAddressPart> parts,
+        string fullPath
+    )
     {
-        using JsonDocument document = JsonDocument.Parse(json);
-        List<LocationAddressPart> parts = [];
-        JsonElement partsElement = document.RootElement.GetProperty(nameof(Parts));
-        foreach (JsonElement node in partsElement.EnumerateArray())
-        {
-            string? addressNodeString = node.GetProperty("Node").GetString();
-            if (string.IsNullOrWhiteSpace(addressNodeString))
-            {
-                throw new Exception("Invalid address part from json.");
-            }
-
-            Result<LocationAddressPart> part = LocationAddressPart.Create(addressNodeString);
-            if (part.IsFailure)
-            {
-                throw new Exception("Invalid address part from json.");
-            }
-            
-            parts.Add(part);
-        }
-
-        return new LocationAddress([], string.Empty);
+        return new LocationAddress(parts, fullPath);
     }
 
     private static bool AoLevelRepeated(IEnumerable<LocationAddressPart> parts, short aoLevel)
     {
-        bool repeated = parts.Count(p => p.AoLevel == aoLevel && p.AoLevel > 1) > 1;
+        bool repeated = parts.Count(p => p.AoLevel == aoLevel) > 1;
         return repeated;
+    }
+
+    private static bool ContainsFederalCity(IEnumerable<LocationAddressPart> parts)
+    {
+        return parts.Any(p =>
+            p.AoLevel == SubjectLocationElement.AoLevel
+            && string.Equals(p.Type, SubjectLocationElement.FederalCityType, StringComparison.Ordinal)
+        );
     }
 
     private static bool ContainsAoLevel(IEnumerable<LocationAddressPart> parts, short aoLevel)

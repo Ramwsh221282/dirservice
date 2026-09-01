@@ -16,5 +16,11 @@ public interface ILocationsRepository
     Task<IEnumerable<Location>> GetBySet(LocationsIdSet set, CancellationToken ct = default);
 
     Task<Result<Location>> GetById(Guid id, CancellationToken ct = default);
-    Task<Result<Location>> GetById(LocationId id, CancellationToken ct = default);
+
+    Task Update(Location location, CancellationToken ct = default);
+
+    Task<IEnumerable<Location>> Get(
+        LocationSpecification specification,
+        CancellationToken ct = default
+    );
 }

@@ -50,6 +50,17 @@ public sealed class Position : ISoftDeletable
         LifeCycle = lifeCycle ?? new EntityLifeCycle();
     }
 
+    public static Position Create(
+        PositionId id,
+        PositionName name,
+        PositionDescription description,
+        EntityLifeCycle lifeCycle,
+        IEnumerable<DepartmentPosition> departments
+    )
+    {
+        return new Position(id, name, description, lifeCycle, departments);
+    }
+
     public Result Archive()
     {
         if (Deleted)
@@ -89,7 +100,7 @@ public sealed class Position : ISoftDeletable
         {
             return position.Error;
         }
-        
+
         position.Value._departments.AddRange(departments.Select(d => new DepartmentPosition(d, position)));
         return position;
     }

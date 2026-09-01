@@ -90,7 +90,7 @@ public sealed class Department : ISoftDeletable
         if (reducing.IsFailure)
         {
             return reducing.Error;
-        }        
+        }
 
         LifeCycle = LifeCycle.Update();
         Attachments = detached;
@@ -115,7 +115,7 @@ public sealed class Department : ISoftDeletable
         bool containsChildIdentifier = Path.ContainsIdentifier(department.Identifier);
         bool containsParent = Parent != null && Parent == department.Id;
         return containsChildIdentifier && containsParent;
-    }        
+    }
 
     public Result AddLocations(IEnumerable<Location> locations)
     {
@@ -125,7 +125,7 @@ public sealed class Department : ISoftDeletable
         }
 
         Location[] duplicates = [.. locations.ExtractDuplicates(l => l.Id)];
-        
+
         if (duplicates.Length > 0)
         {
             string[] duplicateIdentifiers = [.. duplicates.Select(l => l.Id.Value.ToString())];
@@ -148,7 +148,8 @@ public sealed class Department : ISoftDeletable
             return Error.ConflictError("Нельзя архивировать уже архивированную запись.");
         }
 
-        Path = Path.PathOfArchived();        
+        Path = Path.PathOfArchived();
+        ChildrensCount = new DepartmentChildrensCount();
         LifeCycle = LifeCycle.Delete();
         return Result.Success();
     }
@@ -242,10 +243,11 @@ public sealed class Department : ISoftDeletable
         DepartmentDepth depth,
         DepartmentChildAttachmentsHistory attachments,
         DepartmentChildrensCount childrensCount,
-        EntityLifeCycle lifeCycle
+        EntityLifeCycle lifeCycle,
+        IEnumerable<Location>? locations = null
     )
-    {        
-        return new Department(
+    {
+        Department department = new(
             id,
             identifier,
             lifeCycle,
@@ -258,6 +260,15 @@ public sealed class Department : ISoftDeletable
             [],
             parentId == null ? null : DepartmentId.Create(parentId.Value).Value
         );
+
+        if (locations != null)
+        {
+            department._locations.AddRange(
+                locations.Select(l => new DepartmentLocation(department, l))
+            );
+        }
+
+        return department;
     }
 
     public static Department CreateNew(
@@ -281,7 +292,7 @@ public sealed class Department : ISoftDeletable
             depth,
             childrensCount
         );
-        
+
         department._locations.AddRange(locations.Select(l => new DepartmentLocation(department, l)));
         return department;
     }
@@ -293,7 +304,7 @@ public sealed class Department : ISoftDeletable
         DepartmentDepth depth = new();
         EntityLifeCycle lifeCycle = new();
         DepartmentChildrensCount childrensCount = new();
-        
+
         return new Department(id, identifier, lifeCycle, name, path, depth, childrensCount, null);
     }
 }

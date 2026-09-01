@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/.zed/
+**/.idea/
+**/node_modules/
+**/.git/
+**/.env
+**/*.user

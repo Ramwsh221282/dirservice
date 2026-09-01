@@ -22,18 +22,20 @@ public sealed record LocationName
             return Error.ValidationError(message);
         }
 
-        if (value.GreaterThan(MaxLength))
+        string formatted = value.Trim();
+
+        if (formatted.GreaterThan(MaxLength))
         {
             string message = $"Наименование превышает длину {MaxLength} символов.";
             return Error.ValidationError(message);
         }
 
-        if (value.LessThan(MinLength))
+        if (formatted.LessThan(MinLength))
         {
             string message = $"Наименование менее длины {MinLength} символов.";
             return Error.ValidationError(message);
         }
 
-        return new LocationName(value);
+        return new LocationName(formatted);
     }
 }

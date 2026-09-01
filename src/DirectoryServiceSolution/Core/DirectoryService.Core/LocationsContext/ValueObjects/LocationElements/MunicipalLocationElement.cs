@@ -14,10 +14,7 @@ public sealed record MunicipalLocationElement : LocationElement
             new CompositeLocationRegexMatch(
                 new SingleLocationRegexMatch(@"\bгород\s+[а-яё]+(?:\s+[а-яё]+)*\b"),
                 new SingleLocationRegexMatch(@"\bг\s*\.\s*[а-яё]+(?:\s+[а-яё]+)*\b"),
-                new SingleLocationRegexMatch(@"\bг\s+[а-яё]+(?:\s+[а-яё]+)*\b"),
-                new SingleLocationRegexMatch(
-                    @"^(?:г\.?\s*)?(?<name>москва|санкт-петербург|севастополь|санкт петербург)\.?$"
-                )
+                new SingleLocationRegexMatch(@"\bг\s+[а-яё]+(?:\s+[а-яё]+)*\b")
             ),
             "город",
             "г.",
@@ -123,7 +120,7 @@ public sealed record MunicipalLocationElement : LocationElement
     private static Error InvalidLocationSubject(string input)
     {
         return Error.ValidationError($"Некорректный субъект в адресе - {input}");
-    }        
+    }
 
     private static MunicipalLocationElement Create(
         string name,

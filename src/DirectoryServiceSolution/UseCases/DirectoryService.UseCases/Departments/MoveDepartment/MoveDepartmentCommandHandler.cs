@@ -3,7 +3,6 @@ using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Extensions;
 using DirectoryService.UseCases.Common.Transaction;
-using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using FluentValidation;
 using FluentValidation.Results;
@@ -16,21 +15,18 @@ public sealed class MoveDepartmentCommandHandler : ICommandHandler<Guid, MoveDep
 {
     private readonly ITransactionSource _transactions;
     private readonly IDepartmentsRepository _departments;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<MoveDepartmentCommand> _validator;
     private readonly ILogger _logger;
 
     public MoveDepartmentCommandHandler(
         ITransactionSource transactions,
         IDepartmentsRepository departments,
-        IUnitOfWork unitOfWork,
         IValidator<MoveDepartmentCommand> validator,
         ILogger logger
     )
     {
         _transactions = transactions;
         _departments = departments;
-        _unitOfWork = unitOfWork;
         _validator = validator;
         _logger = logger;
     }
@@ -81,12 +77,10 @@ public sealed class MoveDepartmentCommandHandler : ICommandHandler<Guid, MoveDep
             return _logger.ReturnLogged<Guid>(moving.Error);
         }
 
-        // сохранение изменений после логики домена для change tracker
-        Result saving = await _unitOfWork.SaveChanges(ct);
-        if (saving.IsFailure)
-        {
-            return _logger.ReturnLogged<Guid>(saving.Error);
-        }
+        // сохранение изменений участников движения: старый родитель, новый родитель и само подразделение.
+        await _departments.Update(oldAncestor.Value, ct);
+        await _departments.Update(movement.Value.MovingTo, ct);
+        await _departments.Update(movement.Value.Movable, ct);
 
         // обновление пути у дочерних подразделений движимого подразделения.
         await _departments.RefreshDepartmentChildPaths(movement.Value.Movable, path, ct);

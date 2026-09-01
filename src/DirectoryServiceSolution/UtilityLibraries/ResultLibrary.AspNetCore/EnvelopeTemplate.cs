@@ -29,7 +29,7 @@ public record EnvelopeTemplate
             ErrorsCollection col => FromErrorsCollection(col, methodName),
             _ => FromSingleResult(result, methodName),
         };
-    }        
+    }
 
     private static EnvelopeTemplate FromSingleResult(Result result, string methodName)
     {
@@ -42,7 +42,7 @@ public record EnvelopeTemplate
     private static EnvelopeTemplate FromSingleResult<T>(Result<T> result, string methodName)
     {
         return FromResult(result, methodName);
-    }        
+    }
 
     private static EnvelopeTemplate FromErrorsCollection(ErrorsCollection errors, string methodName)
     {
@@ -64,10 +64,11 @@ public record EnvelopeTemplate
             ConflictErrorType => HttpStatusCode.Conflict,
             ExceptionalErrorType => HttpStatusCode.InternalServerError,
             NotFoundErrorType => HttpStatusCode.NotFound,
+            UnauthorizedErrorType => HttpStatusCode.Unauthorized,
             ValidationErrorType => HttpStatusCode.BadRequest,
             _ => HttpStatusCode.OK,
         };
-    }        
+    }
 }
 
 public sealed record EnvelopeTemplate<T> : EnvelopeTemplate
@@ -87,13 +88,13 @@ public sealed record EnvelopeTemplate<T> : EnvelopeTemplate
     }
 
     private EnvelopeTemplate(EnvelopeTemplate template)
-        : base(template) { }    
+        : base(template) { }
 
     public static EnvelopeTemplate<T> FromResult(Result<T> result, string methodName)
     {
         EnvelopeTemplate template = EnvelopeTemplate.FromResult(result, methodName);
         return result.IsFailure
-            ? new EnvelopeTemplate<T>(template) 
+            ? new EnvelopeTemplate<T>(template)
             : new EnvelopeTemplate<T>(result.Value, template.MethodName, template.Errors, template.TimeGenerated, template.OperationStatus);
     }
 }

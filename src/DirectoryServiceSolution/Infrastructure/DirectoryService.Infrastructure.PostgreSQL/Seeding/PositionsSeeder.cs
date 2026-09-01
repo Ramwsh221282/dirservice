@@ -1,41 +1,50 @@
 ﻿using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.PositionsContext;
 using DirectoryService.Core.PositionsContext.ValueObjects;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using DirectoryService.UseCases.Common.Transaction;
+using DirectoryService.UseCases.Departments.Contracts;
+using DirectoryService.UseCases.Positions.Contracts;
 using ResultLibrary;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.Seeding;
 
 public sealed class PositionsSeeder : ISeeder
 {
-    private readonly ServiceDbContext _context;
+    private readonly IPositionsRepository _positionsRepository;
+    private readonly IDepartmentsRepository _departmentsRepository;
+    private readonly IDepartmentPositionsRepository _departmentPositionsRepository;
+    private readonly ITransactionSource _transactionSource;
     private readonly Serilog.ILogger _logger;
     private readonly Random _random = new();
-    private readonly PositionUniquesnessStub _uniquesnessStub;
 
-    public PositionsSeeder(ServiceDbContext context, Serilog.ILogger logger)
+    public PositionsSeeder(
+        IPositionsRepository positionsRepository,
+        IDepartmentsRepository departmentsRepository,
+        IDepartmentPositionsRepository departmentPositionsRepository,
+        ITransactionSource transactionSource,
+        Serilog.ILogger logger)
     {
-        _context = context;
+        _positionsRepository = positionsRepository;
+        _departmentsRepository = departmentsRepository;
+        _departmentPositionsRepository = departmentPositionsRepository;
+        _transactionSource = transactionSource;
         _logger = logger;
-        _uniquesnessStub = new PositionUniquesnessStub(context);
     }
 
     public async Task SeedAsync()
     {
         _logger.Information("Seeding positions...");
-        IDbContextTransaction txn = await _context.Database.BeginTransactionAsync();
+        await using ITransactionScope transaction = await _transactionSource.ReceiveTransaction();
 
         try
         {
             await SeedData();
-            await txn.CommitAsync();
+            await transaction.CommitChanges(nameof(PositionsSeeder));
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "Positions seeding exception");
-            await txn.RollbackAsync();
         }
 
         _logger.Information("Positions seeding complete");
@@ -43,7 +52,8 @@ public sealed class PositionsSeeder : ISeeder
 
     private async Task SeedData()
     {
-        List<Department> allDepartments = await _context.Departments.ToListAsync();
+        List<Department> allDepartments =
+            [.. await _departmentsRepository.Get(new DepartmentSpecification())];
 
         if (allDepartments.Count == 0)
         {
@@ -129,7 +139,9 @@ public sealed class PositionsSeeder : ISeeder
                 continue;
             }
 
-            PositionNameUniquesness uniquesness = await _uniquesnessStub.IsUnique(nameResult);
+            PositionNameUniquesness uniquesness = await _positionsRepository.IsUnique(
+                nameResult.Value
+            );
 
             // Выбираем случайные подразделения: от 1 до 3
             int deptCount = _random.Next(1, Math.Min(4, allDepartments.Count + 1));
@@ -164,8 +176,15 @@ public sealed class PositionsSeeder : ISeeder
             return;
         }
 
-        _context.Positions.AddRange(positionsToSeed);
-        await _context.SaveChangesAsync();
+        foreach (Position position in positionsToSeed)
+        {
+            await _positionsRepository.Add(position);
+
+            foreach (DepartmentPosition departmentPosition in position.Departments)
+            {
+                await _departmentPositionsRepository.Add(departmentPosition);
+            }
+        }
 
         _logger.Information("Successfully seeded {Count} positions.", positionsToSeed.Count);
     }

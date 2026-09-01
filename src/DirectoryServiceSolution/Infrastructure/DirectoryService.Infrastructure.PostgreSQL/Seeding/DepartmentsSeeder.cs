@@ -1,41 +1,50 @@
 ﻿using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.DeparmentsContext.ValueObjects;
 using DirectoryService.Core.LocationsContext;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using DirectoryService.UseCases.Common.Transaction;
+using DirectoryService.UseCases.Departments.Contracts;
+using DirectoryService.UseCases.Locations.Contracts;
 using ResultLibrary;
 
 namespace DirectoryService.Infrastructure.PostgreSQL.Seeding;
 
 public sealed class DepartmentsSeeder : ISeeder
 {
-    private readonly ServiceDbContext _dbContext;
+    private readonly IDepartmentsRepository _departmentsRepository;
+    private readonly IDepartmentLocationsRepository _departmentLocationsRepository;
+    private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionSource _transactionSource;
     private readonly Serilog.ILogger _logger;
     private readonly Random _random = new();
-    private readonly DepartmentNameUniquesnessStub _nameUniquesnessStub;
 
-    public DepartmentsSeeder(ServiceDbContext dbContext, Serilog.ILogger logger)
+    public DepartmentsSeeder(
+        IDepartmentsRepository departmentsRepository,
+        IDepartmentLocationsRepository departmentLocationsRepository,
+        ILocationsRepository locationsRepository,
+        ITransactionSource transactionSource,
+        Serilog.ILogger logger)
     {
-        _dbContext = dbContext;
+        _departmentsRepository = departmentsRepository;
+        _departmentLocationsRepository = departmentLocationsRepository;
+        _locationsRepository = locationsRepository;
+        _transactionSource = transactionSource;
         _logger = logger;
-        _nameUniquesnessStub = new DepartmentNameUniquesnessStub(dbContext);
     }
 
     public async Task SeedAsync()
     {
         _logger.Information("Seeding departments...");
-        IDbContextTransaction txn = await _dbContext.Database.BeginTransactionAsync();
+        await using ITransactionScope transaction = await _transactionSource.ReceiveTransaction();
 
         try
         {
             await SeedData();
-            await txn.CommitAsync();
+            await transaction.CommitChanges(nameof(DepartmentsSeeder));
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "An error occurred seeding departments.");
-            await txn.RollbackAsync();
         }
 
         _logger.Information("Departments seeded.");
@@ -43,7 +52,8 @@ public sealed class DepartmentsSeeder : ISeeder
 
     private async Task SeedData()
     {
-        List<Location> locations = await _dbContext.Locations.ToListAsync();
+        List<Location> locations =
+            [.. await _locationsRepository.Get(new LocationSpecification())];
 
         List<Department> departments = [];
 
@@ -606,7 +616,7 @@ public sealed class DepartmentsSeeder : ISeeder
                 continue;
             }
 
-            if (await _nameUniquesnessStub.HasWithName(nameResult))
+            if (await HasWithName(nameResult.Value))
             {
                 _logger.Warning(
                     "Skipping department '{Name}' due to not unique name",
@@ -833,9 +843,25 @@ public sealed class DepartmentsSeeder : ISeeder
             return;
         }
 
-        _dbContext.Departments.AddRange(departments);
-        await _dbContext.SaveChangesAsync();
+        foreach (Department department in departments)
+        {
+            await _departmentsRepository.Add(department);
+
+            foreach (DepartmentLocation departmentLocation in department.Locations)
+            {
+                await _departmentLocationsRepository.Add(departmentLocation);
+            }
+        }
 
         _logger.Information("Successfully seeded {Count} departments.", departments.Count);
+    }
+
+    private async Task<bool> HasWithName(DepartmentName name)
+    {
+        IEnumerable<Department> found = await _departmentsRepository.Get(
+            new DepartmentSpecification().WithName(name.Value)
+        );
+
+        return found.Any();
     }
 }

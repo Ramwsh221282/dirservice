@@ -12,6 +12,7 @@
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.9" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Npgsql" Version="9.0.4" />
     <PackageReference Include="Testcontainers" Version="4.7.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.7.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
@@ -24,6 +25,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DirectoryService.WebApi\DirectoryService.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\migrations\db\migrations\*.sql" Link="migrations\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\DirectoryService.WebApi\.env" Link=".env" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

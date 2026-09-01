@@ -30,6 +30,16 @@ public sealed record LocationAddressPart
         Type = type;
     }
 
+    public static LocationAddressPart Create(
+        string name,
+        string shortName,
+        short aoLevel,
+        string type
+    )
+    {
+        return new LocationAddressPart(name, shortName, aoLevel, type);
+    }
+
     public static Result<LocationAddressPart> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

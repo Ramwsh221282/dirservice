@@ -43,6 +43,35 @@ public sealed class SeedConfig
     }
 }
 
+public sealed class CorsConfig
+{
+    public const string AllowedOriginsKey = "CORS_ALLOWED_ORIGINS";
+    public const string PolicyName = "ConfiguredCorsPolicy";
+
+    public IReadOnlyList<string> AllowedOrigins { get; }
+
+    public CorsConfig(IReadOnlyList<string> allowedOrigins)
+    {
+        AllowedOrigins = allowedOrigins;
+    }
+
+    public static CorsConfig FromRawValue(string? rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+        {
+            return new CorsConfig([]);
+        }
+
+        string[] origins = rawValue
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(origin => origin.TrimEnd('/'))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        return new CorsConfig(origins);
+    }
+}
+
 public sealed class ApplicationConfig
 {
     public DatabaseConfig Database { get; }
@@ -52,16 +81,20 @@ public sealed class ApplicationConfig
 
     public IdentityConfig Identity { get; }
 
+    public CorsConfig Cors { get; }
+
     private ApplicationConfig(
         DatabaseConfig database,
         SeqConfig seq,
         SeedConfig seed,
-        IdentityConfig identity)
+        IdentityConfig identity,
+        CorsConfig cors)
     {
         Database = database;
         Seq = seq;
         Seed = seed;
         Identity = identity;
+        Cors = cors;
     }
 
     public static ApplicationConfig CreateFromEnvironment()
@@ -105,11 +138,19 @@ public sealed class ApplicationConfig
         bool useSeed = Environment.GetEnvironmentVariable(SeedConfig.Key)?.ToLower() == "true";
 
         IdentityConfig identity = IdentityConfig.CreateFromEnvironment();
+        CorsConfig cors = CorsConfig.FromRawValue(
+            Environment.GetEnvironmentVariable(CorsConfig.AllowedOriginsKey)
+        );
 
         DatabaseConfig config = new(hostName, port, userName, password, databaseName);
         SeqConfig seq = new(seqHost);
         SeedConfig seed = new(useSeed);
-        return new ApplicationConfig(config, seq, seed, identity);
+        return new ApplicationConfig(config, seq, seed, identity, cors);
+    }
+
+    public static ApplicationConfig CreateForDevelopment(string path)
+    {
+        return File.Exists(path) ? CreateFromEnvFile(path) : CreateFromEnvironment();
     }
 
     public static ApplicationConfig CreateFromEnvFile(string path)
@@ -124,7 +165,10 @@ public sealed class ApplicationConfig
         SeqConfig seq = CreateSeqConfiguration(configuration);
         SeedConfig seed = CreateSeedConfiguration(configuration);
         IdentityConfig identity = CreateIdentityConfiguration(configuration);
-        return new ApplicationConfig(database, seq, seed, identity);
+        CorsConfig cors = CorsConfig.FromRawValue(
+            configuration.GetValueOrDefault(CorsConfig.AllowedOriginsKey)
+        );
+        return new ApplicationConfig(database, seq, seed, identity, cors);
     }
 
     private static SeedConfig CreateSeedConfiguration(Dictionary<string, string> configuration)
@@ -140,24 +184,13 @@ public sealed class ApplicationConfig
             throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.JwtHashKeyKey));
         }
 
-        if (!configuration.ContainsKey(IdentityConfig.IdentityDbConnectionStringKey))
-        {
-            throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.IdentityDbConnectionStringKey));
-        }
-
         string jwtHashkey = configuration[IdentityConfig.JwtHashKeyKey];
         if (string.IsNullOrWhiteSpace(jwtHashkey))
         {
             throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.JwtHashKeyKey));
         }
 
-        string identityDbConnectionString = configuration[IdentityConfig.IdentityDbConnectionStringKey];
-        if (string.IsNullOrWhiteSpace(identityDbConnectionString))
-        {
-            throw new ApplicationException(string.Format("{0} is not specified in .env file", IdentityConfig.IdentityDbConnectionStringKey));
-        }
-
-        return new IdentityConfig(jwtHashkey, identityDbConnectionString);
+        return new IdentityConfig(jwtHashkey);
     }
 
     private static SeqConfig CreateSeqConfiguration(Dictionary<string, string> configuration)

@@ -1,14 +1,13 @@
-﻿using System.Reflection;
+﻿using System.Data;
+using System.Reflection;
 using DirectoryService.Infrastructure.PostgreSQL.Database;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Departments;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Locations;
-using DirectoryService.Infrastructure.PostgreSQL.EntityFramework.Repositories.Positions;
+using DirectoryService.Infrastructure.PostgreSQL.Database.Repositories.Departments;
+using DirectoryService.Infrastructure.PostgreSQL.Database.Repositories.Locations;
+using DirectoryService.Infrastructure.PostgreSQL.Database.Repositories.Positions;
 using DirectoryService.Infrastructure.PostgreSQL.Options;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Database;
 using DirectoryService.UseCases.Common.Transaction;
-using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
 using DirectoryService.UseCases.Positions.Contracts;
@@ -37,10 +36,13 @@ public static class DependencyInjectionExtensions
         NpgSqlConnectionOptions options = new() { ConnectionString = connectionString };
         builder.Services.AddSingleton<NpgSqlConnectionOptions>(options);
         builder.Services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
+        builder.Services.AddScoped<IDbConnection>(sp =>
+            sp.GetRequiredService<IDbConnectionFactory>().Create().GetAwaiter().GetResult()
+        );
         builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
         builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
-        builder.Services.AddScoped<ServiceDbContext>();
-        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<IDepartmentLocationsRepository, DepartmentLocationsRepository>();
+        builder.Services.AddScoped<IDepartmentPositionsRepository, DepartmentPositionsRepository>();
         builder.Services.AddScoped<ITransactionSource, TransactionSource>();
         builder.Services.AddScoped<IPositionsRepository, PositionsRepository>();
     }

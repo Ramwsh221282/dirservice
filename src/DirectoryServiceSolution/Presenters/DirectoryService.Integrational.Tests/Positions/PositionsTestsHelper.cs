@@ -1,8 +1,10 @@
-﻿using DirectoryService.UseCases.Common.Cqrs;
+﻿using DirectoryService.Core.DeparmentsContext.Entities;
+using DirectoryService.UseCases.Common.Cqrs;
+using DirectoryService.Core.PositionsContext;
+using DirectoryService.UseCases.Departments.Contracts;
+using DirectoryService.UseCases.Positions.Contracts;
 using DirectoryService.UseCases.Positions.CreatePosition;
-using DirectoryService.WebApi;
 using DirectoryService.WebApi.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ResultLibrary;
 
@@ -17,10 +19,6 @@ public sealed class PositionsTestsHelper
         _services = factory.Services;
     }
 
-    public PositionsTestsHelper(WebApplicationFactory<Program> factory)
-    {
-        _services = factory.Services;
-    }
 
     public async Task<Result<Guid>> CreateNewPosition(
         string name,
@@ -34,5 +32,23 @@ public sealed class PositionsTestsHelper
             ICommandHandler<Guid, CreatePositionCommand>
         >();
         return await handler.Handle(command);
+    }
+
+    public async Task<IEnumerable<DepartmentPosition>> GetDepartmentPositions(Guid positionId)
+    {
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
+        IDepartmentPositionsRepository repository =
+            scope.GetService<IDepartmentPositionsRepository>();
+
+        return await repository.Get(
+            new DepartmentPositionSpecification().WithPositionId(positionId)
+        );
+    }
+
+    public async Task<IEnumerable<Position>> GetPositionsByName(string name)
+    {
+        await using AsyncServiceScope scope = _services.CreateAsyncScope();
+        IPositionsRepository repository = scope.GetService<IPositionsRepository>();
+        return await repository.Get(new PositionSpecification().WithName(name));
     }
 }

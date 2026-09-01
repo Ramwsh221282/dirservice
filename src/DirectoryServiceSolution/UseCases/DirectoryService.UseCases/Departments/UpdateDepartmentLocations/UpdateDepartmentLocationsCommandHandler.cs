@@ -1,10 +1,10 @@
 using DirectoryService.Core.DeparmentsContext;
+using DirectoryService.Core.DeparmentsContext.Entities;
 using DirectoryService.Core.LocationsContext;
 using DirectoryService.Core.LocationsContext.ValueObjects;
 using DirectoryService.UseCases.Common.Cqrs;
 using DirectoryService.UseCases.Common.Extensions;
 using DirectoryService.UseCases.Common.Transaction;
-using DirectoryService.UseCases.Common.UnitOfWork;
 using DirectoryService.UseCases.Departments.Contracts;
 using DirectoryService.UseCases.Locations.Contracts;
 using FluentValidation;
@@ -17,10 +17,10 @@ namespace DirectoryService.UseCases.Departments.UpdateDepartmentLocations;
 public sealed class UpdateDepartmentLocationsCommandHandler
     : ICommandHandler<Guid, UpdateDepartmentLocationsCommand>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly ITransactionSource _transactionSource;
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
+    private readonly IDepartmentLocationsRepository _departmentLocationsRepository;
     private readonly ILogger _logger;
     private readonly IValidator<UpdateDepartmentLocationsCommand> _validator;
 
@@ -28,15 +28,15 @@ public sealed class UpdateDepartmentLocationsCommandHandler
         ITransactionSource transactionSource,
         IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,
+        IDepartmentLocationsRepository departmentLocationsRepository,
         ILogger logger,
-        IUnitOfWork unitOfWork,
         IValidator<UpdateDepartmentLocationsCommand> validator
     )
     {
         _transactionSource = transactionSource;
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
-        _unitOfWork = unitOfWork;
+        _departmentLocationsRepository = departmentLocationsRepository;
         _logger = logger.BindTo<UpdateDepartmentLocationsCommand>();
         _validator = validator;
     }
@@ -74,17 +74,19 @@ public sealed class UpdateDepartmentLocationsCommandHandler
         Result updating = department.Value.UpdateLocations(locations);
         if (updating.IsFailure)
         {
-            return _logger.ReturnLogged<Guid>(department.Error);
+            return _logger.ReturnLogged<Guid>(updating.Error);
         }
 
-        Result saving = await _unitOfWork.SaveChanges(ct);
-        if (saving.IsFailure)
+        await _departmentsRepository.Update(department.Value, ct);
+        await _departmentLocationsRepository.DeleteByDepartmentId(command.DepartmentId, ct);
+
+        foreach (DepartmentLocation departmentLocation in department.Value.Locations)
         {
-            return _logger.ReturnLogged<Guid>(department.Error);
+            await _departmentLocationsRepository.Add(departmentLocation, ct);
         }
 
         Result committing = await transaction.CommitChanges(nameof(UpdateDepartmentLocationsCommand), ct);
-        
+
         return committing.IsFailure
             ? _logger.ReturnLogged<Guid>(committing.Error)
             : department.Value.Id.Value;

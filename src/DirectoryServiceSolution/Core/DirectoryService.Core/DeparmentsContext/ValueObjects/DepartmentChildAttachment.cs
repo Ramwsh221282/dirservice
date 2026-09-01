@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using ResultLibrary;
+﻿using ResultLibrary;
 
 namespace DirectoryService.Core.DeparmentsContext.ValueObjects;
 
@@ -23,20 +22,5 @@ public sealed record DepartmentChildAttachment(DepartmentId Id, DateTime Attache
         }
 
         return new DepartmentChildAttachment(departmentId, attachedAt);
-    }
-
-    public static DepartmentChildAttachment FromJson(JsonElement json)
-    {
-        try
-        {
-            Guid id = json.GetProperty(nameof(Id)).GetProperty("Value").GetGuid();
-            DateTime attachedAt = json.GetProperty(nameof(AttachedAt)).GetDateTime();
-            return Create(id, attachedAt);
-        }
-        catch (JsonException)
-        {
-            string message = $"Некорректный маппинг из JSON в {nameof(DepartmentChildAttachment)}.";
-            throw new ApplicationException(message);
-        }
     }
 }
